@@ -2,8 +2,7 @@
 
 Argument directives can be applied to a [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition).
 
-As arguments may be contained within a list in the schema definition, you must specify
-what your argument should apply to in addition to its function.
+As arguments may be contained within a list in the schema definition, you must specify what your argument should apply to in addition to its function.
 
 - If it applies to the individual items within the list,
   implement the [`\Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
@@ -14,13 +13,11 @@ You must implement exactly one of those two interfaces in order for an argument 
 
 ## ArgValidationDirective
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgValidationDirective.php)
-may be used to return custom rules and messages to use for validation of an argument.
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgValidationDirective.php) may be used to return custom rules and messages to use for validation of an argument.
 
 ## ArgTransformerDirective
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
-takes an incoming value an returns a new value.
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php) takes an incoming value an returns a new value.
 
 Let's take a look at the built-in `@trim` directive.
 
@@ -56,8 +53,7 @@ class TrimDirective implements ArgTransformerDirective
 }
 ```
 
-The `transform` method takes an argument which represents the actual incoming value that is given
-to an argument in a query and is expected to transform the value and return it.
+The `transform` method takes an argument which represents the actual incoming value that is given to an argument in a query and is expected to transform the value and return it.
 
 For example, if we have the following schema.
 
@@ -106,9 +102,7 @@ In the given example, Lighthouse will take the value of the `password` argument 
 
 ## ArgBuilderDirective
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php)
-directive allows using arguments passed by the client to dynamically
-modify the database query that Lighthouse creates for a field.
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php) directive allows using arguments passed by the client to dynamically modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use the defined filters for resolving the query:
 
@@ -126,8 +120,7 @@ type User {
 }
 ```
 
-Passing the `category` argument will select only the user's posts
-where the `category` column is equal to the value of the `category` argument.
+Passing the `category` argument will select only the user's posts where the `category` column is equal to the value of the `category` argument.
 
 So let's take a look at the built-in `@eq` directive.
 
@@ -175,8 +168,7 @@ The `handleBuilder` method takes two arguments:
 - `$value`
   The value of the argument value that the `@eq` was applied on to.
 
-If you want to use a more complex value for manipulating a query,
-you can build a `ArgBuilderDirective` to work with lists or nested input objects.
+If you want to use a more complex value for manipulating a query, you can build a `ArgBuilderDirective` to work with lists or nested input objects.
 Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is one example of this.
 
 ```graphql
@@ -188,5 +180,4 @@ type Query {
 
 ## ArgManipulator
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)
-directive can be used to manipulate the schema AST.
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php) directive can be used to manipulate the schema AST.

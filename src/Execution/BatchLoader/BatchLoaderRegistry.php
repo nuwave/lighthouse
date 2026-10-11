@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\BatchLoader;
 
@@ -11,7 +11,7 @@ abstract class BatchLoaderRegistry
      *
      * @var array<string, object>
      */
-    protected static $instances = [];
+    protected static array $instances = [];
 
     /**
      * Return an instance of a BatchLoader for a specific field.
@@ -28,19 +28,15 @@ abstract class BatchLoaderRegistry
         // The path to the field serves as the unique key for the instance
         $instanceKey = FieldPath::withoutLists($pathToField);
 
-        if (! isset(self::$instances[$instanceKey])) {
-            return self::$instances[$instanceKey] = $makeInstance();
-        }
-
         // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry::instance() should return TBatchLoader of object but returns object.
-        return self::$instances[$instanceKey];
+        return self::$instances[$instanceKey] ??= $makeInstance();
     }
 
     /**
      * Remove all stored BatchLoaders.
      *
-     * This is called after Lighthouse has resolved a query, so multiple
-     * queries can be handled in a single request/session.
+     * This is called after Lighthouse has resolved a query.
+     * It allows handling multiple queries in a single request/session.
      */
     public static function forgetInstances(): void
     {

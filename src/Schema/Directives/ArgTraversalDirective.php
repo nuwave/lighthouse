@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -22,12 +22,12 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
     {
         foreach ($argumentSet->arguments as $argument) {
             $directivesForArray = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirectiveForArray::class)
+                Utils::instanceofMatcher(ArgDirectiveForArray::class),
             );
             $argument->value = $this->transform($argument->value, $directivesForArray);
 
             $directivesForArgument = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirective::class)
+                Utils::instanceofMatcher(ArgDirective::class),
             );
 
             $argument->value = Utils::mapEach(
@@ -40,7 +40,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
                     return $this->transform($value, $directivesForArgument);
                 },
-                $argument->value
+                $argument->value,
             );
         }
 
@@ -49,10 +49,11 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     /**
      * @param  mixed  $value  The client given value
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directivesForArgument
      *
      * @return mixed The transformed value
      */
-    protected function transform($value, Collection $directivesForArgument)
+    protected function transform(mixed $value, Collection $directivesForArgument): mixed
     {
         foreach ($directivesForArgument as $directive) {
             $value = $this->applyDirective($directive, $value);
@@ -66,5 +67,5 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
      *
      * @return mixed The transformed value
      */
-    abstract protected function applyDirective(Directive $directive, $value);
+    abstract protected function applyDirective(Directive $directive, mixed $value): mixed;
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -40,7 +40,7 @@ directive @withCount(
 GRAPHQL;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         if (RootType::isRootType($parentType->name->value)) {
             throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");
@@ -61,7 +61,7 @@ GRAPHQL;
     {
         return new CountModelsLoader(
             $this->relation(),
-            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
+            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo),
         );
     }
 }

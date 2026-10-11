@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,7 +9,7 @@ final class CreateTestbenchWithEnumsTable extends Migration
     public function up(): void
     {
         Schema::create('with_enums', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('name')->nullable();
             $table->enum('type', ['A', 'B'])->nullable();
         });

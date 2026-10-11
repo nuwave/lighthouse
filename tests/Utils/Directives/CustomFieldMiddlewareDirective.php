@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Directives;
 
@@ -11,12 +11,12 @@ final class CustomFieldMiddlewareDirective extends BaseDirective implements Fiel
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-directive @customFieldMiddleware on FIELD_DEFINITION
-GRAPHQL;
+        directive @customFieldMiddleware on FIELD_DEFINITION
+        GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (): callable => fn ($root, array $args): array => $args);
+        $fieldValue->wrapResolver(static fn (): callable => static fn (mixed $root, array $args): array => $args);
     }
 }

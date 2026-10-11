@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,10 +10,9 @@ final class CreateTestbenchTagsTable extends Migration
     public function up(): void
     {
         Schema::create('tags', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('name');
             $table->string('default_string')->default(Constants::TAGS_DEFAULT_STRING);
-
             $table->timestamps();
         });
     }

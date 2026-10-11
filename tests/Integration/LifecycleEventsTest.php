@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\EndExecution;
@@ -26,8 +25,8 @@ final class LifecycleEventsTest extends TestCase
         /** @var array<int, object> $events */
         $events = [];
 
-        $eventsDispatcher->listen('*', function (string $name, array $payload) use (&$events) {
-            if (Str::startsWith($name, 'Nuwave\\Lighthouse')) {
+        $eventsDispatcher->listen('*', static function (string $name, array $payload) use (&$events): void {
+            if (str_starts_with($name, 'Nuwave\\Lighthouse')) {
                 // We only fire class-based events, so the payload
                 // always holds exactly a single class instance.
                 $events[] = $payload[0];
@@ -36,17 +35,17 @@ final class LifecycleEventsTest extends TestCase
 
         $this->mockResolver();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
            foo: Int @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
 
         [
             $startRequest,

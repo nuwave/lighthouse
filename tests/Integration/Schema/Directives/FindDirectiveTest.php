@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -10,11 +10,11 @@ final class FindDirectiveTest extends DBTestCase
 {
     public function testReturnsSingleUser(): void
     {
-        factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'C']);
+        $this->createUserWithName('A');
+        $userB = $this->createUserWithName('B');
+        $this->createUserWithName('C');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -23,15 +23,15 @@ final class FindDirectiveTest extends DBTestCase
         type Query {
             user(id: ID @eq): User @find(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             user(id:{$userB->id}) {
                 name
             }
         }
-        ")->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'user' => [
                 'name' => 'B',
             ],
@@ -40,10 +40,10 @@ final class FindDirectiveTest extends DBTestCase
 
     public function testDefaultsToFieldTypeIfNoModelIsSupplied(): void
     {
-        $userA = factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'B']);
+        $userA = $this->createUserWithName('A');
+        $this->createUserWithName('B');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -52,26 +52,26 @@ final class FindDirectiveTest extends DBTestCase
         type Query {
             user(id: ID @eq): User @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             user(id:{$userA->id}) {
                 name
             }
         }
-        ")->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'name' => 'A',
         ]);
     }
 
     public function testCannotFetchIfMultipleModelsMatch(): void
     {
-        factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'B']);
+        $this->createUserWithName('A');
+        $this->createUserWithName('A');
+        $this->createUserWithName('B');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -80,26 +80,26 @@ final class FindDirectiveTest extends DBTestCase
         type Query {
             user(name: String @eq): User @find(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(name: "A") {
                 name
             }
         }
-        ')->assertJsonCount(1, 'errors');
+        GRAPHQL)->assertJsonCount(1, 'errors');
     }
 
     public function testUseScopes(): void
     {
-        $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
-        $companyB = factory(Company::class)->create(['name' => 'CompanyB']);
-        $userA = factory(User::class)->create(['name' => 'A', 'company_id' => $companyA->id]);
-        factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
-        factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
+        $companyA = $this->createCompanyWithName('CompanyA');
+        $companyB = $this->createCompanyWithName('CompanyB');
+        $userA = $this->createUserWithNameAndCompany('A', $companyA);
+        $this->createUserWithNameAndCompany('A', $companyB);
+        $this->createUserWithNameAndCompany('B', $companyA);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
         }
@@ -112,16 +112,16 @@ final class FindDirectiveTest extends DBTestCase
         type Query {
             user(name: String @eq, company: String!): User @find(model: "User" scopes: [companyName])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(name: "A" company: "CompanyA") {
                 id
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'id' => $userA->id,
@@ -133,7 +133,7 @@ final class FindDirectiveTest extends DBTestCase
 
     public function testReturnsAnEmptyObjectWhenTheModelIsNotFound(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -142,16 +142,16 @@ final class FindDirectiveTest extends DBTestCase
         type Query {
             user(name: String @eq): User @find(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(name: "A") {
                 id
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'user' => null,
             ],
@@ -161,12 +161,10 @@ final class FindDirectiveTest extends DBTestCase
     public function testReturnsCustomAttributes(): void
     {
         $company = factory(Company::class)->create();
-        $user = factory(User::class)->create([
-            'name' => 'A',
-            'company_id' => $company->id,
-        ]);
+        $this->assertInstanceOf(Company::class, $company);
+        $user = $this->createUserWithNameAndCompany('A', $company);
 
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -176,9 +174,9 @@ final class FindDirectiveTest extends DBTestCase
         type Query {
             user(id: ID @eq): User @find(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             user(id: {$user->id}) {
                 id
@@ -186,7 +184,7 @@ final class FindDirectiveTest extends DBTestCase
                 companyName
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'id' => (string) $user->id,
@@ -195,5 +193,36 @@ final class FindDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    private function createCompanyWithName(string $name): Company
+    {
+        $company = factory(Company::class)->make();
+        $this->assertInstanceOf(Company::class, $company);
+        $company->name = $name;
+        $company->save();
+
+        return $company;
+    }
+
+    private function createUserWithName(string $name): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->save();
+
+        return $user;
+    }
+
+    private function createUserWithNameAndCompany(string $name, Company $company): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->company()->associate($company);
+        $user->save();
+
+        return $user;
     }
 }

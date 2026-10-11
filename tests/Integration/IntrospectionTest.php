@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
@@ -9,12 +9,10 @@ use Tests\Utils\Scalars\Email;
 
 final class IntrospectionTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
+    /** @var TypeRegistry */
     protected $typeRegistry;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,32 +21,32 @@ final class IntrospectionTest extends TestCase
 
     public function testFindsTypesFromSchema(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             bar: Int
         }
-        ';
+        GRAPHQL;
 
         $this->assertNotNull(
-            $this->introspectType('Foo')
+            $this->introspectType('Foo'),
         );
         $this->assertNotNull(
-            $this->introspectType(RootType::QUERY)
+            $this->introspectType(RootType::QUERY),
         );
 
         $this->assertNull(
-            $this->introspectType('Bar')
+            $this->introspectType('Bar'),
         );
     }
 
     public function testFindsManuallyRegisteredTypes(): void
     {
         $this->typeRegistry->register(
-            new Email()
+            new Email(),
         );
 
         $this->assertNotNull(
-            $this->introspectType('Email')
+            $this->introspectType('Email'),
         );
     }
 }

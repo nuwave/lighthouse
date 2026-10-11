@@ -1,7 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -10,8 +13,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
     public const ESCAPE = '\\';
+
     public const PERCENTAGE = '%';
+
     public const UNDERSCORE = '_';
+
     public const PLACEHOLDER = '{}';
 
     public static function definition(): string
@@ -46,12 +52,9 @@ directive @like(
 GRAPHQL;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
-     */
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
@@ -63,15 +66,15 @@ GRAPHQL;
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
             'LIKE',
-            $value
+            $value,
         );
     }
 
-    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         return $this->handleBuilder(
             $builder,
-            $this->directiveArgValue('value')
+            $this->directiveArgValue('value'),
         );
     }
 
@@ -80,7 +83,7 @@ GRAPHQL;
         return str_replace(
             self::PLACEHOLDER,
             $this->escapeWildcards($value),
-            $wildcardsTemplate
+            $wildcardsTemplate,
         );
     }
 
@@ -89,7 +92,7 @@ GRAPHQL;
         return str_replace(
             [self::ESCAPE, self::PERCENTAGE, self::UNDERSCORE],
             [self::ESCAPE . self::ESCAPE, self::ESCAPE . self::PERCENTAGE, self::ESCAPE . self::UNDERSCORE],
-            $value
+            $value,
         );
     }
 }

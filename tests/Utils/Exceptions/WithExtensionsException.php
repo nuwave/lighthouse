@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Exceptions;
 
@@ -10,19 +10,12 @@ use GraphQL\Error\ProvidesExtensions;
  */
 final class WithExtensionsException extends \Exception implements ClientAware, ProvidesExtensions
 {
-    /**
-     * @var ExtensionsContent
-     */
-    protected $extensionsContent;
-
-    /**
-     * @param  ExtensionsContent  $extensionsContent
-     */
-    public function __construct(string $message, array $extensionsContent)
-    {
+    public function __construct(
+        string $message,
+        /** @var ExtensionsContent $extensionsContent */
+        protected array $extensionsContent,
+    ) {
         parent::__construct($message);
-
-        $this->extensionsContent = $extensionsContent;
     }
 
     public function isClientSafe(): bool
@@ -30,9 +23,7 @@ final class WithExtensionsException extends \Exception implements ClientAware, P
         return true;
     }
 
-    /**
-     * @return ExtensionsContent
-     */
+    /** @return ExtensionsContent */
     public function getExtensions(): array
     {
         return $this->extensionsContent;

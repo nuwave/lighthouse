@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution;
 
@@ -15,10 +15,10 @@ final class ValidationErrorHandlerTest extends TestCase
         $handler = new ValidationErrorHandler();
 
         $validationException = LaravelValidationException::withMessages([]);
-        $original = new Error('foo', null, null, [], null, $validationException);
+        $original = new Error(message: 'foo', previous: $validationException);
 
         $error = null;
-        $next = function (Error $e) use (&$error) {
+        $next = static function (Error $e) use (&$error): void {
             $error = $e;
         };
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
@@ -18,10 +18,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User> $users
  */
 final class Company extends Model
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

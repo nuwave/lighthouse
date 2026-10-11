@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Source;
 
@@ -9,15 +9,18 @@ use Tests\TestCase;
 final class SchemaStitcherTest extends TestCase
 {
     public const SCHEMA_PATH = __DIR__ . '/schema/';
+
     public const ROOT_SCHEMA_FILENAME = 'root-schema';
+
     public const ROOT_SCHEMA_PATH = self::SCHEMA_PATH . self::ROOT_SCHEMA_FILENAME;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        // @phpstan-ignore-next-line using the Safe variant crashes PHPStan (uses the short `-p` because `--parent` is not available on macOS)
-        exec('mkdir -p ' . self::SCHEMA_PATH);
+        // uses the short `-p` because `--parent` is not available on macOS
+        // @phpstan-ignore-next-line using the Safe variant crashes PHPStan
+        exec('mkdir --parents ' . self::SCHEMA_PATH);
     }
 
     protected function tearDown(): void
@@ -28,13 +31,13 @@ final class SchemaStitcherTest extends TestCase
         parent::tearDown();
     }
 
-    protected function assertSchemaResultIsSame(string $expected): void
+    private function assertSchemaResultIsSame(string $expected): void
     {
         $schema = (new SchemaStitcher(self::ROOT_SCHEMA_PATH))->getSchemaString();
         $this->assertSame($expected, $schema);
     }
 
-    protected function putRootSchema(string $schema): void
+    private function putRootSchema(string $schema): void
     {
         \Safe\file_put_contents(self::ROOT_SCHEMA_PATH, $schema);
     }

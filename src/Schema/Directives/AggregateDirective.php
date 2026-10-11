@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -28,8 +29,6 @@ class AggregateDirective extends BaseDirective implements FieldResolver, FieldMa
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Returns an aggregate of a column in a given relationship or model.
-
-Requires Laravel 8+.
 """
 directive @aggregate(
   """
@@ -99,7 +98,7 @@ GRAPHQL;
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                 $builder = $this->namespaceModelClass($modelArg)::query();
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($builder);
@@ -110,20 +109,17 @@ GRAPHQL;
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
-                    array_merge(
-                        $this->qualifyPath($args, $resolveInfo),
-                        [$this->function(), $this->column()]
-                    ),
+                    [...$this->qualifyPath($args, $resolveInfo), $this->function(), $this->column()],
                     fn (): RelationBatchLoader => new RelationBatchLoader(
                         new AggregateModelsLoader(
                             $this->relation(),
                             $this->column(),
                             $this->function(),
-                            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
-                        )
-                    )
+                            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo),
+                        ),
+                    ),
                 );
 
                 return $relationBatchLoader->load($parent);
@@ -132,7 +128,7 @@ GRAPHQL;
 
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                 $query = $this->namespaceModelClass($modelArg)::query();
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
@@ -144,17 +140,17 @@ GRAPHQL;
         if ($this->directiveHasArgument('builder')) {
             $builderResolver = $this->getResolverFromArgument('builder');
 
-            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
-                $query = $builderResolver($root, $args, $context, $resolveInfo);
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
+                $builder = $builderResolver($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder,
-                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
+                    $builder instanceof QueryBuilder || $builder instanceof EloquentBuilder,
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder.",
                 );
 
-                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($builder);
 
-                return $query->{$this->function()}($this->column());
+                return $builder->{$this->function()}($this->column());
             };
         }
 
@@ -164,7 +160,7 @@ GRAPHQL;
     protected function function(): string
     {
         return strtolower(
-            $this->directiveArgValue('function')
+            $this->directiveArgValue('function'),
         );
     }
 
@@ -173,7 +169,7 @@ GRAPHQL;
         return $this->directiveArgValue('column');
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $this->validateMutuallyExclusiveArguments(['relation', 'model', 'builder']);
     }

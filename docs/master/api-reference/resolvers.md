@@ -8,10 +8,10 @@ Resolvers are always called with the same 4 arguments:
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
 ```
 
-1. `$rootValue`: The result that was returned from the parent field.
+1. `mixed $root`: The result that was returned from the parent field.
    When resolving a field that sits on one of the root types (`Query`, `Mutation`) this is `null`.
 2. `array $args`: The arguments that were passed into the field.
    For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
@@ -21,6 +21,36 @@ function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolve
    such as the execution state, the field name, path to the field from the root, and more.
 
 The return value of this must fit the return type defined for the corresponding field from the schema.
+
+## Root resolvers
+
+Root resolvers are classes with an `__invoke` method that sit directly in the configured
+`lighthouse.namespaces.queries` or `lighthouse.namespaces.mutations` namespaces.
+Lighthouse calls them with positional arguments `($root, $args, $context, $resolveInfo)` where `$root` is always `null` for root types.
+
+Omitting `$root` causes Lighthouse's positional `null` to bind to `$args`, producing TypeErrors at runtime.
+The canonical signature for a root resolver is:
+
+```php
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class MyQuery
+{
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        // ...
+    }
+}
+```
+
+On PHP 8.2+, you can use the more precise `null` type instead of `mixed`.
+The Rector rule below automatically picks the correct type for your PHP version.
+
+### Rector rule
+
+Lighthouse ships `RootResolverSignatureRector` to automatically fix root resolver signatures.
+See [Automated Code Refactoring with Rector](../testing/rector.md) for setup and full documentation.
 
 ## Complexity function signature
 

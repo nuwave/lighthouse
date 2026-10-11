@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Console;
 
@@ -10,24 +10,23 @@ use Tests\TestCase;
 final class PrintFederationSchemaCommandTest extends TestCase
 {
     protected const SCHEMA_TYPE = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID! @external
-  foo: String!
-}
-
-GRAPHQL;
+    type Foo @key(fields: "id") {
+      id: ID! @external
+      foo: String!
+    }
+    GRAPHQL;
 
     protected const SCHEMA_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: Int!
-}
-GRAPHQL;
+    type Query {
+      foo: Int!
+    }
+    GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [FederationServiceProvider::class]
+            [FederationServiceProvider::class],
         );
     }
 
@@ -38,8 +37,11 @@ GRAPHQL;
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--federation' => true]);
 
-        $this->assertStringContainsString(self::SCHEMA_TYPE, $tester->getDisplay());
-        $this->assertStringContainsString(self::SCHEMA_QUERY, $tester->getDisplay());
+        $sdl = $tester->getDisplay();
+
+        $this->assertStringContainsString(self::SCHEMA_TYPE, $sdl);
+        $this->assertStringContainsString(self::SCHEMA_QUERY, $sdl);
+        $this->assertStringNotContainsString('extend schema', $sdl);
     }
 
     public function testWritesSchema(): void

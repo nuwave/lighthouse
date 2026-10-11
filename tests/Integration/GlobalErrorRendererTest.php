@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
@@ -11,6 +11,7 @@ use Tests\Utils\Exceptions\WithExtensionsException;
 final class GlobalErrorRendererTest extends TestCase
 {
     public const MESSAGE = 'foo';
+
     public const EXTENSIONS_CONTENT = ['bar' => 'baz'];
 
     protected function getEnvironmentSetUp($app): void
@@ -19,9 +20,7 @@ final class GlobalErrorRendererTest extends TestCase
 
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.route.middleware', [
-            function () {
-                throw new WithExtensionsException(self::MESSAGE, self::EXTENSIONS_CONTENT);
-            },
+            static fn () => throw new WithExtensionsException(self::MESSAGE, self::EXTENSIONS_CONTENT),
         ]);
     }
 
@@ -32,17 +31,17 @@ final class GlobalErrorRendererTest extends TestCase
 
     public function testCatchesErrorWithExtensions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'errors' => [
                 [
                     'message' => self::MESSAGE,

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Pagination;
 
@@ -8,7 +8,18 @@ use Illuminate\Contracts\Pagination\Paginator;
 class PaginatorField
 {
     /**
-     * @return array<string, mixed>
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<*, *>  $paginator
+     *
+     * @return array{
+     *     count: int,
+     *     currentPage: int,
+     *     firstItem: int|null,
+     *     hasMorePages: bool,
+     *     lastItem: int|null,
+     *     lastPage: int,
+     *     perPage: int,
+     *     total: int,
+     * }
      */
     public function paginatorInfoResolver(LengthAwarePaginator $paginator): array
     {
@@ -25,10 +36,15 @@ class PaginatorField
     }
 
     /**
-     * @return array<mixed>
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  \Illuminate\Contracts\Pagination\Paginator<TKey, TValue>  $paginator
+     *
+     * @return array<TKey, TValue>
      */
     public function dataResolver(Paginator $paginator): array
     {
-        return $paginator->items();
+        return $paginator->items(); // @phpstan-ignore return.type (mismatch when Paginator has only 1 generic type)
     }
 }

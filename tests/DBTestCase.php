@@ -1,25 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\DB;
+use Mattiasgeniar\PhpunitQueryCountAssertions\AssertsQueryCounts;
 
 abstract class DBTestCase extends TestCase
 {
     use AssertsQueryCounts;
 
     public const DEFAULT_CONNECTION = 'mysql';
+
     public const ALTERNATE_CONNECTION = 'alternate';
 
-    /**
-     * Indicates if migrations ran.
-     *
-     * @var bool
-     */
-    protected static $migrated = false;
+    /** Indicates if migrations ran. */
+    protected static bool $migrated = false;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,9 +51,7 @@ abstract class DBTestCase extends TestCase
         $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $this->mysqlOptions());
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     protected function mysqlOptions(): array
     {
         return [
@@ -67,5 +63,12 @@ abstract class DBTestCase extends TestCase
             'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
             'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
         ];
+    }
+
+    protected function countQueries(?int &$count): void
+    {
+        DB::listen(static function () use (&$count): void {
+            ++$count;
+        });
     }
 }

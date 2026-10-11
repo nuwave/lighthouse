@@ -1,6 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
+
+use GraphQL\Executor\ExecutionResult;
 
 /**
  * Fires after a query was resolved.
@@ -10,4 +12,10 @@ namespace Nuwave\Lighthouse\Events;
  */
 class BuildExtensionsResponse
 {
+    public function __construct(
+        /** The result of resolving a single operation. */
+        public ExecutionResult $result,
+        /** The calculated query complexity score of the operation, only available if the validation rule is enabled. */
+        public ?int $queryComplexity,
+    ) {}
 }

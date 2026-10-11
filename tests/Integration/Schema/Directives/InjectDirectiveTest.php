@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -12,7 +12,7 @@ final class InjectDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -30,9 +30,9 @@ final class InjectDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -44,7 +44,7 @@ final class InjectDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTask' => [
                     'id' => '1',

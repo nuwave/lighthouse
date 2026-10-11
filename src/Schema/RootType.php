@@ -1,11 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema;
 
 class RootType
 {
     public const QUERY = 'Query';
+
     public const MUTATION = 'Mutation';
+
     public const SUBSCRIPTION = 'Subscription';
 
     public static function isRootType(string $typeName): bool
@@ -16,24 +18,32 @@ class RootType
                 static::QUERY,
                 static::MUTATION,
                 static::SUBSCRIPTION,
-            ]
+            ],
         );
     }
 
-    /**
-     * @return array<int, string>
-     */
-    public static function defaultNamespaces(string $typeName): array
+    /** @return non-empty-array<string> */
+    public static function namespaces(string $rootType): array
     {
-        switch ($typeName) {
-            case static::QUERY:
-                return (array) config('lighthouse.namespaces.queries');
-            case static::MUTATION:
-                return (array) config('lighthouse.namespaces.mutations');
-            case static::SUBSCRIPTION:
-                return (array) config('lighthouse.namespaces.subscriptions');
-            default:
-                return [];
+        $key = match ($rootType) {
+            self::QUERY => 'queries',
+            self::MUTATION => 'mutations',
+            self::SUBSCRIPTION => 'subscriptions',
+            default => throw new \InvalidArgumentException("Invalid root type: {$rootType}."),
+        };
+
+        $namespaces = (array) config("lighthouse.namespaces.{$key}");
+
+        foreach ($namespaces as $namespace) {
+            if (! is_string($namespace)) {
+                throw new \RuntimeException("Non-string value configured for lighthouse.namespaces.{$key}.");
+            }
         }
+
+        if ($namespaces === []) {
+            throw new \RuntimeException("No namespaces configured for lighthouse.namespaces.{$key}.");
+        }
+
+        return array_values($namespaces);
     }
 }

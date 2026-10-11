@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution;
 
@@ -13,7 +13,7 @@ class AuthenticationErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, \Closure $next): ?array
     {
-        if (null === $error) {
+        if ($error === null) {
             return $next(null);
         }
 
@@ -21,12 +21,11 @@ class AuthenticationErrorHandler implements ErrorHandler
         if ($underlyingException instanceof LaravelAuthenticationException) {
             return $next(new Error(
                 $error->getMessage(),
-                // @phpstan-ignore-next-line graphql-php and phpstan disagree with themselves
                 $error->getNodes(),
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),
-                AuthenticationException::fromLaravel($underlyingException)
+                AuthenticationException::fromLaravel($underlyingException),
             ));
         }
 

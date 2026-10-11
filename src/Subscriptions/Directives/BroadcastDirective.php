@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Directives;
 
@@ -38,7 +38,7 @@ GRAPHQL;
         $subscriptionField = $this->directiveArgValue('subscription');
         $shouldQueue = $this->directiveArgValue('shouldQueue');
 
-        $fieldValue->resultHandler(function ($root) use ($subscriptionField, $shouldQueue) {
+        $fieldValue->resultHandler(static function ($root) use ($subscriptionField, $shouldQueue) {
             Subscription::broadcast($subscriptionField, $root, $shouldQueue);
 
             return $root;

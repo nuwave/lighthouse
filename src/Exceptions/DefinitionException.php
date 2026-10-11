@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
 use GraphQL\Error\ClientAware;
 
 /**

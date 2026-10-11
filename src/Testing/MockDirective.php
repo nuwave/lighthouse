@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
@@ -9,12 +9,10 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class MockDirective extends BaseDirective implements FieldResolver
 {
     public function __construct(
-        protected MockResolverService $mockResolverService
+        protected MockResolverService $mockResolverService,
     ) {}
 
-    /**
-     * SDL definition of the directive.
-     */
+    /** SDL definition of the directive. */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'

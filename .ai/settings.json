@@ -1,0 +1,32 @@
+{
+  "$schema": "https://lnai.sh/schemas/settings.schema.json",
+  "permissions": {
+    "allow": [
+      "Bash(docker compose run --rm php vendor/bin/phpstan:*)",
+      "Bash(docker compose run --rm php vendor/bin/phpunit:*)",
+      "Bash(docker compose run --rm php vendor/bin/php-cs-fixer:*)",
+      "Bash(docker compose up:*)",
+      "Bash(make setup)",
+      "Bash(make it)",
+      "Bash(make up)",
+      "Bash(make build)",
+      "Bash(make test)",
+      "Bash(make stan)",
+      "Bash(make fix)",
+      "Bash(make rector)",
+      "Bash(make php-cs-fixer)",
+      "Bash(make prettier)",
+      "Bash(make bench)",
+      "Bash(make docs)",
+      "Bash(make help)",
+      "Bash(make release)",
+      "Bash(make proto)",
+      "Bash(make proto/update-reports)",
+      "Bash(make vendor)"
+    ],
+    "deny": [
+      "Bash(make php)",
+      "Bash(make node)"
+    ]
+  }
+}

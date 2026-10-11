@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -7,6 +7,7 @@ use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -21,7 +22,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     public function __construct(
         protected GlobalId $globalId,
         protected ErrorPool $errorPool,
-        protected TransactionalMutations $transactionalMutations
+        protected TransactionalMutations $transactionalMutations,
     ) {}
 
     public function resolveField(FieldValue $fieldValue): callable
@@ -30,7 +31,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         $modelClass = $this->getModelClass();
         $scopes = $this->directiveArgValue('scopes', []);
 
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass, $scopes, $expectsList) {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass, $scopes, $expectsList): EloquentCollection|Model|null {
             $builder = $modelClass::query();
 
             if (! $resolveInfo->wouldEnhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo)) {
@@ -45,7 +46,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
             foreach ($modelOrModels as $model) {
                 $success = $this->transactionalMutations->execute(
                     fn (): bool => $this->modifyExistence($model),
-                    $model->getConnectionName()
+                    $model->getConnectionName(),
                 );
 
                 if (! $success) {
@@ -61,7 +62,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     public static function couldNotModify(Model $model): Error
     {
-        $modelClass = get_class($model);
+        $modelClass = $model::class;
 
         return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
     }
@@ -82,6 +83,12 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     /**
      * Enhance the builder used to resolve the models.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<TModel>
      */
     abstract protected function enhanceBuilder(EloquentBuilder $builder): EloquentBuilder;
 

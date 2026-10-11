@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Cache;
 
@@ -7,25 +7,25 @@ use Illuminate\Contracts\Auth\Authenticatable;
 class CacheKeyAndTagsGenerator implements CacheKeyAndTags
 {
     public const PREFIX = 'lighthouse';
+
     public const SEPARATOR = ':';
 
     /**
-     * @param  int|string|null  $id
      * @param  array<string, mixed>  $args
-     * @param  array<int, string|int> $path
+     * @param  array<int, string|int>  $path
      */
     public function key(
         ?Authenticatable $user,
         bool $isPrivate,
         string $parentName,
-        $id,
+        int|string|null $id,
         string $fieldName,
         array $args,
-        array $path
+        array $path,
     ): string {
         $parts = [self::PREFIX];
 
-        if ($isPrivate && null !== $user) {
+        if ($isPrivate && $user !== null) {
             $parts[] = 'auth';
             $parts[] = $user->getAuthIdentifier();
         }
@@ -45,10 +45,7 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
         return implode(self::SEPARATOR, $parts);
     }
 
-    /**
-     * @param  int|string|null $id
-     */
-    public function parentTag(string $parentName, $id): string
+    public function parentTag(string $parentName, int|string|null $id): string
     {
         return implode(self::SEPARATOR, [
             self::PREFIX,
@@ -57,10 +54,7 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
         ]);
     }
 
-    /**
-     * @param  int|string|null $id
-     */
-    public function fieldTag(string $parentName, $id, string $fieldName): string
+    public function fieldTag(string $parentName, int|string|null $id, string $fieldName): string
     {
         return implode(self::SEPARATOR, [
             self::PREFIX,

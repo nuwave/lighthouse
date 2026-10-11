@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Pagination;
 
@@ -14,7 +14,18 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class ConnectionField
 {
     /**
-     * @return array<string, mixed>
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<*, *>  $paginator
+     *
+     * @return array{
+     *     hasNextPage: bool,
+     *     hasPreviousPage: bool,
+     *     startCursor: string|null,
+     *     endCursor: string|null,
+     *     total: int,
+     *     count: int,
+     *     currentPage: int,
+     *     lastPage: int,
+     * }
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {
@@ -27,10 +38,10 @@ class ConnectionField
         return [
             'hasNextPage' => $paginator->hasMorePages(),
             'hasPreviousPage' => $paginator->currentPage() > 1,
-            'startCursor' => null !== $firstItem
+            'startCursor' => $firstItem !== null
                 ? Cursor::encode($firstItem)
                 : null,
-            'endCursor' => null !== $lastItem
+            'endCursor' => $lastItem !== null
                 ? Cursor::encode($lastItem)
                 : null,
             'total' => $paginator->total(),
@@ -41,9 +52,10 @@ class ConnectionField
     }
 
     /**
+     * @param  \Illuminate\Contracts\Pagination\Paginator<*, *>  $paginator
      * @param  array<string, mixed>  $args
      *
-     * @return Collection<array<string, mixed>>
+     * @return Collection<int, array<string, mixed>>
      */
     public function edgeResolver(Paginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
@@ -61,9 +73,8 @@ class ConnectionField
 
         $values = new Collection(array_values($paginator->items()));
 
-        return $values->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
+        return $values->map(static function ($item, int $index) use ($returnTypeFields, $firstItem): array {
             $data = [];
-
             foreach ($returnTypeFields as $field) {
                 switch ($field->name) {
                     case 'cursor':
@@ -72,6 +83,10 @@ class ConnectionField
 
                     case 'node':
                         $data['node'] = $item;
+                        break;
+
+                    case 'pivot':
+                        $data['pivot'] = $item->pivot;
                         break;
 
                     default:

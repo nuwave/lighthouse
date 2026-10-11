@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
@@ -29,7 +29,7 @@ class PusherBroadcaster implements Broadcaster
         $socketId = $request->input('socket_id');
         $data = \Safe\json_decode(
             $this->pusher->socket_auth($channel, $socketId),
-            true
+            true,
         );
 
         return new JsonResponse($data, 200);
@@ -45,7 +45,7 @@ class PusherBroadcaster implements Broadcaster
     public function hook(Request $request): JsonResponse
     {
         foreach ($request->input('events', []) as $event) {
-            if ('channel_vacated' === $event['name']) {
+            if ($event['name'] === 'channel_vacated') {
                 $this->storage->deleteSubscriber($event['channel']);
             }
         }
@@ -53,7 +53,7 @@ class PusherBroadcaster implements Broadcaster
         return new JsonResponse(['message' => 'okay']);
     }
 
-    public function broadcast(Subscriber $subscriber, $data): void
+    public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         try {
             $this->pusher->trigger(
@@ -62,10 +62,10 @@ class PusherBroadcaster implements Broadcaster
                 [
                     'more' => true,
                     'result' => $data,
-                ]
+                ],
             );
-        } catch (ApiErrorException $e) {
-            $this->exceptionHandler->report($e);
+        } catch (ApiErrorException $apiErrorException) {
+            $this->exceptionHandler->report($apiErrorException);
         }
     }
 }

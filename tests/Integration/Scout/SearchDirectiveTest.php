@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Scout;
 
@@ -14,7 +14,7 @@ final class SearchDirectiveTest extends DBTestCase
 {
     use TestsScoutEngine;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->setUpScoutEngine();
@@ -22,25 +22,19 @@ final class SearchDirectiveTest extends DBTestCase
 
     public function testSearch(): void
     {
-        /** @var \Tests\Utils\Models\Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-        ]);
-        /** @var \Tests\Utils\Models\Post $postB */
-        $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-        ]);
+        /** @var Post $postA */
+        $postA = $this->createPostWithTitle('great title');
+        /** @var Post $postB */
+        $postB = $this->createPostWithTitle('Really great title');
+        $this->createPostWithTitle('bad title');
 
         $this->engine
             ->shouldReceive('map')
             ->andReturn(
-                new EloquentCollection([$postA, $postB])
+                new EloquentCollection([$postA, $postB]),
             );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: ID!
             title: String!
@@ -51,16 +45,16 @@ final class SearchDirectiveTest extends DBTestCase
                 search: String @search
             ): [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(search: "great") {
                 id
                 title
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'posts' => [
                     [
@@ -80,13 +74,11 @@ final class SearchDirectiveTest extends DBTestCase
 
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder) use ($id): bool {
-                return $builder->wheres === ['id' => $id];
-            })
+            ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => $id])
             ->andReturn(new EloquentCollection())
             ->once();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: Int!
         }
@@ -97,15 +89,15 @@ final class SearchDirectiveTest extends DBTestCase
                 search: String @search
             ): [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: Int) {
             posts(id: $id, search: "great") {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $id,
         ])->assertJson([
             'data' => [
@@ -120,13 +112,11 @@ final class SearchDirectiveTest extends DBTestCase
 
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder) use ($id): bool {
-                return $builder->wheres === ['from_custom_builder' => $id];
-            })
+            ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['from_custom_builder' => $id])
             ->andReturn(new EloquentCollection())
             ->once();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: Int!
         }
@@ -137,19 +127,19 @@ final class SearchDirectiveTest extends DBTestCase
 
         type Query {
             posts(
-                input: PostsInput! @builder(method: "' . $this->qualifyTestResolver('customBuilderMethod') . '")
+                input: PostsInput! @builder(method: "{$this->qualifyTestResolver('customBuilderMethod')}")
                 search: String! @search
             ): [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: Int!) {
             posts(input: { id: $id }, search: "greatness") {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $id,
         ])->assertJson([
             'data' => [
@@ -158,9 +148,7 @@ final class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @param  array{id: int}  $value
-     */
+    /** @param  array{id: int}  $value */
     public static function customBuilderMethod(ScoutBuilder $builder, array $value): ScoutBuilder
     {
         return $builder->where('from_custom_builder', $value['id']);
@@ -170,13 +158,11 @@ final class SearchDirectiveTest extends DBTestCase
     {
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder): bool {
-                return $builder->wheres === ['__soft_deleted' => 1];
-            })
+            ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['__soft_deleted' => 1])
             ->andReturn(new EloquentCollection())
             ->once();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: Int!
         }
@@ -187,15 +173,15 @@ final class SearchDirectiveTest extends DBTestCase
                 search: String @search
             ): [Post!]! @all @softDeletes
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(search: "foo", trashed: ONLY) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'posts' => [],
             ],
@@ -204,49 +190,41 @@ final class SearchDirectiveTest extends DBTestCase
 
     public function testSearchWithinCustomIndex(): void
     {
-        /** @var \Tests\Utils\Models\Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-        ]);
-        /** @var \Tests\Utils\Models\Post $postB */
-        $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-        ]);
+        /** @var Post $postA */
+        $postA = $this->createPostWithTitle('great title');
+        /** @var Post $postB */
+        $postB = $this->createPostWithTitle('Really great title');
+        $this->createPostWithTitle('bad title');
 
         $myIndex = 'my.index';
 
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder) use ($myIndex): bool {
-                return $builder->index === $myIndex;
-            })
+            ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->index === $myIndex)
             ->andReturn(
-                new EloquentCollection([$postA, $postB])
+                new EloquentCollection([$postA, $postB]),
             )
             ->once();
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: ID!
         }
 
         type Query {
             posts(
-                search: String @search(within: \"{$myIndex}\")
+                search: String @search(within: "{$myIndex}")
             ): [Post!]! @all
         }
-        ";
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(search: "great") {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'posts' => [
                     [
@@ -262,7 +240,7 @@ final class SearchDirectiveTest extends DBTestCase
 
     public function testWithinMustBeString(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
         }
@@ -272,22 +250,22 @@ final class SearchDirectiveTest extends DBTestCase
                 search: String @search(within: 123)
             ): [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(DefinitionException::class);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(search: "great") {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testMultipleSearchesAreNotAllowed(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
         }
@@ -298,22 +276,22 @@ final class SearchDirectiveTest extends DBTestCase
                 second: String @search
             ): [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(ScoutException::class);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(first: "great", second: "nope") {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testIncompatibleArgBuildersAreNotAllowed(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
         }
@@ -324,22 +302,22 @@ final class SearchDirectiveTest extends DBTestCase
                 nope: String @neq
             ): [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(ScoutException::class);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(search: "great", nope: "nope") {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testModelMustBeSearchable(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -349,36 +327,30 @@ final class SearchDirectiveTest extends DBTestCase
                 search: String @search
             ): [Task!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(ScoutException::class);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(search: "great") {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testHandlesScoutBuilderPaginationArguments(): void
     {
-        /** @var \Tests\Utils\Models\Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-        ]);
-        /** @var \Tests\Utils\Models\Post $postB */
-        $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-        ]);
+        /** @var Post $postA */
+        $postA = $this->createPostWithTitle('great title');
+        /** @var Post $postB */
+        $postB = $this->createPostWithTitle('Really great title');
+        $this->createPostWithTitle('bad title');
 
         $this->engine->shouldReceive('map')
             ->andReturn(
-                new EloquentCollection([$postA, $postB])
+                new EloquentCollection([$postA, $postB]),
             )
             ->once();
 
@@ -386,12 +358,12 @@ final class SearchDirectiveTest extends DBTestCase
             ->with(
                 \Mockery::any(),
                 \Mockery::any(),
-                \Mockery::not('page')
+                \Mockery::not('page'),
             )
             ->andReturn(new EloquentCollection([$postA, $postB]))
             ->once();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
         }
@@ -401,9 +373,9 @@ final class SearchDirectiveTest extends DBTestCase
                 search: String @search
             ): [Post!]! @paginate
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(first: 10, search: "great") {
                 data {
@@ -411,7 +383,7 @@ final class SearchDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'posts' => [
                     'data' => [
@@ -425,5 +397,15 @@ final class SearchDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    private function createPostWithTitle(string $title): Post
+    {
+        $post = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $post);
+        $post->title = $title;
+        $post->save();
+
+        return $post;
     }
 }

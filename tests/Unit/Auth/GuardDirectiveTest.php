@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Auth;
 
@@ -13,32 +13,32 @@ final class GuardDirectiveTest extends TestCase
 {
     public function testGuardDefault(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @guard
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
+        GRAPHQL)->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
     }
 
     public function testGuardWith(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @guard(with: ["web"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'errors' => [
                 [
                     'message' => AuthenticationException::MESSAGE,
@@ -54,19 +54,19 @@ final class GuardDirectiveTest extends TestCase
 
     public function testPassesOneFieldButThrowsInAnother(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int
             bar: String @guard
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
             bar
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
                 'bar' => null,
@@ -84,7 +84,7 @@ final class GuardDirectiveTest extends TestCase
 
     public function testGuardHappensBeforeOtherDirectivesIfAddedFromType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query @guard {
             user: User!
                 @can(ability: "adminOnly")
@@ -94,17 +94,51 @@ final class GuardDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     name
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
+    }
+
+    public function testGuardAppliesToFieldsOnExtendTypeOnly(): void
+    {
+        $value = 42;
+        $this->mockResolver($value);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            unguarded: Int! @mock
+        }
+
+        extend type Query @guard {
+            guarded: Int! @mock
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                guarded
+            }
+        GRAPHQL)
+            ->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                unguarded
+            }
+        GRAPHQL)
+            ->assertExactJson([
+                'data' => [
+                    'unguarded' => $value,
+                ],
+            ]);
     }
 
     public function testMultiGuardWithAuthorization(): void
@@ -132,7 +166,7 @@ final class GuardDirectiveTest extends TestCase
 
         $this->mockResolver($team);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Team {
             id: ID!
         }
@@ -140,18 +174,18 @@ final class GuardDirectiveTest extends TestCase
         type Query {
             team: Team!
                 @guard(with: ["team"])
-                @can(ability: "onlyTeams", model: "Tests\\\\Utils\\\\Models\\\\Team")
+                @can(ability: "onlyTeams", model: "Tests\\Utils\\Models\\Team")
                 @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             team {
                 id
             }
         }
-        ')
+        GRAPHQL)
             ->assertGraphQLErrorFree()
             ->assertJson([
                 'data' => [

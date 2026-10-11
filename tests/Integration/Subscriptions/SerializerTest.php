@@ -1,55 +1,48 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Subscriptions;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\ContextFactory;
-use Nuwave\Lighthouse\Subscriptions\Serializer;
+use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Tests\DBTestCase;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\Utils\Models\User;
 
 final class SerializerTest extends DBTestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function testWillSerializeUserModelAndRetrieveItFromTheDatabaseWhenUnserializing(): void
     {
         $user = factory(User::class)->create();
 
-        $serializer = new Serializer(
-            $contextFactory = new ContextFactory()
-        );
+        $contextFactory = new ContextFactory();
+        $serializer = new ContextSerializer($contextFactory);
 
         $request = new Request();
-        $request->setUserResolver(static function () use ($user) {
-            return $user;
-        });
+        $request->setUserResolver(static fn () => $user);
 
         $context = $contextFactory->generate($request);
 
-        /** @var \Tests\Utils\Models\User|null $userFromContext */
         $userFromContext = $context->user();
         $this->assertNotNull($userFromContext);
-
         $this->assertSame($user, $userFromContext);
 
         $retrievedFromDatabase = false;
 
-        User::retrieved(static function () use (&$retrievedFromDatabase) {
+        User::retrieved(static function () use (&$retrievedFromDatabase): void {
             $retrievedFromDatabase = true;
         });
 
         $unserialized = $serializer->unserialize(
-            $serializer->serialize($context)
+            $serializer->serialize($context),
         );
 
         $this->assertTrue($retrievedFromDatabase);
 
-        /** @var \Tests\Utils\Models\User|null $unserializedUser */
         $unserializedUser = $unserialized->user();
         $this->assertNotNull($unserializedUser);
-
         $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }
 }

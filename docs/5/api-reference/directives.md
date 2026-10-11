@@ -133,8 +133,8 @@ directive @all(
 ) on FIELD_DEFINITION
 ```
 
-This assumes your model has the same name as the type you are returning and is defined
-in the default model namespace `App`. [You can change this configuration](../getting-started/configuration.md).
+This assumes your model has the same name as the type you are returning and is defined in the default model namespace `App`.
+[You can change this configuration](../getting-started/configuration.md).
 
 ```graphql
 type Query {
@@ -171,8 +171,7 @@ type Query {
 }
 ```
 
-If you need to use a guard besides the default to resolve the authenticated user,
-you can pass the guard name as the `guard` argument
+If you need to use a guard besides the default to resolve the authenticated user, you can pass the guard name as the `guard` argument
 
 ```graphql
 type Query {
@@ -223,8 +222,7 @@ class Post extends Model
 }
 ```
 
-The directive accepts an optional `relation` argument if your relationship method
-has a different name than the field.
+The directive accepts an optional `relation` argument if your relationship method has a different name than the field.
 
 ```graphql
 type Post {
@@ -323,8 +321,7 @@ class User extends Model
 
 ### Rename Relation
 
-The directive accepts an optional `relation` argument if your relationship method
-has a different name than the field.
+The directive accepts an optional `relation` argument if your relationship method has a different name than the field.
 
 ```graphql
 type User {
@@ -334,16 +331,13 @@ type User {
 
 ### Retrieving Intermediate Table Columns
 
-You may want to allow accessing data that describes the relation between the models
-and is stored in the intermediate table - see [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
+You may want to allow accessing data that describes the relation between the models and is stored in the intermediate table - see [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
 
 Just like in Laravel, you can access the `pivot` attribute on the models (or its alias).
-Even though this attribute is always present when querying the model through the relation,
-it may not be present when reaching the node through another path in the schema, so it is
-recommended to define the field as nullable (no `!`).
+Even though this attribute is always present when querying the model through the relation, it may not be present when reaching the node through another path in the schema.
+It is recommended to define the field as nullable (no `!`).
 
-The following example assumes the intermediate table between `User` and `Role` defines
-a column `meta`.
+The following example assumes the intermediate table between `User` and `Role` defines a column `meta`.
 
 ```php
 use Illuminate\Database\Eloquent\Model;
@@ -386,8 +380,7 @@ type RoleUserPivot {
 }
 ```
 
-When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types)
-that contains the attributes of the intermediate table.
+When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) that contains the attributes of the intermediate table.
 
 The custom edge type must contain at least the following two fields:
 
@@ -440,8 +433,7 @@ type Mutation {
 }
 ```
 
-You may override the default queueing behaviour from the configuration by
-passing the `shouldQueue` argument.
+You may override the default queueing behaviour from the configuration by passing the `shouldQueue` argument.
 
 ```graphql
 type Mutation {
@@ -477,15 +469,13 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar BuilderValue
 ```
 
-You must point to a `method` which will receive the builder instance
-and can apply additional constraints to the query.
+You must point to a `method` which will receive the builder instance and can apply additional constraints to the query.
 
 > This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 When used on an argument, the value is supplied as the second parameter to the method.
-When used on a field, the value argument inside the directive is applied as the second
-parameter to the method.
+When used on a field, the value argument inside the directive is applied as the second parameter to the method.
 
 ```graphql
 type Query {
@@ -661,8 +651,7 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar CanArgs
 ```
 
-The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
-passing the `model` argument:
+The name of the returned Type `Post` is used as the Model class, however you may overwrite this by passing the `model` argument:
 
 ```graphql
 type Mutation {
@@ -759,8 +748,7 @@ type Query {
 }
 ```
 
-A custom complexity function may look like the following,
-refer to the [complexity function signature](resolvers.md#complexity-function-signature).
+A custom complexity function may look like the following, refer to the [complexity function signature](resolvers.md#complexity-function-signature).
 
 ```php
 namespace App\Security;
@@ -802,8 +790,7 @@ type Mutation {
 }
 ```
 
-Non-nullable arguments will _not_ be converted when this directive is used on a field,
-but will be converted when it is used directly on the argument.
+Non-nullable arguments will _not_ be converted when this directive is used on a field, but will be converted when it is used directly on the argument.
 
 ```graphql
 type Mutation {
@@ -814,8 +801,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, consider adding this directive to your
-global field middleware in `lighthouse.php`:
+If you want this for all your fields, consider adding this directive to your global field middleware in `lighthouse.php`:
 
 ```php
     'field_middleware' => [
@@ -908,8 +894,7 @@ type Mutation {
 }
 ```
 
-If you are using a single input object as an argument, you must tell Lighthouse
-to spread out the nested values before applying it to the resolver.
+If you are using a single input object as an argument, you must tell Lighthouse to spread out the nested values before applying it to the resolver.
 
 ```graphql
 type Mutation {
@@ -921,8 +906,7 @@ input CreatePostInput {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field,
-or is located in a non-default namespace, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field, or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
@@ -971,8 +955,8 @@ type Mutation {
 }
 ```
 
-In the upcoming `v6`, the `@delete`, `@forceDelete` and `@restore` directives no longer offer the
-`globalId` argument. Use `@globalId` on the argument instead.
+In the upcoming `v6`, the `@delete`, `@forceDelete` and `@restore` directives no longer offer the `globalId` argument.
+Use `@globalId` on the argument instead.
 
 ```diff
 type Mutation {
@@ -982,8 +966,7 @@ type Mutation {
 ```
 
 You can also delete multiple models at once.
-Define a field that takes a list of IDs and returns a collection of the
-deleted models.
+Define a field that takes a list of IDs and returns a collection of the deleted models.
 
 _In contrast to Laravel mass updates, this does trigger model events._
 
@@ -993,8 +976,7 @@ type Mutation {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field,
-or is located in a non-default namespace, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field, or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
@@ -1011,9 +993,7 @@ type Mutation {
 }
 ```
 
-If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or
-`MorphTo` relationship, you can just pass a Boolean instead of an ID, as there is only one
-possible model that can be deleted.
+If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or `MorphTo` relationship, you can just pass a Boolean instead of an ID, as there is only one possible model that can be deleted.
 
 ```graphql
 type Mutation {
@@ -1039,8 +1019,7 @@ directive @deprecated(
 ```
 
 You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive.
-It is recommended to provide a `reason` for the deprecation, as well as a suggestion on
-how to move forward.
+It is recommended to provide a `reason` for the deprecation, as well as a suggestion on how to move forward.
 
 ```graphql
 type Query {
@@ -1049,8 +1028,7 @@ type Query {
 }
 ```
 
-Deprecated elements are not included in introspection queries by default,
-but they can still be queried by clients.
+Deprecated elements are not included in introspection queries by default, but they can still be queried by clients.
 
 ## @drop
 
@@ -1061,8 +1039,7 @@ Ignore the user given value, don't pass it to the resolver.
 directive @drop on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-This is useful when you want to deprecate a field, but avoid breaking changes
-for clients that still pass the value.
+This is useful when you want to deprecate a field, but avoid breaking changes for clients that still pass the value.
 
 ```graphql
 type User {
@@ -1106,9 +1083,8 @@ type Mutation {
 }
 ```
 
-If your field is defined on the root types `Query` or `Mutation`, you can take advantage
-of the default namespaces that are defined in the [configuration](../getting-started/configuration.md). The following
-will look for a class in `App\GraphQL\Queries` by default.
+If your field is defined on the root types `Query` or `Mutation`, you can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md).
+The following will look for a class in `App\GraphQL\Queries` by default.
 
 ```graphql
 type Query {
@@ -1116,8 +1092,8 @@ type Query {
 }
 ```
 
-Be aware that resolvers are not limited to root fields. A resolver can be used for basic tasks
-such as transforming the value of scalar fields, e.g. reformat a date.
+Be aware that resolvers are not limited to root fields.
+A resolver can be used for basic tasks such as transforming the value of scalar fields, e.g. reformat a date.
 
 ```graphql
 type User {
@@ -1262,8 +1238,8 @@ enum Role {
 }
 ```
 
-You do not need this directive if the internal value of each enum key
-is an identical string. [Read more about enum types](../the-basics/types.md#enum)
+You do not need this directive if the internal value of each enum key is an identical string.
+[Read more about enum types](../the-basics/types.md#enum)
 
 ## @eq
 
@@ -1302,8 +1278,7 @@ type User {
 }
 ```
 
-If the name of the argument does not match the database column,
-pass the actual column name as the `key`.
+If the name of the argument does not match the database column, pass the actual column name as the `key`.
 
 ```graphql
 type User {
@@ -1392,8 +1367,7 @@ enum GlobalIdDecode {
 }
 ```
 
-Instead of the original ID, the `id` field will now return a base64-encoded String
-that globally identifies the User and can be used for querying the `node` endpoint.
+Instead of the original ID, the `id` field will now return a base64-encoded String that globally identifies the User and can be used for querying the `node` endpoint.
 
 ```graphql
 type User {
@@ -1402,8 +1376,7 @@ type User {
 }
 ```
 
-The field resolver will receive the decoded version of the passed `id`,
-split into type and ID.
+The field resolver will receive the decoded version of the passed `id`, split into type and ID.
 
 ```graphql
 type Mutation {
@@ -1411,8 +1384,7 @@ type Mutation {
 }
 ```
 
-You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
-own mechanism of encoding/decoding global ids.
+You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your own mechanism of encoding/decoding global ids.
 
 ## @guard
 
@@ -1447,15 +1419,13 @@ To ensure the user is logged in, add the `AttemptAuthenticate` middleware to you
 ],
 ```
 
-A useful pattern is to group fields in an `extend type` to apply [@guard](#guard)
-on all of them at once.
+A useful pattern is to group fields in an `extend type` to apply [@guard](#guard) on all of them at once.
 
 ```graphql
 extend type Query @guard { ... }
 ```
 
-The `@guard` directive will be prepended to other directives defined on the fields
-and thus executes before them.
+The `@guard` directive will be prepended to other directives defined on the fields and thus executes before them.
 
 ```graphql
 extend type Query {
@@ -1569,8 +1539,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
-you can override it by setting `relation`.
+If the name of the relationship on the Eloquent model is different than the field name, you can override it by setting `relation`.
 
 ```graphql
 type User {
@@ -1673,8 +1642,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
-you can override it by setting `relation`.
+If the name of the relationship on the Eloquent model is different than the field name, you can override it by setting `relation`.
 
 ```graphql
 type User {
@@ -1729,8 +1697,7 @@ directive @inject(
 ) repeatable on FIELD_DEFINITION
 ```
 
-This is useful to ensure that the authenticated user's `id` is
-automatically used for creating new models and cannot be manipulated.
+This is useful to ensure that the authenticated user's `id` is automatically used for creating new models and cannot be manipulated.
 
 ```graphql
 type Mutation {
@@ -1740,8 +1707,7 @@ type Mutation {
 }
 ```
 
-If you are using an Input Object as an argument, you can use dot notation to
-set a nested argument.
+If you are using an Input Object as an argument, you can use dot notation to set a nested argument.
 
 ```graphql
 type Mutation {
@@ -1767,8 +1733,7 @@ directive @interface(
 ) on INTERFACE
 ```
 
-Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding
-to use this directive, you probably don't need it.
+Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding to use this directive, you probably don't need it.
 
 Set the `resolveType` argument to a function that returns the implementing Object Type.
 
@@ -1779,8 +1744,8 @@ interface Commentable
 }
 ```
 
-The function receives the value of the parent field as its single argument and must
-return an Object Type. You can get the appropriate Object Type from Lighthouse's type registry.
+The function receives the value of the parent field as its single argument and must return an Object Type.
+You can get the appropriate Object Type from Lighthouse's type registry.
 
 ```php
 namespace App\GraphQL\Interfaces;
@@ -1956,8 +1921,7 @@ Ensure the order of the argument definition matches the parameters of your metho
 public function purchasedItemsCount(int $year, ?bool $includeReturns)
 ```
 
-Lighthouse will always pass down the same number of arguments and default to `null`
-if the client passes nothing.
+Lighthouse will always pass down the same number of arguments and default to `null` if the client passes nothing.
 
 ```graphql
 {
@@ -2211,8 +2175,7 @@ The arguments are a map from directive names to namespaces.
 directive @namespace repeatable on FIELD_DEFINITION | OBJECT
 ```
 
-The following example applies the namespace `App\Blog`
-to the [@field](#field) directive used on the `posts` field.
+The following example applies the namespace `App\Blog` to the [@field](#field) directive used on the `posts` field.
 
 ```graphql
 type Query {
@@ -2222,9 +2185,8 @@ type Query {
 }
 ```
 
-When used upon an object type or an object type extension, the namespace
-applies to fields of the type as well. This allows you to specify
-a common namespace for a group of fields.
+When used upon an object type or an object type extension, the namespace applies to fields of the type as well.
+This allows you to specify a common namespace for a group of fields.
 
 ```graphql
 extend type Query @namespace(field: "App\\Blog") {
@@ -2322,8 +2284,7 @@ directive @node(
 ) on OBJECT
 ```
 
-Lighthouse defaults to resolving types through the underlying model,
-for example by calling `User::find($id)`.
+Lighthouse defaults to resolving types through the underlying model, for example by calling `User::find($id)`.
 
 ```graphql
 type User @node {
@@ -2339,8 +2300,7 @@ type Country @node(resolver: "App\\Countries@byId") {
 }
 ```
 
-The `resolver` argument has to specify a function which will be passed the
-decoded `id` and resolves to a result.
+The `resolver` argument has to specify a function which will be passed the decoded `id` and resolves to a result.
 
 ```php
 public function byId($id): array {
@@ -2353,8 +2313,7 @@ public function byId($id): array {
 
 [Read more](../digging-deeper/relay.md#global-object-identification).
 
-Behind the scenes, Lighthouse will decode the global id sent from the client
-to find the model by it's primary id in the database.
+Behind the scenes, Lighthouse will decode the global id sent from the client to find the model by it's primary id in the database.
 
 ## @notIn
 
@@ -2626,9 +2585,8 @@ It can be queried like this:
 
 ### Pagination type
 
-The `type` of pagination defaults to `PAGINATOR`, but may also be set to
-`SIMPLE` (see [Simple Pagination](#simple-pagination)) or a Relay compliant
-`CONNECTION`.
+The `type` of pagination defaults to `PAGINATOR`.
+May also be set to `SIMPLE` (see [Simple Pagination](#simple-pagination)) or a Relay compliant `CONNECTION`.
 
 > Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
 > Under the hood, the "cursor" is decoded into a page offset.
@@ -2673,9 +2631,8 @@ type PostEdge {
 
 ### Simple Pagination
 
-In contrast to other pagination types, `SIMPLE` pagination only fires a single database
-query on every request. This improves performance, but means that the response does not
-hold information about the total number of items.
+In contrast to other pagination types, `SIMPLE` pagination only fires a single database query on every request.
+This improves performance, but means that the response does not hold information about the total number of items.
 
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
@@ -2773,9 +2730,8 @@ query {
 
 ### Limit maximum count
 
-Lighthouse allows you to specify a global maximum for the number of items a user
-can request through pagination through the config. You may also overwrite this
-per field with the `maxCount` argument:
+Lighthouse allows you to specify a global maximum for the number of items a user can request through pagination through the config.
+You may also overwrite this per field with the `maxCount` argument:
 
 ```graphql
 type Query {
@@ -2785,8 +2741,8 @@ type Query {
 
 ### Overwrite model
 
-By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same
-name as the returned type. You can overwrite this by setting the `model` argument.
+By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same name as the returned type.
+You can overwrite this by setting the `model` argument.
 
 ```graphql
 type Query {
@@ -2832,7 +2788,8 @@ class Blog
 
 You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
 
-This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+This is mutually exclusive with `builder` and `model`.
+Not compatible with `scopes` and builder arguments such as `@eq`.
 
 ```graphql
 type Query {
@@ -2888,8 +2845,7 @@ directive @rename(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-This can often be useful to ensure consistent naming of your schema
-without having to change the underlying models.
+This can often be useful to ensure consistent naming of your schema without having to change the underlying models.
 
 ```graphql
 type User {
@@ -3132,8 +3088,7 @@ directive @search(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-The `search()` method of the model is called with the value of the argument,
-using the driver you configured for [Laravel Scout](https://laravel.com/docs/scout).
+The `search()` method of the model is called with the value of the argument, using the driver you configured for [Laravel Scout](https://laravel.com/docs/scout).
 
 ```graphql
 type Query {
@@ -3141,8 +3096,7 @@ type Query {
 }
 ```
 
-The [@search](#search) directive only works in combination with filter directives that
-implement `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
+The [@search](#search) directive only works in combination with filter directives that implement `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
 
 - [@eq](#eq)
 - [@softDeletes](#softdeletes)
@@ -3228,8 +3182,7 @@ mutation {
 }
 ```
 
-Internally, the arguments will be transformed into a flat structure before
-they are passed along to the resolver:
+Internally, the arguments will be transformed into a flat structure before they are passed along to the resolver:
 
 ```php
 [
@@ -3239,8 +3192,7 @@ they are passed along to the resolver:
 ]
 ```
 
-Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/argument-directives.md)
-have been applied, e.g. validation, transformation.
+Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/argument-directives.md) have been applied, e.g. validation, transformation.
 
 ## @subscription
 
@@ -3257,8 +3209,8 @@ directive @subscription(
 ) on FIELD_DEFINITION
 ```
 
-If you follow the default naming conventions for [defining subscription fields](../subscriptions/defining-fields.md)
-you do not need this directive. It is only useful if you need to override the default namespace.
+If you follow the default naming conventions for [defining subscription fields](../subscriptions/defining-fields.md) you do not need this directive.
+It is only useful if you need to override the default namespace.
 
 ```graphql
 type Subscription {
@@ -3296,11 +3248,11 @@ directive @throttle(
 ) on FIELD_DEFINITION
 ```
 
-Allows use Laravel throttling on a per-field basis. See [Laravel doc](https://laravel.com/docs/routing#rate-limiting)
-on how to configure named limiters.
+Allows use Laravel throttling on a per-field basis.
+See [Laravel doc](https://laravel.com/docs/routing#rate-limiting) on how to configure named limiters.
 
-Limiters that return `response` are not supported. Hashes are different from the ones of Laravel, so one can't use
-one named limiter to limit both Laravel route and GraphQL field.
+Limiters that return `response` are not supported.
+Hashes are different from the ones of Laravel, so one can't use one named limiter to limit both Laravel route and GraphQL field.
 
 ## @trashed
 
@@ -3316,8 +3268,7 @@ directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 The most convenient way to use this directive is through [@softDeletes](#softdeletes).
 
-If you want to add it manually, make sure the argument is of the
-enum type `Trashed`:
+If you want to add it manually, make sure the argument is of the enum type `Trashed`:
 
 ```graphql
 type Query {
@@ -3354,8 +3305,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, consider adding this directive to your
-global field middleware in `lighthouse.php`:
+If you want this for all your fields, consider adding this directive to your global field middleware in `lighthouse.php`:
 
 ```php
     'field_middleware' => [
@@ -3380,8 +3330,7 @@ directive @union(
 ) on UNION
 ```
 
-Make sure you read the [basics about Unions](../the-basics/types.md#union) before deciding
-to use this directive, you probably don't need it.
+Make sure you read the [basics about Unions](../the-basics/types.md#union) before deciding to use this directive, you probably don't need it.
 
 ```graphql
 type User {
@@ -3397,8 +3346,7 @@ union Person @union(resolveType: "App\\GraphQL\\Unions\\Person@resolveType") =
   | Employee
 ```
 
-The function receives the value of the parent field as its single argument and must
-resolve an Object Type from Lighthouse's `TypeRegistry`.
+The function receives the value of the parent field as its single argument and must resolve an Object Type from Lighthouse's `TypeRegistry`.
 
 ```php
 namespace App\GraphQL\Unions;
@@ -3477,8 +3425,7 @@ type Mutation {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field,
-or is located in a non-default namespace, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field, or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
@@ -3660,7 +3607,7 @@ directive @whereAuth(
 > This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
-The following query returns all posts that belong to the currently authenticated user.  
+The following query returns all posts that belong to the currently authenticated user.
 Behind the scenes it is using a `whereHas` query.
 
 ```graphql
@@ -3703,8 +3650,8 @@ input DateRange {
 }
 ```
 
-You may use any custom `input` type for the argument. Make sure it has
-exactly two required fields to ensure the query is valid.
+You may use any custom `input` type for the argument.
+Make sure it has exactly two required fields to ensure the query is valid.
 
 ## @whereConditions
 
@@ -3800,8 +3747,7 @@ directive @with(
 ) repeatable on FIELD_DEFINITION
 ```
 
-This can be a useful optimization for fields that are not returned directly
-but rather used for resolving other fields.
+This can be a useful optimization for fields that are not returned directly but rather used for resolving other fields.
 
 ```graphql
 type User {
@@ -3809,8 +3755,7 @@ type User {
 }
 ```
 
-If you just want to return the relation itself as-is,
-look into [handling Eloquent relationships](../eloquent/relationships.md).
+If you just want to return the relation itself as-is, look into [handling Eloquent relationships](../eloquent/relationships.md).
 
 ## @withCount
 

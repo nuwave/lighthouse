@@ -7,6 +7,7 @@
 - [thekonz/lighthouse-redis-broadcaster](https://github.com/thekonz/lighthouse-redis-broadcaster)
 - [brightalley/lighthouse-apollo](https://github.com/brightalley/lighthouse-apollo)
 - [roboroads/lighthouse-settings](https://github.com/Roboroads/lighthouse-settings)
+- [lastdragon-ru/lara-asp-graphql](https://github.com/LastDragon-ru/php-packages/tree/main/packages/lara-asp-graphql "Strictly typed Searching and Sorting")
 
 ## Tutorials
 

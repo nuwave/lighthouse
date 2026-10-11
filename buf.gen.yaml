@@ -1,0 +1,7 @@
+version: v1
+managed:
+  enabled: true
+plugins:
+  # For new releases, see https://github.com/protocolbuffers/protobuf/releases and https://buf.build/protocolbuffers/php
+  - plugin: buf.build/protocolbuffers/php:v25.1
+    out: proto-tmp

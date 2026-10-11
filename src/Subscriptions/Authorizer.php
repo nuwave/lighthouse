@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
@@ -10,30 +10,11 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 
 class Authorizer implements AuthorizesSubscriptions
 {
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
-     */
-    protected $storage;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
-     */
-    protected $registry;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler
-     */
-    protected $exceptionHandler;
-
     public function __construct(
-        StoresSubscriptions $storage,
-        SubscriptionRegistry $registry,
-        SubscriptionExceptionHandler $exceptionHandler
-    ) {
-        $this->storage = $storage;
-        $this->registry = $registry;
-        $this->exceptionHandler = $exceptionHandler;
-    }
+        protected StoresSubscriptions $storage,
+        protected SubscriptionRegistry $registry,
+        protected SubscriptionExceptionHandler $exceptionHandler,
+    ) {}
 
     public function authorize(Request $request): bool
     {
@@ -46,7 +27,7 @@ class Authorizer implements AuthorizesSubscriptions
             $channel = $this->sanitizeChannelName($channel);
 
             $subscriber = $this->storage->subscriberByChannel($channel);
-            if (null === $subscriber) {
+            if ($subscriber === null) {
                 return false;
             }
 
@@ -64,8 +45,8 @@ class Authorizer implements AuthorizesSubscriptions
             }
 
             return true;
-        } catch (\Exception $e) {
-            $this->exceptionHandler->handleAuthError($e);
+        } catch (\Exception $exception) {
+            $this->exceptionHandler->handleAuthError($exception);
 
             return false;
         }
@@ -78,7 +59,7 @@ class Authorizer implements AuthorizesSubscriptions
      */
     protected function sanitizeChannelName(string $channelName): string
     {
-        if (Str::startsWith($channelName, 'presence-')) {
+        if (str_starts_with($channelName, 'presence-')) {
             return Str::substr($channelName, 9);
         }
 

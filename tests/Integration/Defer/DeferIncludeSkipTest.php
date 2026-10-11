@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Defer;
 
@@ -7,48 +7,48 @@ use Tests\TestCase;
 
 final class DeferIncludeSkipTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     directive @include(if: Boolean!) on FIELD
     directive @skip(if: Boolean!) on FIELD
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . "\n" . self::PLACEHOLDER_QUERY;
 
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [DeferServiceProvider::class]
+            [DeferServiceProvider::class],
         );
     }
 
     public function testDoesNotDeferWithIncludeFalse(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo @defer @include(if: false)
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [],
         ]);
     }
 
     public function testDoesDeferWithIncludeTrue(): void
     {
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo @defer @include(if: true)
         }
-        ');
+        GRAPHQL);
 
         $this->assertCount(2, $chunks);
     }
 
     public function testDoesNotDeferWithIncludeFalseFromVariable(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($include: Boolean!){
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($include: Boolean!) {
             foo @defer @include(if: $include)
         }
-        ', [
+        GRAPHQL, [
             'include' => false,
         ])->assertExactJson([
             'data' => [],
@@ -57,33 +57,33 @@ final class DeferIncludeSkipTest extends TestCase
 
     public function testDoesNotDeferWithSkipTrue(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo @defer @skip(if: true)
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [],
         ]);
     }
 
     public function testDoesDeferWithSkipFalse(): void
     {
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo @defer @skip(if: false)
         }
-        ');
+        GRAPHQL);
 
         $this->assertCount(2, $chunks);
     }
 
     public function testDoesNotDeferWithSkipTrueFromVariable(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($skip: Boolean!){
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($skip: Boolean!) {
             foo @defer @skip(if: $skip)
         }
-        ', [
+        GRAPHQL, [
             'skip' => true,
         ])->assertExactJson([
             'data' => [],

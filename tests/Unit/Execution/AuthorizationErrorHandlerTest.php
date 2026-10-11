@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution;
 
@@ -15,10 +15,10 @@ final class AuthorizationErrorHandlerTest extends TestCase
         $handler = new AuthorizationErrorHandler();
 
         $authorizationException = new LaravelAuthorizationException();
-        $original = new Error('foo', null, null, [], null, $authorizationException);
+        $original = new Error(message: 'foo', previous: $authorizationException);
 
         $error = null;
-        $next = function (Error $e) use (&$error) {
+        $next = static function (Error $e) use (&$error): void {
             $error = $e;
         };
 

@@ -1,14 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use GraphQL\Type\Definition\PhpEnumType;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Enums\ImageableType;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
 final class MorphToTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID
         name: String
@@ -22,6 +26,7 @@ final class MorphToTest extends DBTestCase
 
     type Mutation {
         createImage(input: CreateImageInput! @spread): Image @create
+        createImageWithEnumType(input: CreateImageWithEnumTypeInput! @spread): Image @create
         updateImage(input: UpdateImageInput! @spread): Image @update
         upsertImage(input: UpsertImageInput! @spread): Image @upsert
     }
@@ -39,6 +44,22 @@ final class MorphToTest extends DBTestCase
 
     input ConnectImageableInput {
         type: String!
+        id: ID!
+    }
+
+    input CreateImageWithEnumTypeInput {
+        from: String
+        to: String
+        url: String
+        imageable: CreateImageableOperationsWithEnumType
+    }
+
+    input CreateImageableOperationsWithEnumType {
+        connect: ConnectImageableWithEnumTypeInput
+    }
+
+    input ConnectImageableWithEnumTypeInput {
+        type: ImageableType!
         id: ID!
     }
 
@@ -69,19 +90,22 @@ final class MorphToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testConnectsMorphTo(): void
     {
-        factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->name = 'first_task';
+        $task->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createImage(input: {
                 url: "foo"
                 imageable: {
                     connect: {
-                        type: "Tests\\\Utils\\\Models\\\Task"
+                        type: "Tests\\Utils\\Models\\Task"
                         id: 1
                     }
                 }
@@ -94,7 +118,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createImage' => [
                     'id' => '1',
@@ -108,18 +132,28 @@ final class MorphToTest extends DBTestCase
         ]);
     }
 
-    public function testConnectsMorphToWithUpsert(): void
+    public function testConnectsMorphToWithEnumType(): void
     {
-        factory(Task::class)->create(['name' => 'first_task']);
+        if (PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Requires native enums.');
+        }
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        $phpEnumType = new PhpEnumType(ImageableType::class); // @phpstan-ignore-line native enums not supported in all versions
+        $typeRegistry->register($phpEnumType);
+
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->name = 'first_task';
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
-            upsertImage(input: {
-                id: 1
+            createImageWithEnumType(input: {
                 url: "foo"
                 imageable: {
                     connect: {
-                        type: "Tests\\\Utils\\\Models\\\Task"
+                        type: TASK
                         id: 1
                     }
                 }
@@ -132,7 +166,48 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createImageWithEnumType' => [
+                    'id' => '1',
+                    'url' => 'foo',
+                    'imageable' => [
+                        'id' => '1',
+                        'name' => 'first_task',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testConnectsMorphToWithUpsert(): void
+    {
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->name = 'first_task';
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertImage(input: {
+                id: 1
+                url: "foo"
+                imageable: {
+                    connect: {
+                        type: "Tests\\Utils\\Models\\Task"
+                        id: 1
+                    }
+                }
+            }) {
+                id
+                url
+                imageable {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertImage' => [
                     'id' => '1',
@@ -150,7 +225,7 @@ final class MorphToTest extends DBTestCase
     {
         factory(Image::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateImage(input: {
                 id: 1
@@ -167,7 +242,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateImage' => [
                     'url' => 'foo',
@@ -177,27 +252,25 @@ final class MorphToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
-    public static function existingModelMutations(): array
+    /** @return iterable<array{string}> */
+    public static function existingModelMutations(): iterable
     {
-        return [
-            ['Update action' => 'update'],
-            ['Upsert action' => 'upsert'],
-        ];
+        yield 'Update action' => ['update'];
+        yield 'Upsert action' => ['upsert'];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectsMorphTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->name = 'first_task';
+        $task->save();
 
-        /** @var \Tests\Utils\Models\Image $image */
-        $image = $task->image()->make();
+        $image = factory(Image::class)->make();
+        $this->assertInstanceOf(Image::class, $image);
+        $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();
 
@@ -218,8 +291,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 $field => [
                     'url' => 'foo',
@@ -229,16 +301,18 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDeletesMorphTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->name = 'first_task';
+        $task->save();
 
-        /** @var \Tests\Utils\Models\Image $image */
-        $image = $task->image()->make();
+        $image = factory(Image::class)->make();
+        $this->assertInstanceOf(Image::class, $image);
+        $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();
 
@@ -259,9 +333,7 @@ GRAPHQL
                 }
             }
         }
-
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 $field => [
                     'url' => 'foo',

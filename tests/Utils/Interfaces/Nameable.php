@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Interfaces;
 
@@ -10,15 +10,9 @@ use Tests\Utils\Models\User;
 
 final class Nameable
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    private $typeRegistry;
-
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        private TypeRegistry $typeRegistry,
+    ) {}
 
     public function resolve(?Model $value): ?Type
     {

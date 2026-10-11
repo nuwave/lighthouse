@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests;
 
@@ -10,7 +10,7 @@ trait TestsRedis
 {
     protected function tearDown(): void
     {
-        Redis::flushall();
+        Redis::flushdb();
 
         parent::tearDown();
     }
@@ -31,7 +31,6 @@ trait TestsRedis
             'prefix' => 'lighthouse-test-',
         ]);
         $config->set('lighthouse.subscriptions', [
-            'version' => 1,
             'storage' => 'redis',
             'broadcaster' => 'echo',
             'broadcasters' => [

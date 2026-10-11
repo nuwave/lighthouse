@@ -1,10 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Types;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -37,7 +36,7 @@ final class InterfaceTest extends DBTestCase
         }
 GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
@@ -46,7 +45,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJsonStructure([
+        GRAPHQL)->assertJsonStructure([
             'data' => [
                 'namedThings' => [
                     [
@@ -87,7 +86,7 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
@@ -96,7 +95,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJsonStructure([
+        GRAPHQL)->assertJsonStructure([
             'data' => [
                 'namedThings' => [
                     [
@@ -137,13 +136,13 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectNotToPerformAssertions();
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testThrowsOnAmbiguousSchemaMapping(): void
@@ -170,15 +169,15 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectExceptionObject(
-            TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Team'])
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Team']),
         );
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testThrowsOnNonOverlappingSchemaMapping(): void
@@ -205,21 +204,21 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectExceptionObject(
-            TypeRegistry::unresolvableAbstractTypeMapping(User::class, [])
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, []),
         );
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testUseCustomTypeResolver(): void
     {
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        interface Nameable @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}"){
+        interface Nameable @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}") {
             name: String!
         }
 
@@ -231,9 +230,9 @@ GRAPHQL;
         type Query {
             namedThings: Nameable @field(resolver: "{$this->qualifyTestResolver('fetchGuy')}")
         }
-GRAPHQL;
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
@@ -242,7 +241,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'namedThings' => $this->fetchGuy(),
             ],
@@ -273,7 +272,7 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             __schema {
                 types {
@@ -285,7 +284,7 @@ GRAPHQL;
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $interface = (new Collection($result->json('data.__schema.types')))
             ->firstWhere('name', 'Nameable');
@@ -316,9 +315,9 @@ GRAPHQL;
         type Query {
             foo: String
         }
-GRAPHQL;
+        GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             __type(name: "HasPosts") {
                 name
@@ -334,20 +333,18 @@ GRAPHQL;
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame('HasPosts', $result->json('data.__type.name'));
         $this->assertSame('INTERFACE', $result->json('data.__type.kind'));
         $this->assertSame('PostPaginator', $result->json('data.__type.fields.0.type.ofType.name'));
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team>
-     */
-    public static function fetchResults(): EloquentCollection
+    /** @return \Illuminate\Support\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> */
+    public static function fetchResults(): Collection
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
-        $results = new EloquentCollection();
+        /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
+        $results = new Collection();
 
         return $results
             ->concat(User::all())
@@ -361,9 +358,7 @@ GRAPHQL;
         return $typeRegistry->get('Guy');
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function fetchGuy(): array
     {
         return [

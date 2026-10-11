@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -11,7 +11,7 @@ final class WithCountDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelationCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -21,23 +21,25 @@ final class WithCountDirectiveTest extends DBTestCase
                 @withCount(relation: "tasks")
                 @method
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 3)->create()
-            ->each(function ($user) {
-                factory(Task::class, 3)->create([
-                    'user_id' => $user->getKey(),
-                ]);
+            ->each(static function (User $user): void {
+                $tasks = factory(Task::class, 3)->make();
+                $tasks->each(static function (Task $task) use ($user): void {
+                    $task->user()->associate($user);
+                    $task->save();
+                });
             });
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     tasksCountLoaded
                 }
             }
-            ')->assertExactJson([
+            GRAPHQL)->assertExactJson([
                 'data' => [
                     'users' => [
                         [
@@ -57,7 +59,7 @@ final class WithCountDirectiveTest extends DBTestCase
 
     public function testFailsToEagerLoadRelationCountWithoutRelation(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -65,17 +67,17 @@ final class WithCountDirectiveTest extends DBTestCase
         type User {
             name: String! @withCount
         }
-        ';
+        GRAPHQL;
 
         factory(User::class)->create();
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 }

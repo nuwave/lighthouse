@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests;
 
@@ -8,22 +8,16 @@ use Mockery\MockInterface;
 
 trait TestsScoutEngine
 {
-    /**
-     * @var \Mockery\MockInterface&\Laravel\Scout\EngineManager
-     */
-    protected $engineManager;
+    /** @var \Mockery\MockInterface&\Laravel\Scout\EngineManager */
+    protected EngineManager $engineManager;
 
-    /**
-     * @var \Mockery\MockInterface&\Laravel\Scout\Engines\NullEngine
-     */
-    protected $engine;
+    /** @var \Mockery\MockInterface&\Laravel\Scout\Engines\NullEngine */
+    protected NullEngine $engine;
 
     public function setUpScoutEngine(): void
     {
         $this->engineManager = \Mockery::mock(EngineManager::class);
-        $this->app->singleton(EngineManager::class, function (): MockInterface {
-            return $this->engineManager;
-        });
+        $this->app->singleton(EngineManager::class, fn (): MockInterface => $this->engineManager);
 
         $this->engine = \Mockery::mock(NullEngine::class)
             ->makePartial();

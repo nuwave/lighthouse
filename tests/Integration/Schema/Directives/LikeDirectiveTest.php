@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -9,11 +9,11 @@ final class LikeDirectiveTest extends DBTestCase
 {
     public function testLikeClientsCanPassWildcards(): void
     {
-        factory(User::class)->create(['name' => 'Alan']);
-        factory(User::class)->create(['name' => 'Alex']);
-        factory(User::class)->create(['name' => 'Aaron']);
+        $this->createUserWithName('Alan');
+        $this->createUserWithName('Alex');
+        $this->createUserWithName('Aaron');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -23,15 +23,15 @@ final class LikeDirectiveTest extends DBTestCase
                 name: String! @like
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(name: "Al%") {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alan',
@@ -45,11 +45,11 @@ final class LikeDirectiveTest extends DBTestCase
 
     public function testLikeWithWildcardsInTemplate(): void
     {
-        factory(User::class)->create(['name' => 'Alan']);
-        factory(User::class)->create(['name' => 'Alex']);
-        factory(User::class)->create(['name' => 'Aaron']);
+        $this->createUserWithName('Alan');
+        $this->createUserWithName('Alex');
+        $this->createUserWithName('Aaron');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -59,15 +59,15 @@ final class LikeDirectiveTest extends DBTestCase
                 name: String! @like(template: "%{}%")
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(name: "l") {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alan',
@@ -81,12 +81,12 @@ final class LikeDirectiveTest extends DBTestCase
 
     public function testLikeClientWildcardsAreEscapedFromTemplate(): void
     {
-        factory(User::class)->create(['name' => 'Aaron']);
-        factory(User::class)->create(['name' => 'Aar%on']);
-        factory(User::class)->create(['name' => 'Aar%']);
-        factory(User::class)->create(['name' => 'Aar%toomuch']);
+        $this->createUserWithName('Aaron');
+        $this->createUserWithName('Aar%on');
+        $this->createUserWithName('Aar%');
+        $this->createUserWithName('Aar%toomuch');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -97,15 +97,15 @@ final class LikeDirectiveTest extends DBTestCase
                 name: String! @like(template: "%{}__")
             ): [User!] @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(name: "ar%") {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Aar%on',
@@ -116,10 +116,10 @@ final class LikeDirectiveTest extends DBTestCase
 
     public function testLikeOnField(): void
     {
-        factory(User::class)->create(['name' => 'Alex']);
-        factory(User::class)->create(['name' => 'Aaron']);
+        $this->createUserWithName('Alex');
+        $this->createUserWithName('Aaron');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -130,20 +130,30 @@ final class LikeDirectiveTest extends DBTestCase
                 @all
                 @like(key: "name", value: "%ex")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alex',
                 ],
             ],
         ]);
+    }
+
+    private function createUserWithName(string $name): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->save();
+
+        return $user;
     }
 }

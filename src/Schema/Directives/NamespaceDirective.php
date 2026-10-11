@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -33,16 +33,13 @@ directive @namespace repeatable on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     */
-    protected function addNamespacesToFields(&$objectType): void
+    protected function addNamespacesToFields(ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType): void
     {
         $namespaceDirective = $this->directiveNode->cloneDeep();
 
         foreach ($objectType->fields as $fieldDefinition) {
             $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);
-            if (null !== $existingNamespaces) {
+            if ($existingNamespaces !== null) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
@@ -50,9 +47,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * Apply manipulations from a type definition node.
-     */
+    /** Apply manipulations from a type definition node. */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
@@ -60,9 +55,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * Apply manipulations from a type definition node.
-     */
+    /** Apply manipulations from a type definition node. */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
         if ($typeExtension instanceof ObjectTypeExtensionNode) {

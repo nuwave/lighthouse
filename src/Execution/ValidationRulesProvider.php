@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution;
 
@@ -11,19 +11,12 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
 class ValidationRulesProvider implements ProvidesValidationRules
 {
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
-    public function __construct(ConfigRepository $configRepository)
-    {
-        $this->configRepository = $configRepository;
-    }
+    public function __construct(
+        protected ConfigRepository $configRepository,
+    ) {}
 
     public function validationRules(): ?array
     {
-        // @phpstan-ignore-next-line remove when graphql-php 15 has an accurate type for DocumentValidator::allRules()
         return [
             QueryComplexity::class => new QueryComplexity($this->configRepository->get('lighthouse.security.max_query_complexity', 0)),
             QueryDepth::class => new QueryDepth($this->configRepository->get('lighthouse.security.max_query_depth', 0)),

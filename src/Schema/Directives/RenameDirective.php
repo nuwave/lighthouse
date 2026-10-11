@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -29,24 +29,13 @@ GRAPHQL;
     {
         $attribute = $this->attributeArgValue();
 
-        return fn (mixed $root): mixed => data_get($root, $attribute);
+        return static fn (mixed $root): mixed => data_get($root, $attribute);
     }
 
-    /**
-     * Retrieves the attribute argument for the directive.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
+    /** Retrieves the attribute argument for the directive. */
     public function attributeArgValue(): string
     {
-        $attribute = $this->directiveArgValue('attribute');
-
-        if (! $attribute) {
-            throw new DefinitionException(
-                "The @{$this->name()} directive requires an `attribute` argument."
-            );
-        }
-
-        return $attribute;
+        return $this->directiveArgValue('attribute')
+            ?: throw new DefinitionException("The @{$this->name()} directive requires an `attribute` argument.");
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Cache;
 
@@ -16,7 +16,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 {
     public function __construct(
         protected CacheRepository $cacheRepository,
-        protected CacheKeyAndTags $cacheKeyAndTags
+        protected CacheKeyAndTags $cacheKeyAndTags,
     ) {}
 
     public static function definition(): string
@@ -51,9 +51,9 @@ GRAPHQL;
         $maxAge = $this->directiveArgValue('maxAge');
         $isPrivate = $this->directiveArgValue('private', false);
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
             $parentName = $resolveInfo->parentType->name;
-            $rootID = null !== $root && null !== $rootCacheKey
+            $rootID = $root !== null && $rootCacheKey !== null
                 ? data_get($root, $rootCacheKey)
                 : null;
             $fieldName = $resolveInfo->fieldName;
@@ -67,22 +67,20 @@ GRAPHQL;
                 : $this->cacheRepository;
 
             $cacheKey = $this->cacheKeyAndTags->key(
-                $context->user(),
-                $isPrivate,
-                $parentName,
-                $rootID,
-                $fieldName,
-                $args,
-                $path
+                user: $context->user(),
+                isPrivate: $isPrivate,
+                parentName: $parentName,
+                id: $rootID,
+                fieldName: $fieldName,
+                args: $args,
+                path: $path,
             );
 
-            // We found a matching value in the cache, so we can just return early without actually running the query.
+            // We found a matching value in the cache, so we can return early without actually running the query.
             $value = $cache->get($cacheKey);
-            if (null !== $value) {
+            if ($value !== null) {
                 // Deferring the result will allow nested deferred resolves to be bundled together, see https://github.com/nuwave/lighthouse/pull/2270#discussion_r1072414584.
-                return new Deferred(function () use ($value) {
-                    return $value;
-                });
+                return new Deferred(static fn () => $value);
             }
 
             // In Laravel cache, null is considered a non-existent value, see https://laravel.com/docs/9.x/cache#checking-for-item-existence:
@@ -111,12 +109,8 @@ GRAPHQL;
             $resolved = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
-                ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
-                    $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
-                }
-            : static function ($result) use ($cacheKey, $cache): void {
-                $cache->forever($cacheKey, $result);
-            };
+                ? static fn ($result): bool => $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge))
+                : static fn ($result): bool => $cache->forever($cacheKey, $result);
 
             Resolved::handle($resolved, $storeInCache);
 
@@ -124,12 +118,10 @@ GRAPHQL;
         });
     }
 
-    /**
-     * Check if tags should be used and are available.
-     */
+    /** Check if tags should be used and are available. */
     protected function shouldUseTags(): bool
     {
-        return config('lighthouse.cache.tags', false)
+        return config('lighthouse.cache_directive_tags', false)
             && method_exists($this->cacheRepository->getStore(), 'tags');
     }
 }

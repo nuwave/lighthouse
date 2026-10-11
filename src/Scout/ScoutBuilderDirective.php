@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Scout;
 
@@ -11,5 +11,5 @@ interface ScoutBuilderDirective
      *
      * @param  mixed  $value  Any client given value
      */
-    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder;
+    public function handleScoutBuilder(ScoutBuilder $builder, mixed $value): ScoutBuilder;
 }

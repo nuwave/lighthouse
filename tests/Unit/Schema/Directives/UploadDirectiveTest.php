@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
@@ -21,38 +21,38 @@ final class UploadDirectiveTest extends TestCase
 
         Storage::fake('uploadDisk');
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
         type Mutation {
             upload(
             file: Upload! @upload
             ): String @mock
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $file = UploadedFile::fake()->create('test.pdf', 500);
 
         $this->multipartGraphQL(
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                     mutation ($file: Upload!) {
                         file: upload(file: $file)
                     }
-                ',
+                GRAPHQL,
                 'variables' => [
                     'file' => null,
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
             ],
         ]);
 
-        $this->assertEquals('private', Storage::getVisibility($filePath));
+        $this->assertSame('private', Storage::getVisibility($filePath));
     }
 
     public function testUploadArgumentWithDiskParameter(): void
@@ -64,31 +64,31 @@ final class UploadDirectiveTest extends TestCase
             return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
         type Mutation {
             upload(
             file: Upload! @upload(disk:"uploadDisk")
             ): String @mock
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $file = UploadedFile::fake()->create('test.pdf', 500);
 
         $this->multipartGraphQL(
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file: Upload!) {
                     file: upload(file: $file)
                 }
-            ',
+                GRAPHQL,
                 'variables' => [
                     'file' => null,
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -106,31 +106,31 @@ final class UploadDirectiveTest extends TestCase
             return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
         type Mutation {
             upload(
             file: Upload! @upload(path:"test")
             ): String @mock
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $file = UploadedFile::fake()->create('test.pdf', 500);
 
         $this->multipartGraphQL(
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file: Upload!) {
                     file: upload(file: $file)
                 }
-            ',
+                GRAPHQL,
                 'variables' => [
                     'file' => null,
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -148,38 +148,38 @@ final class UploadDirectiveTest extends TestCase
             return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
         type Mutation {
             upload(
             file: Upload! @upload(public: true disk:"uploadDisk")
             ): String @mock
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $file = UploadedFile::fake()->create('test.pdf', 500);
 
         $this->multipartGraphQL(
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file: Upload!) {
                     file: upload(file: $file)
                 }
-            ',
+                GRAPHQL,
                 'variables' => [
                     'file' => null,
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
             ],
         ]);
 
-        $this->assertEquals('public', Storage::getVisibility($filePath));
+        $this->assertSame('public', Storage::getVisibility($filePath));
     }
 
     public function testUploadArgumentWhereValueIsNull(): void
@@ -189,29 +189,29 @@ final class UploadDirectiveTest extends TestCase
             return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
         type Mutation {
             upload(
             file: Upload @upload
             ): String @mock
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $this->multipartGraphQL(
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file: Upload) {
                     file: upload(file: $file)
                 }
-            ',
+                GRAPHQL,
                 'variables' => [
                     'file' => null,
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => []]
+            ['0' => []],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -223,15 +223,15 @@ final class UploadDirectiveTest extends TestCase
     {
         config(['filesystems.default' => 'uploadDisk']);
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
         type Mutation {
             upload(
             file: Upload! @upload(disk:"uploadDisk")
             ): Boolean
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $file = UploadedFile::fake()->create('test.pdf', 500);
 
@@ -239,17 +239,17 @@ final class UploadDirectiveTest extends TestCase
 
         $this->multipartGraphQL(
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file: Upload!) {
                     file: upload(file: $file)
                 }
-            ',
+                GRAPHQL,
                 'variables' => [
                     'file' => null,
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         );
     }
 
@@ -258,15 +258,15 @@ final class UploadDirectiveTest extends TestCase
         config(['filesystems.default' => 'uploadDisk']);
         Storage::fake('uploadDisk');
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
         type Mutation {
             upload(
             file: Upload! @upload(path:"/")
             ): String
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $file = \Mockery::mock(File::class);
 
@@ -280,35 +280,35 @@ final class UploadDirectiveTest extends TestCase
 
         $this->multipartGraphQL(
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file: Upload!) {
                     file: upload(file: $file)
                 }
-            ',
+                GRAPHQL,
                 'variables' => [
                     'file' => null,
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         );
     }
 
     public function testThrowsAnExceptionIfAttributeIsNotUploadedFile(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 baz: String @upload
             ): Boolean
         }
-        ';
+        GRAPHQL;
 
         $this->expectExceptionObject(new \InvalidArgumentException('Expected argument `baz` to be instanceof Illuminate\\Http\\UploadedFile.'));
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(baz: "something")
         }
-        ');
+        GRAPHQL);
     }
 }

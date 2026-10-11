@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 final class Image extends Model
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<Model, $this> */
     public function imageable(): MorphTo
     {
         return $this->morphTo();

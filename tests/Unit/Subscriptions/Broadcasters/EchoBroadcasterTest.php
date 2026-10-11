@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions\Broadcasters;
 
@@ -9,26 +9,24 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Constraint\Callback;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
 
 final class EchoBroadcasterTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function testBroadcast(): void
     {
         $broadcastManager = $this->createMock(BroadcastManager::class);
         $broadcastManager->expects($this->once())
             ->method('event')
-            ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return Broadcaster::EVENT_NAME === $event->broadcastAs()
-                    && 'test-123' === $event->broadcastOn()->name
-                    && 'foo' === $event->data;
-            }));
+            ->with(new Callback(static fn (EchoSubscriptionEvent $event): bool => $event->broadcastAs() === Broadcaster::EVENT_NAME
+                && $event->broadcastOn()->name === 'test-123'
+                && $event->data === 'foo'));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'test-123';
 
         $redisBroadcaster->broadcast($subscriber, 'foo');
@@ -39,12 +37,12 @@ final class EchoBroadcasterTest extends TestCase
         $broadcastManager = $this->createMock(BroadcastManager::class);
         $broadcastManager->expects($this->once())
             ->method('event')
-            ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return 'private-test-123' === $event->broadcastOn()->name;
-            }));
+            ->with(new Callback(
+                static fn (EchoSubscriptionEvent $event): bool => $event->broadcastOn()->name === 'private-test-123',
+            ));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'private-test-123';
 
         $redisBroadcaster->broadcast($subscriber, 'foo');
@@ -52,8 +50,7 @@ final class EchoBroadcasterTest extends TestCase
 
     public function testAuthorized(): void
     {
-        $broadcastManager = $this->createMock(BroadcastManager::class);
-        $redisBroadcaster = new EchoBroadcaster($broadcastManager);
+        $redisBroadcaster = new EchoBroadcaster($this->createStub(BroadcastManager::class));
 
         $request = new Request();
         $request['channel_name'] = 'abc';
@@ -61,16 +58,15 @@ final class EchoBroadcasterTest extends TestCase
 
         $response = $redisBroadcaster->authorized($request);
         $data = \Safe\json_decode($response->content());
-        $this->assertEquals(md5('abcdef'), $data->channel_data->user_id);
-        $this->assertEquals(200, $response->status());
+        $this->assertSame(md5('abcdef'), $data->channel_data->user_id);
+        $this->assertSame(200, $response->status());
     }
 
     public function testUnauthorized(): void
     {
-        $broadcastManager = $this->createMock(BroadcastManager::class);
-        $redisBroadcaster = new EchoBroadcaster($broadcastManager);
+        $redisBroadcaster = new EchoBroadcaster($this->createStub(BroadcastManager::class));
 
         $response = $redisBroadcaster->unauthorized(new Request());
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertSame(403, $response->getStatusCode());
     }
 }

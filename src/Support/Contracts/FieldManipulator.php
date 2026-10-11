@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
@@ -9,14 +9,10 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface FieldManipulator extends Directive
 {
-    /**
-     * Manipulate the AST based on a field definition.
-     *
-     * @return void
-     */
+    /** Manipulate the AST based on a field definition. */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    );
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+    ): void;
 }

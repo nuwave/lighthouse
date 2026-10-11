@@ -1,32 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
-use BenSampo\Enum\Enum;
+use BenSampo\Enum\Enum as BenSampoEnum;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 
 /**
- * A convenience wrapper for registering enums programmatically.
+ * A convenience wrapper for registering enums from bensampo/laravel-enum programmatically.
+ *
+ * @template TValue
+ * @template TEnum of \BenSampo\Enum\Enum<TValue>
  */
 class LaravelEnumType extends EnumType
 {
     public const DEPRECATED_PHPDOC_TAG = '@deprecated';
 
-    /**
-     * @var class-string<\BenSampo\Enum\Enum>
-     */
+    /** @var class-string<TEnum> */
     protected string $enumClass;
 
-    /**
-     * @var \ReflectionClass<\BenSampo\Enum\Enum>
-     */
+    /** @var \ReflectionClass<TEnum> */
     protected \ReflectionClass $reflection;
 
     /**
      * Create a GraphQL enum from a Laravel enum type.
      *
-     * @param  class-string<\BenSampo\Enum\Enum>  $enumClass
+     * @param  class-string<TEnum>  $enumClass
      * @param  string|null  $name  The name the enum will have in the schema, defaults to the basename of the given class
      */
     public function __construct(string $enumClass, ?string $name = null)
@@ -36,7 +35,7 @@ class LaravelEnumType extends EnumType
         }
 
         // @phpstan-ignore-next-line not necessary with full static validation
-        if (! is_subclass_of($enumClass, Enum::class)) {
+        if (! is_subclass_of($enumClass, BenSampoEnum::class)) {
             throw self::classMustExtendBenSampoEnumEnum($enumClass);
         }
 
@@ -47,18 +46,21 @@ class LaravelEnumType extends EnumType
             'name' => $name ?? class_basename($enumClass),
             'description' => $this->enumClassDescription($enumClass),
             'values' => array_map(
-                /**
-                 * @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition
-                 */
-                function (Enum $enum): array {
+                /** @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition */
+                function (BenSampoEnum $enum): array {
+                    $key = $enum->key;
+                    if (! $key) {
+                        throw static::enumMustHaveKey($enum);
+                    }
+
                     return [
-                        'name' => $enum->key,
+                        'name' => $key,
                         'value' => $enum,
                         'description' => $this->enumValueDescription($enum),
-                        'deprecationReason' => $this->deprecationReason($enum),
+                        'deprecationReason' => $this->deprecationReason($key),
                     ];
                 },
-                $enumClass::getInstances()
+                $enumClass::getInstances(),
             ),
         ]);
     }
@@ -70,25 +72,26 @@ class LaravelEnumType extends EnumType
 
     public static function classMustExtendBenSampoEnumEnum(string $enumClass): \InvalidArgumentException
     {
-        $baseClass = Enum::class;
+        $baseClass = BenSampoEnum::class;
 
         return new \InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
     }
 
-    public static function enumMustHaveKey(Enum $value): \InvalidArgumentException
+    /** @param  \BenSampo\Enum\Enum<mixed>  $value */
+    public static function enumMustHaveKey(BenSampoEnum $value): \InvalidArgumentException
     {
-        $class = get_class($value);
+        $class = $value::class;
 
         return new \InvalidArgumentException("Enum of class {$class} must have key.");
     }
 
-    protected function deprecationReason(Enum $enum): ?string
+    protected function deprecationReason(string $key): ?string
     {
-        $constant = $this->reflection->getReflectionConstant($enum->key);
+        $constant = $this->reflection->getReflectionConstant($key);
         assert($constant instanceof \ReflectionClassConstant, 'Enum keys are derived from the constant names');
 
         $docComment = $constant->getDocComment();
-        if (false === $docComment) {
+        if ($docComment === false) {
             return null;
         }
 
@@ -99,13 +102,13 @@ class LaravelEnumType extends EnumType
         foreach ($lines as $line) {
             $parts = explode(self::DEPRECATED_PHPDOC_TAG, $line);
 
-            if (1 === count($parts)) {
+            if (count($parts) === 1) {
                 continue;
             }
 
             $reason = trim($parts[1]);
 
-            return '' === $reason
+            return $reason === ''
                 ? Directive::DEFAULT_DEPRECATION_REASON
                 : $reason;
         }
@@ -116,28 +119,26 @@ class LaravelEnumType extends EnumType
     /**
      * TODO remove check and inline when requiring bensampo/laravel-enum:6.
      *
-     * @param  class-string<\BenSampo\Enum\Enum>  $enumClass
+     * @param  class-string<\BenSampo\Enum\Enum<mixed>>  $enumClass
      */
     protected function enumClassDescription(string $enumClass): ?string
     {
         // @phpstan-ignore-next-line only in some versions
         return method_exists($enumClass, 'getClassDescription')
-            // @phpstan-ignore-next-line proven to exist by the line above
             ? $enumClass::getClassDescription()
             : null;
     }
 
-    protected function enumValueDescription(Enum $enum): ?string
+    /** @param  TEnum  $enum */
+    protected function enumValueDescription(BenSampoEnum $enum): ?string
     {
         return $enum->description;
     }
 
-    /**
-     * Overwrite the native EnumType serialization, as this class does not hold plain values.
-     */
+    /** Overwrite the native EnumType serialization, as this class does not hold plain values. */
     public function serialize($value): string
     {
-        if (! $value instanceof Enum) {
+        if (! $value instanceof BenSampoEnum) {
             $value = $this->enumClass::fromValue($value);
         }
 
@@ -147,5 +148,14 @@ class LaravelEnumType extends EnumType
         }
 
         return $key;
+    }
+
+    public function parseValue($value)
+    {
+        if ($value instanceof $this->enumClass) {
+            return $value;
+        }
+
+        return parent::parseValue($value);
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema;
 
@@ -9,45 +9,31 @@ use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class SchemaBuilder
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    protected Schema $schema;
 
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
-     */
-    protected $astBuilder;
-
-    /**
-     * @var \GraphQL\Type\Schema
-     */
-    protected $schema;
-
-    public function __construct(TypeRegistry $typeRegistry, ASTBuilder $astBuilder)
-    {
-        $this->typeRegistry = $typeRegistry;
-        $this->astBuilder = $astBuilder;
-    }
+    public function __construct(
+        protected TypeRegistry $typeRegistry,
+        protected ASTBuilder $astBuilder,
+    ) {}
 
     public function schema(): Schema
     {
-        if (! isset($this->schema)) {
-            return $this->schema = $this->build(
-                $this->astBuilder->documentAST()
-            );
-        }
-
-        return $this->schema;
+        return $this->schema ??= $this->build(
+            $this->astBuilder->documentAST(),
+        );
     }
 
-    /**
-     * Build an executable schema from an AST.
-     */
+    public function schemaHash(): string
+    {
+        return $this->astBuilder->documentAST()->hash;
+    }
+
+    /** Build an executable schema from an AST. */
     protected function build(DocumentAST $documentAST): Schema
     {
         $config = SchemaConfig::create();
@@ -75,24 +61,26 @@ class SchemaBuilder
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            function (string $name): ?Type {
-                return $this->typeRegistry->search($name);
-            }
+            fn (string $name): ?Type => $this->typeRegistry->search($name),
         );
 
         // Enables introspection to list all types in the schema
         $config->setTypes(
-            /**
-             * @return array<string, \GraphQL\Type\Definition\Type>
-             */
-            function (): array {
-                return $this->typeRegistry->possibleTypes();
-            }
+            /** @return array<string, \GraphQL\Type\Definition\Type> */
+            fn (): array => $this->typeRegistry->possibleTypes(),
         );
+
+        // Passing scalar overrides explicitly prevents the first lookup of a built-in scalar
+        // from discovering them by resolving the lazy types callable, which would eagerly
+        // build every type in the schema, see https://github.com/nuwave/lighthouse/issues/2771.
+        // TODO remove this check when the minimum version of webonyx/graphql-php includes the method
+        if (method_exists($config, 'setScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
+            $config->setScalarOverrides($this->typeRegistry->scalarOverrides());
+        }
 
         // There is no way to resolve directives lazily, so we convert them eagerly
         $directiveFactory = new DirectiveFactory(
-            new ExecutableTypeNodeConverter($this->typeRegistry)
+            new ExecutableTypeNodeConverter($this->typeRegistry),
         );
 
         $directives = [];
@@ -101,8 +89,10 @@ class SchemaBuilder
         }
 
         $config->setDirectives(
-            array_merge(GraphQL::getStandardDirectives(), $directives)
+            array_merge(GraphQL::getStandardDirectives(), $directives),
         );
+
+        $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
     }

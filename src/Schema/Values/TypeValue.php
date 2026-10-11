@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
@@ -13,26 +13,20 @@ use Nuwave\Lighthouse\Schema\RootType;
 
 class TypeValue
 {
-    /**
-     * Cache key for this type.
-     */
+    /** Cache key for this type. */
     protected string $cacheKey;
 
     public function __construct(
-        protected TypeDefinitionNode $typeDefinition
+        protected TypeDefinitionNode $typeDefinition,
     ) {}
 
-    /**
-     * Get the name of the node.
-     */
+    /** Get the name of the node. */
     public function getTypeDefinitionName(): string
     {
         return $this->getTypeDefinition()->getName()->value;
     }
 
-    /**
-     * Get the underlying type definition.
-     */
+    /** Get the underlying type definition. */
     public function getTypeDefinition(): TypeDefinitionNode
     {
         return $this->typeDefinition;
@@ -44,15 +38,14 @@ class TypeValue
             $typeName = $this->getTypeDefinitionName();
 
             // The Query type is exempt from requiring a cache key
-            if (RootType::QUERY === $typeName) {
+            if ($typeName === RootType::QUERY) {
                 return null;
             }
 
             $typeDefinition = $this->typeDefinition;
             if (! $typeDefinition instanceof ObjectTypeDefinitionNode) {
                 $expected = ObjectTypeDefinitionNode::class;
-                $actual = get_class($typeDefinition);
-
+                $actual = $typeDefinition::class;
                 throw new DefinitionException("Can only determine cacheKey for types of {$expected}, but type {$typeName} is {$actual}.");
             }
 
@@ -72,7 +65,7 @@ class TypeValue
                 if (
                     $fieldType instanceof NonNullTypeNode
                     && $fieldType->type instanceof NamedTypeNode
-                    && 'ID' === $fieldType->type->name->value
+                    && $fieldType->type->name->value === 'ID'
                 ) {
                     return $this->cacheKey = ASTHelper::internalFieldName($field);
                 }

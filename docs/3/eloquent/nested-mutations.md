@@ -1,12 +1,10 @@
 # Nested Mutations
 
-Lighthouse allows you to create, update or delete models and their associated relationships
-all in one single mutation.
+Lighthouse allows you to create, update or delete models and their associated relationships all in one single mutation.
 
 ## Return Types Required
 
-You have to define return types on your relationship methods so that Lighthouse
-can detect them.
+You have to define return types on your relationship methods so that Lighthouse can detect them.
 
 ```php
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,8 +28,7 @@ class Post extends Model
 ## Partial Failure
 
 By default, all mutations are wrapped in a database transaction.
-If any of the nested operations fail, the whole mutation is aborted
-and no changes are written to the database.
+If any of the nested operations fail, the whole mutation is aborted and no changes are written to the database.
 
 You can change this setting [in the configuration](../getting-started/configuration.md).
 
@@ -45,8 +42,7 @@ type Mutation {
 }
 ```
 
-The mutation takes a single argument `input` that contains data about
-the Post you want to create.
+The mutation takes a single argument `input` that contains data about the Post you want to create.
 
 ```graphql
 input CreatePostInput {
@@ -55,8 +51,7 @@ input CreatePostInput {
 }
 ```
 
-The first argument `title` is a value of the `Post` itself and corresponds
-to a column in the database.
+The first argument `title` is a value of the `Post` itself and corresponds to a column in the database.
 
 The second argument `author`, exposes operations on the related `User` model.
 It has to be named just like the relationship method that is defined on the `Post` model.
@@ -83,8 +78,7 @@ input CreateUserInput {
 }
 ```
 
-To create a new model and connect it to an existing model,
-just pass the ID of the model you want to associate.
+To create a new model and connect it to an existing model, just pass the ID of the model you want to associate.
 
 ```graphql
 mutation {
@@ -112,8 +106,7 @@ Lighthouse will create a new `Post` and associate an `User` with it.
 }
 ```
 
-If the related model does not exist yet, you can also
-create a new one.
+If the related model does not exist yet, you can also create a new one.
 
 ```graphql
 mutation {
@@ -142,8 +135,7 @@ mutation {
 ```
 
 When issuing an update, you can also allow the user to remove a relation.
-Both `disconnect` and `delete` remove the association to the author,
-but `delete` also removes the author model itself.
+Both `disconnect` and `delete` remove the association to the author, but `delete` also removes the author model itself.
 
 ```graphql
 type Mutation {
@@ -165,8 +157,7 @@ input UpdateAuthorRelation {
 ```
 
 You must pass a truthy value to `disconnect` and `delete` for them to actually run.
-This structure was chosen as it is consistent with updating `BelongsToMany` relationships
-and allows the query string to be mostly static, taking a variable value to control its behaviour.
+This structure was chosen as it is consistent with updating `BelongsToMany` relationships and allows the query string to be mostly static, taking a variable value to control its behaviour.
 
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean) {
@@ -184,8 +175,7 @@ mutation UpdatePost($disconnectAuthor: Boolean) {
 }
 ```
 
-The `author` relationship will only be disconnected if the value of the variable
-`$disconnectAuthor` is `true`, if `false` or `null` are passed, it will not change.
+The `author` relationship will only be disconnected if the value of the variable `$disconnectAuthor` is `true`, if `false` or `null` are passed, it will not change.
 
 ```json
 {
@@ -200,8 +190,8 @@ The `author` relationship will only be disconnected if the value of the variable
 
 ## Has Many
 
-The counterpart to a `BelongsTo` relationship is `HasMany`. We will start
-of by defining a mutation to create an `User`.
+The counterpart to a `BelongsTo` relationship is `HasMany`.
+We will start of by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
@@ -209,8 +199,7 @@ type Mutation {
 }
 ```
 
-This mutation takes a single argument `input` that contains values
-of the `User` itself and its associated `Post` models.
+This mutation takes a single argument `input` that contains values of the `User` itself and its associated `Post` models.
 
 ```graphql
 input CreateUserInput {
@@ -219,8 +208,7 @@ input CreateUserInput {
 }
 ```
 
-Now, we can an operation that allows us to directly create new posts
-right when we create the `User`.
+Now, we can an operation that allows us to directly create new posts right when we create the `User`.
 
 ```graphql
 input CreatePostsRelation {
@@ -276,8 +264,7 @@ mutation {
 When updating a `User`, further nested operations become possible.
 It is up to you which ones you want to expose through the schema definition.
 
-The following example covers the full range of possible operations:
-`create`, `update` and `delete`.
+The following example covers the full range of possible operations: `create`, `update` and `delete`.
 
 ```graphql
 type Mutation {
@@ -329,8 +316,7 @@ mutation {
 
 ## Belongs To Many
 
-A belongs to many relation allows you to create new related models as well
-as attaching existing ones.
+A belongs to many relation allows you to create new related models as well as attaching existing ones.
 
 ```graphql
 type Mutation {
@@ -353,8 +339,7 @@ input CreateAuthorInput {
 }
 ```
 
-Just pass the ID of the models you want to associate or their full information
-to create a new relation.
+Just pass the ID of the models you want to associate or their full information to create a new relation.
 
 ```graphql
 mutation {
@@ -394,8 +379,7 @@ Lighthouse will detect the relationship and attach/create it.
 }
 ```
 
-It is also possible to use the `sync` operation to ensure only the given IDs
-will be contained withing the relation.
+It is also possible to use the `sync` operation to ensure only the given IDs will be contained withing the relation.
 
 ```graphql
 mutation {
@@ -487,8 +471,7 @@ mutation {
 
 ## Morph To Many
 
-A morph to many relation allows you to create new related models as well
-as attaching existing ones.
+A morph to many relation allows you to create new related models as well as attaching existing ones.
 
 ```graphql
 type Mutation {
@@ -522,7 +505,8 @@ type Tag {
 }
 ```
 
-In this example, the tag with id `1` already exists in the database. The query connects this tag to the task using the `MorphToMany` relationship.
+In this example, the tag with id `1` already exists in the database.
+The query connects this tag to the task using the `MorphToMany` relationship.
 
 ```graphql
 mutation {
@@ -537,8 +521,7 @@ mutation {
 
 You can either use `connect` or `sync` during creation.
 
-When you want to create a new tag while creating the task,
-you need use the `create` operation to provide an array of `CreateTagInput`:
+When you want to create a new tag while creating the task, you need use the `create` operation to provide an array of `CreateTagInput`:
 
 ```graphql
 mutation {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Defer;
 
@@ -12,71 +12,44 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Defer implements CreatesResponse
 {
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse
-     */
-    protected $stream;
-
-    /**
-     * @var \Nuwave\Lighthouse\GraphQL
-     */
-    protected $graphQL;
-
-    /**
-     * @var \Nuwave\Lighthouse\Events\StartExecution
-     */
-    protected $startExecution;
+    protected StartExecution $startExecution;
 
     /**
      * A map from paths to deferred resolvers.
      *
-     * @var array<string, \Closure(): mixed>
+     * @var array<string, callable(): mixed>
      */
-    protected $deferred = [];
+    protected array $deferred = [];
 
     /**
      * Paths resolved during the current nesting of defers.
      *
      * @var array<int, mixed>
      */
-    protected $resolved = [];
+    protected array $resolved = [];
 
     /**
      * The entire result of resolving the query up until the current nesting.
      *
      * @var array<string, mixed>
      */
-    protected $result = [];
+    protected array $result = [];
 
-    /**
-     * Should further deferring happen?
-     *
-     * @var bool
-     */
-    protected $shouldDeferFurther = true;
+    /** Should further deferring happen? */
+    protected bool $shouldDeferFurther = true;
 
-    /**
-     * Are we currently streaming deferred results?
-     *
-     * @var bool
-     */
-    protected $isStreaming = false;
+    /** Are we currently streaming deferred results? */
+    protected bool $isStreaming = false;
 
-    /**
-     * @var float|int
-     */
-    protected $maxExecutionTime = 0;
+    protected int|float $maxExecutionTime = 0;
 
-    /**
-     * @var int
-     */
-    protected $maxNestedFields = 0;
+    protected int $maxNestedFields = 0;
 
-    public function __construct(CanStreamResponse $stream, GraphQL $graphQL, ConfigRepository $config)
-    {
-        $this->stream = $stream;
-        $this->graphQL = $graphQL;
-
+    public function __construct(
+        protected CanStreamResponse $stream,
+        protected GraphQL $graphQL,
+        ConfigRepository $config,
+    ) {
         $executionTime = $config->get('lighthouse.defer.max_execution_ms', 0);
         if ($executionTime > 0) {
             $this->maxExecutionTime = microtime(true) + $executionTime * 1000;
@@ -93,20 +66,20 @@ class Defer implements CreatesResponse
     /**
      * Register deferred field.
      *
-     * @param  \Closure(): mixed  $resolver
+     * @param  callable(): mixed  $resolver
      *
      * @return mixed the data if it is already available
      */
-    public function defer(\Closure $resolver, string $path)
+    public function defer(callable $resolver, string $path): mixed
     {
         $data = $this->getData($path);
-        if (null !== $data) {
+        if ($data !== null) {
             return $data;
         }
 
         // If we have been here before, now is the time to resolve this field
         $deferredResolver = $this->deferred[$path] ?? null;
-        if ($deferredResolver) {
+        if ($deferredResolver !== null) {
             return $this->resolve($deferredResolver, $path);
         }
 
@@ -119,20 +92,13 @@ class Defer implements CreatesResponse
         return null;
     }
 
-    /**
-     * @return mixed The data at the path
-     */
-    protected function getData(string $path)
+    protected function getData(string $path): mixed
     {
         return Arr::get($this->result, "data.{$path}");
     }
 
-    /**
-     * @param  \Closure(): mixed  $resolver
-     *
-     * @return mixed The loaded data
-     */
-    protected function resolve(\Closure $resolver, string $path)
+    /** @param  callable(): mixed  $resolver */
+    protected function resolve(callable $resolver, string $path): mixed
     {
         unset($this->deferred[$path]);
         $this->resolved[] = $path;
@@ -140,12 +106,8 @@ class Defer implements CreatesResponse
         return $resolver();
     }
 
-    /**
-     * @param  \Closure(): mixed  $originalResolver
-     *
-     * @return mixed The loaded data
-     */
-    public function findOrResolve(\Closure $originalResolver, string $path)
+    /** @param  callable(): mixed  $originalResolver */
+    public function findOrResolve(callable $originalResolver, string $path): mixed
     {
         if ($this->hasData($path)) {
             return $this->getData($path);
@@ -202,13 +164,13 @@ class Defer implements CreatesResponse
             [
                 'X-Accel-Buffering' => 'no',
                 'Content-Type' => 'multipart/mixed; boundary="-"',
-            ]
+            ],
         );
     }
 
     protected function hasRemainingDeferred(): bool
     {
-        return [] !== $this->deferred;
+        return $this->deferred !== [];
     }
 
     protected function stream(): void
@@ -216,28 +178,24 @@ class Defer implements CreatesResponse
         $this->stream->stream(
             $this->result,
             $this->resolved,
-            ! $this->hasRemainingDeferred()
+            ! $this->hasRemainingDeferred(),
         );
     }
 
-    /**
-     * Check if we reached the maximum execution time.
-     */
+    /** Check if we reached the maximum execution time. */
     protected function maxExecutionTimeReached(): bool
     {
-        if (0 === $this->maxExecutionTime) {
+        if ($this->maxExecutionTime === 0) {
             return false;
         }
 
         return $this->maxExecutionTime <= microtime(true);
     }
 
-    /**
-     * Check if the maximum number of nested field has been resolved.
-     */
+    /** Check if the maximum number of nested field has been resolved. */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
-        if (0 === $this->maxNestedFields) {
+        if ($this->maxNestedFields === 0) {
             return false;
         }
 
@@ -246,17 +204,14 @@ class Defer implements CreatesResponse
 
     protected function executeDeferred(): void
     {
-        $executionResult = $this->graphQL->executeParsedQuery(
+        $this->result = $this->graphQL->executeParsedQuery(
             $this->startExecution->query,
             $this->startExecution->context,
             $this->startExecution->variables,
             null,
-            $this->startExecution->operationName
+            $this->startExecution->operationName,
         );
-
-        $this->result = $this->graphQL->serializable($executionResult);
         $this->stream();
-
         $this->resolved = [];
     }
 

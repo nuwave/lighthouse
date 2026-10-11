@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation\Resolvers;
 
@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class Entities
 {
     public function __construct(
-        protected EntityResolverProvider $entityResolverProvider
+        protected EntityResolverProvider $entityResolverProvider,
     ) {}
 
     /**
@@ -23,14 +23,14 @@ class Entities
      *
      * @return array<mixed>
      */
-    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         $results = [];
 
         $representations = $args['representations'];
         $representationHashes = array_map('serialize', $representations);
 
-        $assignResultsByHash = function ($result, string $hash) use ($representationHashes, &$results): void {
+        $assignResultsByHash = static function ($result, string $hash) use ($representationHashes, &$results): void {
             foreach ($representationHashes as $index => $h) {
                 if ($hash === $h) {
                     $results[$index] = $result;
@@ -39,7 +39,8 @@ class Entities
         };
 
         /**
-         * Firstly, representations are grouped by typename to allow assigning the correct resolver for each entity.
+         * First, representations are grouped by typename.
+         * That allows assigning the correct resolver for each entity.
          * Secondly, they are deduplicated based on their hash to avoid resolving the same entity twice.
          *
          * @var array<string, array<string, array<string, mixed>>> $groupedRepresentations
