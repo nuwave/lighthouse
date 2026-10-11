@@ -129,7 +129,16 @@ class WhereConditionsHandler
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
         if (isset($condition['column'])) {
-            $condition['column'] = "{$model->getTable()}.{$condition['column']}";
+            $condition['column'] = $model->qualifyColumn($condition['column']);
+        }
+
+        foreach (['AND', 'OR'] as $boolean) {
+            if (isset($condition[$boolean])) {
+                $condition[$boolean] = array_map(
+                    fn (array $nestedCondition): array => $this->prefixConditionWithTableName($nestedCondition, $model),
+                    $condition[$boolean],
+                );
+            }
         }
 
         return $condition;

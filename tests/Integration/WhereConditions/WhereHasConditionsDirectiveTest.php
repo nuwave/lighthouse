@@ -238,6 +238,82 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testWhereHasBelongsToManyWithNestedAnd(): void
+    {
+        factory(User::class)->create();
+
+        /** @var Role $role */
+        $role = factory(Role::class)->create();
+
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $user->roles()->attach($role);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: Mixed!) {
+            users(
+                hasRoles: {
+                    AND: [
+                        {
+                            column: "id",
+                            value: $id
+                        }
+                    ]
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $role->getKey(),
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $user->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasBelongsToManyWithQualifiedColumn(): void
+    {
+        factory(User::class)->create();
+
+        /** @var Role $role */
+        $role = factory(Role::class)->create();
+
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $user->roles()->attach($role);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: Mixed!) {
+            users(
+                hasRoles: {
+                    column: "roles.id",
+                    value: $id
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $role->getKey(),
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $user->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testWhereHasBelongsToManyOrNestedConditions(): void
     {
         $parentWithoutPosts = factory(Category::class)->create();

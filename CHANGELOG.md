@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Qualify columns in nested `AND`/`OR` of `HAS` conditions and keep already qualified columns as they are https://github.com/nuwave/lighthouse/pull/1472
+
 ## v6.71.1
 
 ### Fixed
