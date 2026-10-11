@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix `@delete`, `@forceDelete` and `@restore` rejecting arguments with builder directives that follow an input argument without builder directives https://github.com/nuwave/lighthouse/pull/PR_NUMBER
+- Fix `@delete`, `@forceDelete` and `@restore` rejecting arguments with builder directives that follow an input argument without builder directives https://github.com/nuwave/lighthouse/pull/2797
 
 ## v6.71.2
 
