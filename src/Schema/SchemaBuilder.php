@@ -45,21 +45,8 @@ class SchemaBuilder
         assert($query instanceof ObjectType);
         $config->setQuery($query);
 
-        // Mutation and Subscription are optional, so only add them
-        // if they are present in the schema or named in the schema definition
-        $mutationTypeName = $documentAST->rootTypes[RootType::MUTATION] ?? null;
-        if ($mutationTypeName !== null && ($mutationTypeName !== RootType::MUTATION || isset($documentAST->types[$mutationTypeName]))) {
-            $mutation = $this->typeRegistry->get($mutationTypeName);
-            assert($mutation instanceof ObjectType);
-            $config->setMutation($mutation);
-        }
-
-        $subscriptionTypeName = $documentAST->rootTypes[RootType::SUBSCRIPTION] ?? null;
-        if ($subscriptionTypeName !== null && ($subscriptionTypeName !== RootType::SUBSCRIPTION || isset($documentAST->types[$subscriptionTypeName]))) {
-            $subscription = $this->typeRegistry->get($subscriptionTypeName);
-            assert($subscription instanceof ObjectType);
-            $config->setSubscription($subscription);
-        }
+        $config->setMutation($this->optionalRootType($documentAST, RootType::MUTATION));
+        $config->setSubscription($this->optionalRootType($documentAST, RootType::SUBSCRIPTION));
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
@@ -97,5 +84,23 @@ class SchemaBuilder
         $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
+    }
+
+    /** A root type with its default name is optional, one with a custom name must be defined. */
+    protected function optionalRootType(DocumentAST $documentAST, string $defaultName): ?ObjectType
+    {
+        $typeName = $documentAST->rootTypes[$defaultName] ?? null;
+        if ($typeName === null) {
+            return null;
+        }
+
+        if ($typeName === $defaultName && ! isset($documentAST->types[$typeName])) {
+            return null;
+        }
+
+        $type = $this->typeRegistry->get($typeName);
+        assert($type instanceof ObjectType, 'root types are object types');
+
+        return $type;
     }
 }
