@@ -17,6 +17,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Cache the query AST as an array in `query_cache.mode: store`, so it no longer requires allowing AST classes in `cache.serializable_classes` https://github.com/nuwave/lighthouse/pull/2785
 
+## v6.71.2
+
+### Fixed
+
+- Apply the `action` of `@canResolved` and friends when the field resolves to a promise, such as a batch loaded relation https://github.com/nuwave/lighthouse/pull/2786
+
 ## v6.71.1
 
 ### Fixed
