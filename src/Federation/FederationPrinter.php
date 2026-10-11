@@ -17,7 +17,6 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Federation\Directives\ComposeDirectiveDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
@@ -30,7 +29,6 @@ use Nuwave\Lighthouse\Federation\Directives\ProvidesDirective;
 use Nuwave\Lighthouse\Federation\Directives\RequiresDirective;
 use Nuwave\Lighthouse\Federation\Directives\ShareableDirective;
 use Nuwave\Lighthouse\Federation\Directives\TagDirective;
-use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
 {
@@ -70,8 +68,9 @@ class FederationPrinter
             unset($types[$type]);
         }
 
-        $originalQueryType = Arr::pull($types, RootType::QUERY);
+        $originalQueryType = $schema->getQueryType();
         assert($originalQueryType instanceof ObjectType);
+        unset($types[$originalQueryType->name]);
 
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
@@ -79,16 +78,16 @@ class FederationPrinter
         );
         $newQueryType = $queryFieldsWithoutFederation !== []
             ? new ObjectType([
-                'name' => RootType::QUERY,
+                'name' => $originalQueryType->name,
                 'fields' => $queryFieldsWithoutFederation,
                 'interfaces' => $originalQueryType->getInterfaces(),
             ])
             : null;
         $config->setQuery($newQueryType);
 
-        $config->setMutation(Arr::pull($types, RootType::MUTATION));
+        $config->setMutation($schema->getMutationType());
 
-        $config->setSubscription(Arr::pull($types, RootType::SUBSCRIPTION));
+        $config->setSubscription($schema->getSubscriptionType());
 
         $config->setTypes($types);
 

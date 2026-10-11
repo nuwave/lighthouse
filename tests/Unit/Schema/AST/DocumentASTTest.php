@@ -118,4 +118,94 @@ final class DocumentASTTest extends TestCase
 
         $this->assertSame($documentAST->hash, $reserialized->hash);
     }
+
+    public function testRootTypesDefaultToTheirNames(): void
+    {
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int
+        }
+        GRAPHQL);
+
+        $this->assertSame([
+            RootType::QUERY => 'Query',
+            RootType::MUTATION => 'Mutation',
+            RootType::SUBSCRIPTION => 'Subscription',
+        ], $documentAST->rootTypes);
+    }
+
+    public function testRootTypesFromSchemaDefinitionAndExtension(): void
+    {
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        extend schema {
+            subscription: RootSubscription
+        }
+
+        schema {
+            query: RootQuery
+        }
+
+        type RootQuery {
+            foo: Int
+        }
+        GRAPHQL);
+
+        $this->assertSame([
+            RootType::QUERY => 'RootQuery',
+            RootType::SUBSCRIPTION => 'RootSubscription',
+        ], $documentAST->rootTypes);
+
+        $this->assertTrue($documentAST->isRootType('RootSubscription'));
+        $this->assertFalse($documentAST->isRootType(RootType::MUTATION));
+        $this->assertSame(RootType::SUBSCRIPTION, $documentAST->defaultRootTypeName('RootSubscription'));
+        $this->assertNull($documentAST->defaultRootTypeName(RootType::QUERY));
+    }
+
+    public function testThrowsOnSchemaDefinitionWithoutQuery(): void
+    {
+        $this->expectExceptionObject(new DefinitionException('The schema definition must define the root query type.'));
+
+        DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            mutation: Mutation
+        }
+
+        type Mutation {
+            foo: Int
+        }
+        GRAPHQL);
+    }
+
+    public function testSerializesRootTypes(): void
+    {
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: RootQuery
+        }
+
+        type RootQuery {
+            foo: Int
+        }
+        GRAPHQL);
+
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
+        $reserialized = unserialize(
+            serialize($documentAST),
+        );
+        $this->assertInstanceOf(DocumentAST::class, $reserialized);
+
+        $this->assertSame([RootType::QUERY => 'RootQuery'], $reserialized->rootTypes);
+    }
+
+    public function testFromArrayWithoutRootTypes(): void
+    {
+        $serialized = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int
+        }
+        GRAPHQL)->toArray();
+        unset($serialized[DocumentAST::ROOT_TYPES]);
+
+        $this->assertSame(RootType::QUERY, DocumentAST::fromArray($serialized)->rootTypes[RootType::QUERY]);
+    }
 }

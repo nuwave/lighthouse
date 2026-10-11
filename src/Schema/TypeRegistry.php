@@ -285,7 +285,7 @@ class TypeRegistry
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
-        $typeValue = new TypeValue($definition);
+        $typeValue = new TypeValue($definition, $this->documentAST ?? null);
         $typeMiddlewareDirectives = $this->directiveLocator
             ->associatedOfType($definition, TypeMiddleware::class)
             ->all();
@@ -407,7 +407,7 @@ class TypeRegistry
     {
         return function () use ($typeDefinition): array {
             $fieldFactory = $this->fieldFactory();
-            $typeValue = new TypeValue($typeDefinition);
+            $typeValue = new TypeValue($typeDefinition, $this->documentAST);
             $fields = [];
 
             foreach ($typeDefinition->fields as $fieldDefinition) {

@@ -21,7 +21,6 @@ use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -140,7 +139,7 @@ class ASTBuilder
     {
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
         if ($extendedObjectLikeType === null) {
-            if (RootType::isRootType($typeName)) {
+            if ($this->documentAST->isRootType($typeName)) {
                 $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
             } else {

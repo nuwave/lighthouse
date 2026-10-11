@@ -102,7 +102,7 @@ GRAPHQL;
                 ),
             );
 
-            $queryType = $documentAST->types[RootType::QUERY];
+            $queryType = $documentAST->types[$documentAST->rootTypes[RootType::QUERY]];
             assert($queryType instanceof ObjectTypeDefinitionNode);
 
             if (! ASTHelper::hasNode($queryType->fields, 'node')) {

@@ -68,7 +68,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $parentName = $parentType->name->value;
-        if ($parentName !== RootType::MUTATION) {
+        if ($parentName !== ($documentAST->rootTypes[RootType::MUTATION] ?? null)) {
             $location = "{$parentName}.{$fieldDefinition->name->value}";
             throw new DefinitionException("The @async directive must only be used on root mutation fields, found it on {$location}.");
         }

@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Support custom root type names through the schema definition `schema { query: RootQuery }` https://github.com/nuwave/lighthouse/pull/2077
+
 ## v6.71.1
 
 ### Fixed
