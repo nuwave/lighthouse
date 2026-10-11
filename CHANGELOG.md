@@ -13,6 +13,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Support custom root type names through the schema definition `schema { query: RootQuery }` https://github.com/nuwave/lighthouse/pull/2077
 
+### Deprecated
+
+- Deprecate `RootType::isRootType()`, use `DocumentAST::isRootType()` which knows custom root type names https://github.com/nuwave/lighthouse/pull/2077
+
 ## v6.71.1
 
 ### Fixed
