@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -287,10 +288,74 @@ final class AggregateDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testAggregateWithBuilderReturningRelation(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Query {
+            sum(
+                difficulty: Int! @eq
+                user: ID!
+            ): Int! @aggregate(builder: "{$this->qualifyTestResolver('userTasks')}", function: SUM, column: "difficulty")
+        }
+        GRAPHQL;
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $otherUser = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $otherUser);
+
+        $task1 = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task1);
+        $task1->difficulty = 3;
+        $task1->user()->associate($user);
+        $task1->save();
+
+        $task2 = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task2);
+        $task2->difficulty = 5;
+        $task2->user()->associate($user);
+        $task2->save();
+
+        $task3 = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task3);
+        $task3->difficulty = 5;
+        $task3->user()->associate($user);
+        $task3->save();
+
+        $task4 = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task4);
+        $task4->difficulty = 5;
+        $task4->user()->associate($otherUser);
+        $task4->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($user: ID!) {
+            sum(difficulty: 5, user: $user)
+        }
+        GRAPHQL, [
+            'user' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'sum' => 10,
+            ],
+        ]);
+    }
+
     /** @param  array{difficulty: int, exclude: int}  $args */
     public function builder(mixed $root, array $args): Builder
     {
         return DB::table('tasks')
             ->where('id', '!=', $args['exclude']);
+    }
+
+    /**
+     * @param  array{user: int}  $args
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Task, \Tests\Utils\Models\User>
+     */
+    public function userTasks(mixed $root, array $args): HasMany
+    {
+        return User::findOrFail($args['user'])->tasks();
     }
 }
