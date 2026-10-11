@@ -145,6 +145,20 @@ We can model this in our database schema like this.
 <p><small>Database relations diagram</small></p>
 </div>
 
+Lighthouse fills models through mass assignment.
+Allow it once in a base model in `app/Models/Model.php`:
+
+```php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model as EloquentModel;
+
+abstract class Model extends EloquentModel
+{
+    protected $guarded = [];
+}
+```
+
 Begin by defining models and migrations for your posts and comments
 
 ```shell
@@ -156,7 +170,6 @@ Replace the newly generated `app/Models/Post.php` and the `create_posts_table.ph
 ```php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -207,7 +220,6 @@ php artisan make:model -m Comment
 ```php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class Comment extends Model
@@ -318,7 +330,7 @@ The way that Lighthouse knows how to resolve the queries is a combination of con
 
 - [@all](../master/api-reference/directives.md#all) returns a list of all `Post` models
 - [@find](../master/api-reference/directives.md#find) and [@eq](../master/api-reference/directives.md#eq)
-are combined to retrieve a single `Post` by its ID
+  are combined to retrieve a single `Post` by its ID
 
 We add additional type definitions that clearly define the shape of our data:
 
@@ -349,11 +361,67 @@ type Comment {
 
 Just like in Eloquent, we express the relationship between our types using the [@belongsTo](../master/api-reference/directives.md#belongsto) and [@hasMany](../master/api-reference/directives.md#hasmany) directives.
 
+## The Mutations
+
+To write data, we add a root `Mutation` type with fields to create, update and delete posts:
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput! @spread): Post! @create
+  updatePost(input: UpdatePostInput! @spread): Post! @update
+  deletePost(id: ID! @whereKey): Post @delete
+}
+```
+
+- [@create](../master/api-reference/directives.md#create) and [@update](../master/api-reference/directives.md#update) save a `Post` with the given arguments
+- [@spread](../master/api-reference/directives.md#spread) passes the fields of `input` as if they were arguments
+- [@delete](../master/api-reference/directives.md#delete) removes the `Post` that [@whereKey](../master/api-reference/directives.md#wherekey) finds by its ID
+
+The inputs define which fields clients can send:
+
+```graphql
+input CreatePostInput {
+  title: String!
+  content: String!
+  author: CreateUserBelongsTo!
+}
+
+input CreateUserBelongsTo {
+  connect: ID!
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  content: String
+  author: UpdateUserBelongsTo
+}
+
+input UpdateUserBelongsTo {
+  connect: ID!
+}
+```
+
+The field `author` is named like the relation method in `Post`.
+Lighthouse uses it as a [nested mutation](../master/eloquent/nested-mutations.md#belongsto) and connects the post to an existing user.
+
 ## The Result
 
-Insert some fake data into your database, you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.
+Create a user, for example with `php artisan tinker` and `User::factory()->create()`.
 
-Visit `/graphiql` and try the following query:
+Visit `/graphiql` and create a post for that user:
+
+```graphql
+mutation {
+  createPost(
+    input: { title: "Hello", content: "World", author: { connect: 1 } }
+  ) {
+    id
+  }
+}
+```
+
+Now try the following query:
 
 ```graphql
 {
@@ -373,6 +441,24 @@ Visit `/graphiql` and try the following query:
 
 You should get a list of all the posts in your database, together with all of its comments and the name of the author.
 
+Change a post with `updatePost` and remove it with `deletePost`:
+
+```graphql
+mutation {
+  updatePost(input: { id: 1, title: "Hello again" }) {
+    title
+  }
+}
+```
+
+```graphql
+mutation {
+  deletePost(id: 1) {
+    id
+  }
+}
+```
+
 Hopefully, this example could demonstrate the power of GraphQL and how you can serve your own GraphQL API with Lighthouse.
 
 ## Next Steps
@@ -381,5 +467,5 @@ The app you just built might need some more features.
 Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../master/api-reference/directives.md#paginate)
-- [Create and update eloquent models](../master/eloquent/getting-started.md#create)
+- [Create related models in nested mutations](../master/eloquent/nested-mutations.md)
 - [Validate the inputs that are sent to your server](../master/security/validation.md)
