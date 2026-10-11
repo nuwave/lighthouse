@@ -74,7 +74,8 @@ Delete `_lighthouse_ide_helper.php` and remove `vendor/nuwave/lighthouse/_ide_he
 
 `ArgBuilderDirective::handleBuilder()` and `FieldBuilderDirective::handleFieldBuilder()` now type the builder
 with the common interface `Illuminate\Contracts\Database\Query\Builder` instead of a union of concrete classes.
-Custom directives that implement them must adopt the new signature.
+Custom directives that implement them, and subclasses of built-in directives that override them, must adopt the new signature.
+The same applies to overrides of `WhereConditionsBaseDirective::handle()` and the protected builder methods of `ResolveInfo`.
 The interface does not relate to a model, so `ResolveInfo::enhanceBuilder()` and `PaginationArgs::applyToBuilder()` are no longer generic over it.
 Narrow the result with `assert()` where you need the model type.
 
@@ -84,10 +85,13 @@ Narrow the result with `assert()` where you need the model type.
 -use Illuminate\Database\Query\Builder as QueryBuilder;
 +use Illuminate\Contracts\Database\Query\Builder;
 
-final class MyDirective extends BaseDirective implements ArgBuilderDirective
+final class MyDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
 -    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
 +    public function handleBuilder(Builder $builder, mixed $value): Builder
+
+-    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
++    public function handleFieldBuilder(Builder $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
 }
 ```
 
