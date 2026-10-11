@@ -67,7 +67,7 @@ docs/node_modules: docs/package.json docs/yarn.lock ## Install yarn dependencies
 .PHONY: ai-sync
 ai-sync: ## Generate local agent configuration from .ai
 	# https://github.com/KrystianJonca/lnai/releases
-	docker compose run --rm node-tools npx --yes lnai@0.6.7 sync
+	docker compose run --rm node-tools npx --yes lnai@0.6.92 sync
 
 .PHONY: proto/update-reports
 proto/update-reports:

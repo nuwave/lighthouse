@@ -11,7 +11,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Support Laravel JSON SQL Operators in Where Conditions
+- Support JSON operators in `@whereConditions` https://github.com/nuwave/lighthouse/pull/2793
+
+## v6.71.1
+
+### Fixed
+
+- Stop resolving built-in `@rules` like `url` to global classes, reference global rule classes as `"\\MyRule"` https://github.com/nuwave/lighthouse/pull/2792
 
 ## v6.71.0
 
