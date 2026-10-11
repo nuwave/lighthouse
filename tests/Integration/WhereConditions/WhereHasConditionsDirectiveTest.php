@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
@@ -635,5 +637,54 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testQualifiesJSONColumnWithDottedPath(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Location {
+            id: ID!
+        }
+
+        type Query {
+            locations(hasChildren: _ @whereHasConditions): [Location!]! @all
+        }
+        GRAPHQL;
+
+        /** @var Location $parent */
+        $parent = factory(Location::class)->create();
+
+        /** @var Location $child */
+        $child = factory(Location::class)->make();
+        $child->extra = ['a.b' => 'foo'];
+        $child->parent()->associate($parent);
+        $child->save();
+
+        $queries = [];
+        DB::listen(static function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            locations(
+                hasChildren: {
+                    column: "extra->a.b",
+                    value: "foo"
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'locations' => [
+                    [
+                        'id' => (string) $parent->id,
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertMatchesRegularExpression('/`laravel_reserved_\d+`\.`extra`/', $queries[0]);
     }
 }

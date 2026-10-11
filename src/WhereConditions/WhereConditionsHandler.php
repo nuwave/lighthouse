@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Str;
 
 class WhereConditionsHandler
 {
@@ -128,8 +129,8 @@ class WhereConditionsHandler
      */
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
-        if (isset($condition['column'])) {
-            $condition['column'] = $model->qualifyColumn($condition['column']);
+        if (isset($condition['column']) && ! str_contains(Str::before($condition['column'], '->'), '.')) {
+            $condition['column'] = "{$model->getTable()}.{$condition['column']}";
         }
 
         foreach (['AND', 'OR'] as $boolean) {
