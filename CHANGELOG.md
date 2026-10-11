@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply the `action` of `@canResolved` and friends when the field resolves to a promise, such as a batch loaded relation https://github.com/nuwave/lighthouse/pull/2786
 
+## v6.71.1
+
+### Fixed
+
+- Stop resolving built-in `@rules` like `url` to global classes, reference global rule classes as `"\\MyRule"` https://github.com/nuwave/lighthouse/pull/2792
+
 ## v6.71.0
 
 ### Deprecated

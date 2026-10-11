@@ -33,7 +33,7 @@ final class RedisStorageManagerTest extends TestCase
             $this->assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');
         }
 
-        $allConsecutiveCallsArguments = [$firstCallArguments, ...$consecutiveCallsArguments];
+        $allConsecutiveCallsArguments = [$firstCallArguments, ...array_values($consecutiveCallsArguments)];
 
         $numberOfArguments = count($firstCallArguments);
         $argumentList = [];
