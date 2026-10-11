@@ -54,9 +54,9 @@ class ResolverProvider implements ProvidesResolver
     /** @return never */
     protected function throwMissingResolver(FieldValue $fieldValue): void
     {
-        // Since we already know we are on the root type, this is either
-        // query, mutation or subscription
-        $parent = lcfirst($fieldValue->getParentName());
+        $defaultRootTypeName = $fieldValue->getParent()->getDocumentAST()->defaultRootTypeName($fieldValue->getParentName());
+        assert($defaultRootTypeName !== null, 'only called for fields of root types');
+        $parent = lcfirst($defaultRootTypeName);
         $fieldName = $fieldValue->getFieldName();
         $proposedResolverClass = ucfirst($fieldName);
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Mutations\Foo as FooMutation;
 use Tests\Utils\Queries\Foo as FooQuery;
@@ -97,5 +98,27 @@ final class RootTypesTest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    public function testProposesResolverCommandOfDefaultRootTypeName(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: RootQuery
+        }
+
+        type RootQuery {
+            missing: Int
+        }
+        GRAPHQL;
+
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('php artisan lighthouse:query Missing');
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            missing
+        }
+        ');
     }
 }
