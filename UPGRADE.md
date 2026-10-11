@@ -75,6 +75,8 @@ Delete `_lighthouse_ide_helper.php` and remove `vendor/nuwave/lighthouse/_ide_he
 `ArgBuilderDirective::handleBuilder()` and `FieldBuilderDirective::handleFieldBuilder()` now type the builder
 with the common interface `Illuminate\Contracts\Database\Query\Builder` instead of a union of concrete classes.
 Custom directives that implement them must adopt the new signature.
+The interface does not relate to a model, so `ResolveInfo::enhanceBuilder()` and `PaginationArgs::applyToBuilder()` are no longer generic over it.
+Narrow the result with `assert()` where you need the model type.
 
 ```diff
 -use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
