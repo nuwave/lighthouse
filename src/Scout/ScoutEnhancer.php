@@ -11,9 +11,6 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
-/**
- * @template TModel of \Illuminate\Database\Eloquent\Model
- */
 class ScoutEnhancer
 {
     /**
@@ -39,7 +36,6 @@ class ScoutEnhancer
 
     public function __construct(
         protected ArgumentSet $argumentSet,
-        /** @var \Illuminate\Contracts\Database\Query\Builder|\Laravel\Scout\Builder $builder */
         protected Builder|ScoutBuilder $builder,
     ) {
         $this->gather($this->argumentSet);
