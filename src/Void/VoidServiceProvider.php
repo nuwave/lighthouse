@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Void;
 
@@ -33,16 +33,14 @@ enum Unit {
   {$unit}
 }
 GRAPHQL
-                    )
+                    ),
                 );
-            }
+            },
         );
 
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            static function (): string {
-                return __NAMESPACE__;
-            }
+            static fn (): string => __NAMESPACE__,
         );
     }
 }
