@@ -2,10 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectColumns;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -35,8 +37,11 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): callable
     {
         return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+            $query = $this->getModelClass()::query();
+            Container::getInstance()->make(SelectColumns::class)->applyTo($query, $resolveInfo);
+
             $builder = $resolveInfo->enhanceBuilder(
-                $this->getModelClass()::query(),
+                $query,
                 $this->directiveArgValue('scopes', []),
                 $root,
                 $args,
