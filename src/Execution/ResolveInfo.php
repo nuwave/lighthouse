@@ -47,16 +47,14 @@ class ResolveInfo extends BaseResolveInfo
         GraphQLContext $context,
         ?callable $directiveFilter = null,
     ): Builder|ScoutBuilder {
-        $argumentSet = $this->argumentSet;
-
-        $scoutEnhancer = new ScoutEnhancer($argumentSet, $builder);
+        $scoutEnhancer = new ScoutEnhancer($this->argumentSet, $builder);
         if ($scoutEnhancer->canEnhanceBuilder()) {
             return $scoutEnhancer->enhanceBuilder($directiveFilter);
         }
 
         assert($builder instanceof Builder, 'Scout builders are handled by the ScoutEnhancer.');
 
-        self::applyArgBuilderDirectives($argumentSet, $builder, $directiveFilter);
+        self::applyArgBuilderDirectives($this->argumentSet, $builder, $directiveFilter);
         self::applyFieldBuilderDirectives($builder, $root, $args, $context, $this);
 
         foreach ($scopes as $scope) {
@@ -81,10 +79,8 @@ class ResolveInfo extends BaseResolveInfo
         GraphQLContext $context,
         ?callable $directiveFilter = null,
     ): bool {
-        $argumentSet = $this->argumentSet;
-
-        return (new ScoutEnhancer($argumentSet, $builder))->wouldEnhanceBuilder()
-            || self::wouldApplyArgBuilderDirectives($argumentSet, $builder, $directiveFilter)
+        return (new ScoutEnhancer($this->argumentSet, $builder))->wouldEnhanceBuilder()
+            || self::wouldApplyArgBuilderDirectives($this->argumentSet, $builder, $directiveFilter)
             || self::wouldApplyFieldBuilderDirectives($this)
             || $scopes !== [];
     }
