@@ -19,6 +19,7 @@ class TypeValue
 
     public function __construct(
         protected TypeDefinitionNode $typeDefinition,
+        // TODO require in v7
         protected ?DocumentAST $documentAST = null,
     ) {}
 
