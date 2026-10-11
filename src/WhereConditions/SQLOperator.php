@@ -63,7 +63,7 @@ enum SQLOperator {
     "Whether the JSON path given in `column` exists, e.g. `preferences->theme`."
     JSON_CONTAINS_KEY @enum(value: "JsonContainsKey")
 
-    "Whether the JSON path given in `column` does not exist."
+    "Whether the JSON path given in `column` does not exist, e.g. `preferences->theme`."
     JSON_DOESNT_CONTAIN_KEY @enum(value: "JsonDoesntContainKey")
 
     "Whether a value is in the JSON."
