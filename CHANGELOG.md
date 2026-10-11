@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Qualify columns in nested `AND`/`OR` of `HAS` conditions and keep already qualified columns as they are https://github.com/nuwave/lighthouse/pull/1472
+- Fix ambiguous or doubly qualified columns in `HAS` conditions https://github.com/nuwave/lighthouse/pull/1472
 
 ## v6.71.1
 
