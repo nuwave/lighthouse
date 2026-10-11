@@ -30,11 +30,16 @@ class CacheControlServiceProvider extends ServiceProvider
         $dispatcher->listen(StartExecution::class, function (StartExecution $startExecution): void {
             $schema = $startExecution->schema;
             $typeInfo = new TypeInfo($schema);
+            $rootTypes = [
+                $schema->getQueryType(),
+                $schema->getMutationType(),
+                $schema->getSubscriptionType(),
+            ];
             $cacheControl = $this->app->make(CacheControl::class);
 
             // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type
             $visitorWithTypeInfo = Visitor::visitWithTypeInfo($typeInfo, [
-                NodeKind::FIELD => function (FieldNode $_) use ($schema, $typeInfo, $cacheControl): void {
+                NodeKind::FIELD => function (FieldNode $_) use ($rootTypes, $typeInfo, $cacheControl): void {
                     $field = $typeInfo->getFieldDef();
                     if ($field === null) {
                         return;
@@ -49,7 +54,7 @@ class CacheControlServiceProvider extends ServiceProvider
                         $parent = $typeInfo->getParentType();
                         assert($parent instanceof NamedType);
 
-                        if (in_array($parent, [$schema->getQueryType(), $schema->getMutationType(), $schema->getSubscriptionType()], true)) {
+                        if (in_array($parent, $rootTypes, strict: true)) {
                             $cacheControl->addMaxAge(0);
                             $cacheControl->setPrivate();
                         } else {

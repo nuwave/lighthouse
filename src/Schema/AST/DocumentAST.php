@@ -216,15 +216,14 @@ class DocumentAST implements Arrayable
         return $instance;
     }
 
-    /** Return the default name of the given root type, or null if it is not a root type. */
     public function defaultRootTypeName(string $typeName): ?string
     {
-        return array_search($typeName, $this->rootTypes, true) ?: null;
+        return array_search($typeName, $this->rootTypes, strict: true) ?: null;
     }
 
     public function isRootType(string $typeName): bool
     {
-        return in_array($typeName, $this->rootTypes, true);
+        return in_array($typeName, $this->rootTypes, strict: true);
     }
 
     /**
