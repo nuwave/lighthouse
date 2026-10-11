@@ -12,6 +12,17 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 trait HasBuilderArgument
 {
+    abstract protected function directiveHasArgument(string $name): bool;
+
+    abstract public function getResolverFromArgument(string $argumentName): \Closure;
+
+    /** @return class-string<\Illuminate\Database\Eloquent\Model> */
+    abstract protected function getModelClass(string $argumentName = 'model'): string;
+
+    abstract public function name(): string;
+
+    abstract protected function nodeName(): string;
+
     /** @param  array<string, mixed>  $args */
     protected function makeBuilder(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder|ScoutBuilder
     {
