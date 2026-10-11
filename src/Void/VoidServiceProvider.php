@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 /**
- * TODO include by default in v6.
+ * TODO include by default in v7.
  */
 class VoidServiceProvider extends ServiceProvider
 {
