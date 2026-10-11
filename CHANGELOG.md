@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.71.2
+
 ### Fixed
 
 - Apply the `action` of `@canResolved` and friends when the field resolves to a promise, such as a batch loaded relation https://github.com/nuwave/lighthouse/pull/2786
