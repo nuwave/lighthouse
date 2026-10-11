@@ -80,7 +80,7 @@ class QueryCache
     protected function fromStoreOrParse(string $hash, \Closure $parse): DocumentNode
     {
         $store = $this->makeCacheStore();
-        // v2 holds arrays, which survive cache.serializable_classes
+        // v2 holds arrays, which survive cache.serializable_classes; old workers read DocumentNode from v1
         $key = "lighthouse:query:v2:{$hash}";
 
         $astArray = $store->get(key: $key);
