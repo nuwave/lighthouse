@@ -15,6 +15,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `ResolveInfo` parameter from `ResolveInfo::enhanceBuilder()` and `ResolveInfo::wouldEnhanceBuilder()` https://github.com/nuwave/lighthouse/pull/2389
 - Allow the `builder` argument of `@aggregate` to return a `Relation` https://github.com/nuwave/lighthouse/pull/2389
 
+## v6.71.1
+
+### Fixed
+
+- Stop resolving built-in `@rules` like `url` to global classes, reference global rule classes as `"\\MyRule"` https://github.com/nuwave/lighthouse/pull/2792
+
 ## v6.71.0
 
 ### Deprecated
