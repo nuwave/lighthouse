@@ -31,7 +31,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation), $relation));
 
             foreach ($args->arguments['update']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized
@@ -40,7 +40,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation), parentRelation: $relation));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized
@@ -60,13 +60,16 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('disconnect')) {
-            $children = $relation
-                ->make()
-                ->whereIn(
-                    $relation->make()->getKeyName(),
-                    $args->arguments['disconnect']->value,
-                )
-                ->get();
+            $ids = $args->arguments['disconnect']->value;
+            $children = ParentRelationScope::applies($relation)
+                ? ParentRelationScope::findManyOrFail($relation, $ids)
+                : $relation
+                    ->make()
+                    ->whereIn(
+                        $relation->make()->getKeyName(),
+                        $ids,
+                    )
+                    ->get();
             foreach ($children as $child) {
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
@@ -74,9 +77,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('delete')) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain(),
-            );
+            ParentRelationScope::delete($relation, $args->arguments['delete']->toPlain());
         }
     }
 }

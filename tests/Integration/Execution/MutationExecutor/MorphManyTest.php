@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
@@ -583,5 +584,66 @@ final class MorphManyTest extends DBTestCase
         ]);
 
         $this->assertSame(1, $calledImageSaving);
+    }
+
+    public function testDeleteMorphManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $otherTask = factory(Task::class)->create();
+        $otherTasksImage = factory(Image::class)->make();
+        $otherTasksImage->imageable()->associate($otherTask);
+        $otherTasksImage->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $imageID: ID!) {
+            updateTask(input: {
+                id: $taskID
+                images: {
+                    delete: [$imageID]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'imageID' => $otherTasksImage->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $this->assertNotNull(Image::find($otherTasksImage->id));
+    }
+
+    public function testUpsertMorphManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $otherTask = factory(Task::class)->create();
+        $otherTasksImage = factory(Image::class)->make();
+        $otherTasksImage->url = 'original';
+        $otherTasksImage->imageable()->associate($otherTask);
+        $otherTasksImage->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $imageID: ID!) {
+            updateTask(input: {
+                id: $taskID
+                images: {
+                    upsert: [{ id: $imageID, url: "hacked" }]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'imageID' => $otherTasksImage->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherTasksImage->refresh();
+        $this->assertSame('original', $otherTasksImage->url);
+        $this->assertSame($otherTask->id, $otherTasksImage->imageable_id);
     }
 }

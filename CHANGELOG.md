@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add config option `nested_mutations_scope_to_parent` to limit nested `delete`, `disconnect`, `update` and `upsert` to models related to the parent https://github.com/nuwave/lighthouse/issues/2744
+
 ## v6.71.1
 
 ### Fixed

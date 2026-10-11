@@ -3,6 +3,7 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Faker\Provider\Lorem;
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
@@ -1093,6 +1094,175 @@ final class BelongsToManyTest extends DBTestCase
                             'pivot' => [
                                 'meta' => $meta,
                             ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testDeleteBelongsToManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $role = factory(Role::class)->create();
+        $otherRole = factory(Role::class)->create();
+        $otherRolesUser = factory(User::class)->create();
+        $otherRole->users()->attach($otherRolesUser);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userID: ID!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    delete: [$userID]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userID' => $otherRolesUser->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $this->assertNotNull(User::find($otherRolesUser->id));
+        $this->assertCount(1, $otherRole->users()->get());
+    }
+
+    public function testDeleteBelongsToManyWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $role = factory(Role::class)->create();
+        $user = factory(User::class)->create();
+        $role->users()->attach($user);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userID: ID!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    delete: [$userID]
+                }
+            }) {
+                users {
+                    id
+                }
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userID' => $user->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateRole' => [
+                    'users' => [],
+                ],
+            ],
+        ]);
+
+        $this->assertNull(User::find($user->id));
+    }
+
+    public function testUpdateBelongsToManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $role = factory(Role::class)->create();
+        $otherRole = factory(Role::class)->create();
+        $otherRolesUser = factory(User::class)->make();
+        $otherRolesUser->name = 'original';
+        $otherRolesUser->save();
+        $otherRole->users()->attach($otherRolesUser);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userID: ID!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    update: [{ id: $userID, name: "hacked" }]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userID' => $otherRolesUser->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherRolesUser->refresh();
+
+        $this->assertSame('original', $otherRolesUser->name);
+        $this->assertCount(0, $role->users()->get());
+    }
+
+    public function testUpsertBelongsToManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $role = factory(Role::class)->create();
+        $otherRole = factory(Role::class)->create();
+        $otherRolesUser = factory(User::class)->make();
+        $otherRolesUser->name = 'original';
+        $otherRolesUser->save();
+        $otherRole->users()->attach($otherRolesUser);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userID: ID!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    upsert: [{ id: $userID, name: "hacked" }]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userID' => $otherRolesUser->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherRolesUser->refresh();
+
+        $this->assertSame('original', $otherRolesUser->name);
+        $this->assertCount(0, $role->users()->get());
+    }
+
+    public function testUpdateBelongsToManyWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $role = factory(Role::class)->create();
+        $user = factory(User::class)->create();
+        $role->users()->attach($user);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userID: ID!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    update: [{ id: $userID, name: "updated" }]
+                }
+            }) {
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userID' => $user->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateRole' => [
+                    'users' => [
+                        [
+                            'id' => (string) $user->id,
+                            'name' => 'updated',
                         ],
                     ],
                 ],

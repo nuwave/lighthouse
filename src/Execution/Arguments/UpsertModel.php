@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\PreSaveArgumentsAware;
 
@@ -23,6 +24,8 @@ class UpsertModel implements ArgResolver, PreSaveArgumentsAware
         callable $previous,
         /** @var array<string>|null */
         protected ?array $identifyingColumns = null,
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null */
+        protected ?Relation $parentRelation = null,
     ) {
         $this->previous = $previous;
     }
@@ -40,7 +43,7 @@ class UpsertModel implements ArgResolver, PreSaveArgumentsAware
             $identifyingColumns = $this->identifyingColumnValues($args, $this->identifyingColumns)
                 ?? throw new Error(self::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
 
-            $existingModel = $model->newQuery()->firstWhere($identifyingColumns);
+            $existingModel = $this->findExisting($model, $identifyingColumns);
 
             if ($existingModel !== null) {
                 $model = $existingModel;
@@ -50,7 +53,7 @@ class UpsertModel implements ArgResolver, PreSaveArgumentsAware
         if ($existingModel === null) {
             $id = $this->retrieveID($model, $args);
             if ($id) {
-                $existingModel = $model->newQuery()->find($id);
+                $existingModel = $this->findExisting($model, [$model->getKeyName() => $id]);
                 if ($existingModel !== null) {
                     $model = $existingModel;
                 }
@@ -83,6 +86,16 @@ class UpsertModel implements ArgResolver, PreSaveArgumentsAware
         }
 
         return $identifyingValues;
+    }
+
+    /** @param  array<string, mixed>  $columns */
+    protected function findExisting(Model $model, array $columns): ?Model
+    {
+        if ($this->parentRelation !== null && ParentRelationScope::applies($this->parentRelation)) {
+            return ParentRelationScope::firstForUpsert($this->parentRelation, $columns);
+        }
+
+        return $model->newQuery()->firstWhere($columns);
     }
 
     /** @return mixed The value of the ID or null */

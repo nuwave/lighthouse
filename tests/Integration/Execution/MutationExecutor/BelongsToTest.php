@@ -1312,4 +1312,40 @@ final class BelongsToTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testUpdateBelongsToAttachesUnrelatedModelWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $otherUser = factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $userID: ID!) {
+            upsertTask(input: {
+                id: $taskID
+                user: {
+                    update: { id: $userID, name: "updated" }
+                }
+            }) {
+                user {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'userID' => $otherUser->id,
+        ])->assertExactJson([
+            'data' => [
+                'upsertTask' => [
+                    'user' => [
+                        'id' => (string) $otherUser->id,
+                        'name' => 'updated',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
