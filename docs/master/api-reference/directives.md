@@ -4135,8 +4135,8 @@ Read more in the [validation docs](../security/validation.md#validator-classes).
 """
 Mark a field that returns no value.
 
-The return type of the field will be changed to `Unit!`, defined as `enum Unit { UNIT }`.
-Whatever result is returned from the resolver will be replaced with `UNIT`.
+The return type of the field will be changed to `Void!`, defined as `enum Void { VOID }`.
+Whatever result is returned from the resolver will be replaced with `VOID`.
 """
 directive @void on FIELD_DEFINITION
 ```
@@ -4157,9 +4157,9 @@ Allows only one value and thus can hold no information.
 
 https://en.wikipedia.org/wiki/Unit_type
 """
-enum Unit {
+enum Void {
   "The only possible value."
-  UNIT
+  VOID
 }
 ```
 
@@ -4171,8 +4171,8 @@ type Mutation {
 }
 ```
 
-Lighthouse will modify the definition of your field and have it return `Unit!`.
-No matter what your resolver returns, the resulting value will always be `UNIT`.
+Lighthouse will modify the definition of your field and have it return `Void!`.
+No matter what your resolver returns, the resulting value will always be `VOID`.
 
 ## @where
 

@@ -20,8 +20,8 @@ class VoidDirective extends BaseDirective implements FieldManipulator, FieldMidd
 """
 Mark a field that returns no value.
 
-The return type of the field will be changed to `Unit!`, defined as `enum Unit { UNIT }`.
-Whatever result is returned from the resolver will be replaced with `UNIT`.
+The return type of the field will be changed to `Void!`, defined as `enum Void { VOID }`.
+Whatever result is returned from the resolver will be replaced with `VOID`.
 """
 directive @void on FIELD_DEFINITION
 GRAPHQL;
@@ -29,12 +29,12 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
-        $fieldDefinition->type = Parser::typeReference(/** @lang GraphQL */ 'Unit!');
+        $fieldDefinition->type = Parser::typeReference(/** @lang GraphQL */ 'Void!');
     }
 
     public function handleField(FieldValue $fieldValue): void
     {
         // Just ignore whatever the original resolver is doing and always return a singular value
-        $fieldValue->resultHandler(static fn (): string => VoidServiceProvider::UNIT);
+        $fieldValue->resultHandler(static fn (): string => VoidServiceProvider::VOID);
     }
 }

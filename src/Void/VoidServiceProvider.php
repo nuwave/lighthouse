@@ -13,14 +13,14 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
  */
 class VoidServiceProvider extends ServiceProvider
 {
-    public const UNIT = 'UNIT';
+    public const VOID = 'VOID';
 
     public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
             ManipulateAST::class,
             static function (ManipulateAST $manipulateAST): void {
-                $unit = self::UNIT;
+                $void = self::VOID;
                 $manipulateAST->documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 """
@@ -28,9 +28,9 @@ Allows only one value and thus can hold no information.
 
 https://en.wikipedia.org/wiki/Unit_type
 """
-enum Unit {
+enum Void {
   "The only possible value."
-  {$unit}
+  {$void}
 }
 GRAPHQL
                     ),

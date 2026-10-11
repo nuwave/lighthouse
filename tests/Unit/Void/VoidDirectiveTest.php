@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Void;
 
-use Nuwave\Lighthouse\Void\VoidServiceProvider;
 use Tests\TestCase;
 
 final class VoidDirectiveTest extends TestCase
@@ -21,7 +20,7 @@ final class VoidDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => VoidServiceProvider::UNIT,
+                'foo' => 'VOID',
             ],
         ]);
     }
