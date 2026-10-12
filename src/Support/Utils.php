@@ -216,9 +216,15 @@ class Utils
         $randomSuffix = bin2hex(random_bytes(6));
         $tempPath = "{$path}.{$randomSuffix}";
 
-        if ($filesystem->put(path: $tempPath, contents: $contents) === false) {
+        try {
+            if ($filesystem->put(path: $tempPath, contents: $contents) === false) {
+                throw new \RuntimeException("Failed to write file {$tempPath}.");
+            }
+        } catch (\Throwable $throwable) {
+            // Laravel converts the warning of a failed write to an exception, so clean up in either case
             $filesystem->delete($tempPath);
-            throw new \RuntimeException("Failed to write file {$tempPath}.");
+
+            throw $throwable;
         }
 
         $filesystem->move(path: $tempPath, target: $path);
@@ -227,24 +233,28 @@ class Utils
     /**
      * Require a PHP file that is expected to return an array.
      *
-     * If it returns something else, e.g. because it is empty after a failed write,
-     * it is evicted from OPcache and deleted, so it can be rebuilt.
+     * If it returns something else or fails to parse, e.g. because it is empty or truncated
+     * after a failed write, it is deleted and evicted from OPcache, so it can be rebuilt.
      *
      * @return array<mixed>|null
      */
     public static function requireArrayOrForget(Filesystem $filesystem, string $path): ?array
     {
-        $contents = require $path;
-        if (is_array($contents)) {
-            return $contents;
+        try {
+            $contents = require $path;
+            if (is_array($contents)) {
+                return $contents;
+            }
+        } catch (\ParseError) {
         }
+
+        // Delete first, so concurrent requests can not compile the invalid file into OPcache again
+        $filesystem->delete($path);
 
         // With opcache.validate_timestamps=0, the compiled file would otherwise be served forever
         if (function_exists('opcache_invalidate')) {
             opcache_invalidate($path, true);
         }
-
-        $filesystem->delete($path);
 
         return null;
     }

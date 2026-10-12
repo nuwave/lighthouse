@@ -304,6 +304,31 @@ final class QueryCacheTest extends TestCase
         $this->assertIsArray(require $filesystem->path($fileName));
     }
 
+    public function testRebuildsTruncatedQueryCacheFile(): void
+    {
+        $filesystem = Storage::fake();
+
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', true);
+        $config->set('lighthouse.query_cache.mode', 'opcache');
+        $config->set('lighthouse.query_cache.opcache_path', $filesystem->path(''));
+
+        $fileName = 'lighthouse-query-ec859ac754fc185143d0daf8dcfa644b5e2271e219b9a8f80c3a6fdfb0ce67d0.php';
+        $filesystem->put($fileName, "<?php return array (\n  'kind' => 'Document',");
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $this->assertIsArray(require $filesystem->path($fileName));
+    }
+
     public function testRebuildsInvalidQueryCacheFileFromInvalidStoreInHybridMode(): void
     {
         $filesystem = Storage::fake();
