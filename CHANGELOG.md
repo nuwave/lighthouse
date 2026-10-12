@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Rebuild query and schema cache files that do not return an array, e.g. when empty after a failed write, instead of failing every request https://github.com/nuwave/lighthouse/pull/2800
+
 ## v6.72.0
 
 ### Changed
