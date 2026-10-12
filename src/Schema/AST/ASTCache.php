@@ -61,12 +61,12 @@ class ASTCache
     {
         $path = $this->path();
         if ($this->filesystem->exists($path)) {
-            $astArray = require $path;
-            assert(is_array($astArray), "The schema cache file at {$path} is expected to return an array.");
+            $astArray = Utils::requireArrayOrForget($this->filesystem, $path);
+            if ($astArray !== null) {
+                /** @var SerializableDocumentAST $astArray */
 
-            /** @var SerializableDocumentAST $astArray */
-
-            return DocumentAST::fromArray($astArray);
+                return DocumentAST::fromArray($astArray);
+            }
         }
 
         $documentAST = $build();

@@ -216,7 +216,36 @@ class Utils
         $randomSuffix = bin2hex(random_bytes(6));
         $tempPath = "{$path}.{$randomSuffix}";
 
-        $filesystem->put(path: $tempPath, contents: $contents);
+        if ($filesystem->put(path: $tempPath, contents: $contents) === false) {
+            $filesystem->delete($tempPath);
+            throw new \RuntimeException("Failed to write file {$tempPath}.");
+        }
+
         $filesystem->move(path: $tempPath, target: $path);
+    }
+
+    /**
+     * Require a PHP file that is expected to return an array.
+     *
+     * If it returns something else, e.g. because it is empty after a failed write,
+     * it is evicted from OPcache and deleted, so it can be rebuilt.
+     *
+     * @return array<mixed>|null
+     */
+    public static function requireArrayOrForget(Filesystem $filesystem, string $path): ?array
+    {
+        $contents = require $path;
+        if (is_array($contents)) {
+            return $contents;
+        }
+
+        // With opcache.validate_timestamps=0, the compiled file would otherwise be served forever
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, true);
+        }
+
+        $filesystem->delete($path);
+
+        return null;
     }
 }

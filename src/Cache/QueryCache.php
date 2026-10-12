@@ -104,7 +104,10 @@ class QueryCache
         $path = $this->opcacheFilePath($hash);
 
         if ($this->filesystem->exists($path)) {
-            return $this->requireOPcacheFile($path);
+            $query = $this->requireOPcacheFile($path);
+            if ($query !== null) {
+                return $query;
+            }
         }
 
         $query = $parse();
@@ -121,7 +124,10 @@ class QueryCache
         $path = $this->opcacheFilePath($hash);
 
         if ($this->filesystem->exists($path)) {
-            return $this->requireOPcacheFile($path);
+            $query = $this->requireOPcacheFile($path);
+            if ($query !== null) {
+                return $query;
+            }
         }
 
         $store = $this->makeCacheStore();
@@ -130,7 +136,10 @@ class QueryCache
         if (is_string($contents)) {
             Utils::atomicPut(filesystem: $this->filesystem, path: $path, contents: $contents);
 
-            return $this->requireOPcacheFile($path);
+            $query = $this->requireOPcacheFile($path);
+            if ($query !== null) {
+                return $query;
+            }
         }
 
         $query = $parse();
@@ -159,10 +168,12 @@ class QueryCache
         return "<?php return {$queryArrayString};";
     }
 
-    protected function requireOPcacheFile(string $path): DocumentNode
+    protected function requireOPcacheFile(string $path): ?DocumentNode
     {
-        $astArray = require $path;
-        assert(is_array($astArray), "The query cache file at {$path} is expected to return an array.");
+        $astArray = Utils::requireArrayOrForget($this->filesystem, $path);
+        if ($astArray === null) {
+            return null;
+        }
 
         $astInstance = AST::fromArray($astArray);
         assert($astInstance instanceof DocumentNode, 'The AST array is expected to convert to a DocumentNode.');

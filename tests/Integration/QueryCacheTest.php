@@ -279,7 +279,7 @@ final class QueryCacheTest extends TestCase
         $event->assertDispatchedTimes(KeyWritten::class, 0);
     }
 
-    public function testInvalidQueryCacheContents(): void
+    public function testRebuildsInvalidQueryCacheFile(): void
     {
         $filesystem = Storage::fake();
 
@@ -291,12 +291,44 @@ final class QueryCacheTest extends TestCase
         $fileName = 'lighthouse-query-ec859ac754fc185143d0daf8dcfa644b5e2271e219b9a8f80c3a6fdfb0ce67d0.php';
         $filesystem->put($fileName, '');
 
-        $this->expectException(\AssertionError::class);
-        $this->expectExceptionMessage("The query cache file at {$filesystem->path($fileName)} is expected to return an array.");
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        GRAPHQL);
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $this->assertIsArray(require $filesystem->path($fileName));
+    }
+
+    public function testRebuildsInvalidQueryCacheFileFromInvalidStoreInHybridMode(): void
+    {
+        $filesystem = Storage::fake();
+
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', true);
+        $config->set('lighthouse.query_cache.mode', 'hybrid');
+        $config->set('lighthouse.query_cache.opcache_path', $filesystem->path(''));
+
+        $queryHash = 'ec859ac754fc185143d0daf8dcfa644b5e2271e219b9a8f80c3a6fdfb0ce67d0';
+        $fileName = "lighthouse-query-{$queryHash}.php";
+        $filesystem->put($fileName, '');
+        Cache::put(key: "lighthouse:query:{$queryHash}", value: '');
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $this->assertIsArray(require $filesystem->path($fileName));
+        $this->assertNotSame('', Cache::get("lighthouse:query:{$queryHash}"));
     }
 }
