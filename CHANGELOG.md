@@ -11,7 +11,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Use `serialize` instead of `json_encode` to avoid UTF-8 encoding errors https://github.com/nuwave/lighthouse/issues/2789
+- Fix UTF-8 encoding errors when paginated relation directives such as `@belongsToMany(type: PAGINATOR)` load related models with binary column values https://github.com/nuwave/lighthouse/pull/2790
+
+## v6.72.1
+
+### Fixed
+
+- Fix ambiguous or doubly qualified columns in `HAS` conditions https://github.com/nuwave/lighthouse/pull/1472
 
 ## v6.72.0
 
