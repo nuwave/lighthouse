@@ -24,12 +24,12 @@ class VoidServiceProvider extends ServiceProvider
                 $manipulateAST->documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 """
-Allows only one value and thus can hold no information.
+Returned by fields that complete without a value.
 
-https://en.wikipedia.org/wiki/Unit_type
+It is a [unit type](https://en.wikipedia.org/wiki/Unit_type), so it has only one value.
 """
 enum Void {
-  "The only possible value."
+  "The field completed successfully."
   {$void}
 }
 GRAPHQL
