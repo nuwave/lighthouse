@@ -27,4 +27,25 @@ final class VoidDirectiveTest extends TestCase
             ],
         ]);
     }
+
+    public function testVoidReplacesNonNullResult(): void
+    {
+        $this->mockResolver('ignored');
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: _ @mock @void
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => 'VOID',
+            ],
+        ]);
+    }
 }
