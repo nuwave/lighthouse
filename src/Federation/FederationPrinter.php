@@ -2,8 +2,11 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
@@ -18,10 +21,10 @@ use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Federation\Directives\AuthenticatedDirective;
 use Nuwave\Lighthouse\Federation\Directives\ComposeDirectiveDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
-use Nuwave\Lighthouse\Federation\Directives\AuthenticatedDirective;
 use Nuwave\Lighthouse\Federation\Directives\InaccessibleDirective;
 use Nuwave\Lighthouse\Federation\Directives\InterfaceObjectDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
@@ -126,20 +129,13 @@ class FederationPrinter
 
             $astNode = $definition->astNode;
 
-            if ($astNode instanceof ObjectTypeDefinitionNode) {
-                $directivesToPrint = [];
-                foreach ($astNode->directives as $directive) {
-                    $name = $directive->name->value;
-
-                    if (in_array($name, $federationDirectives)) {
-                        $directivesToPrint[] = $directive;
-                    }
-                }
-
-                return SchemaPrinter::printDirectives($directivesToPrint);
-            }
-
-            if ($astNode instanceof FieldDefinitionNode) {
+            if (
+                $astNode instanceof ObjectTypeDefinitionNode
+                || $astNode instanceof FieldDefinitionNode
+                || $astNode instanceof InterfaceTypeDefinitionNode
+                || $astNode instanceof ScalarTypeDefinitionNode
+                || $astNode instanceof EnumTypeDefinitionNode
+            ) {
                 $directivesToPrint = [];
                 foreach ($astNode->directives as $directive) {
                     $name = $directive->name->value;

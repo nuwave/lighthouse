@@ -4,9 +4,12 @@ namespace Nuwave\Lighthouse\Federation;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\Printer;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\EnumValueDefinition;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter as GraphQLSchemaPrinter;
 use Illuminate\Container\Container;
@@ -82,6 +85,42 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     protected static function printInterface(InterfaceType $type, array $options): string
     {
         return static::printObjectLike('interface', $type, $options);
+    }
+
+    /** @param  array<string, mixed>  $options */
+    protected static function printScalar(ScalarType $type, array $options): string
+    {
+        return parent::printScalar($type, $options)
+            . (isset($options['printDirectives'])
+                ? $options['printDirectives']($type)
+                : '');
+    }
+
+    /** @param  array<string, mixed>  $options */
+    protected static function printEnum(EnumType $type, array $options): string
+    {
+        $values = [];
+        $firstInBlock = true;
+        $valueDefinitions = $type->getValues();
+
+        if (isset($options['sortEnumValues']) && $options['sortEnumValues']) {
+            usort($valueDefinitions, static fn (EnumValueDefinition $left, EnumValueDefinition $right): int => $left->name <=> $right->name);
+        }
+
+        foreach ($valueDefinitions as $value) {
+            $values[] = static::printDescription($options, $value, '  ', $firstInBlock)
+                . '  '
+                . $value->name
+                . static::printDeprecated($value);
+            $firstInBlock = false;
+        }
+
+        return static::printDescription($options, $type)
+            . "enum {$type->name}"
+            . (isset($options['printDirectives'])
+                ? $options['printDirectives']($type)
+                : '')
+            . static::printBlock($values);
     }
 
     /** @param  array<string, mixed>  $options */

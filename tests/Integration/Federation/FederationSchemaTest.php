@@ -182,9 +182,22 @@ final class FederationSchemaTest extends TestCase
         GRAPHQL;
 
         $typeUser = /** @lang GraphQL */ <<<'GRAPHQL'
-        type User @key(fields: "id") @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:user"], ["admin"]]) {
+        type User implements Profile @key(fields: "id") @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:user"], ["admin"]]) {
           id: ID!
           email: String! @authenticated @requiresScopes(scopes: [["email.read"]]) @policy(policies: [["email_policy"]])
+          contactEmail: Email
+          status: Status
+        }
+
+        interface Profile @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:profile"], ["admin"]]) {
+          id: ID!
+        }
+
+        scalar Email @scalar(class: "Tests\\Utils\\Scalars\\Email") @authenticated @requiresScopes(scopes: [["email.read"]]) @policy(policies: [["email_policy"]])
+
+        enum Status @authenticated @requiresScopes(scopes: [["status.read"]]) @policy(policies: [["status_policy"]]) {
+          ACTIVE
+          INACTIVE
         }
         GRAPHQL;
 
@@ -193,8 +206,12 @@ final class FederationSchemaTest extends TestCase
         $sdl = $this->_serviceSdl();
 
         $this->assertSdlContainsString($schemaExtension, $sdl);
-        $this->assertStringContainsString('type User @key(fields: "id") @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:user"], ["admin"]]) {', $sdl);
+        $this->assertStringContainsString('type User implements Profile @key(fields: "id") @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:user"], ["admin"]]) {', $sdl);
         $this->assertStringContainsString('email: String! @authenticated @requiresScopes(scopes: [["email.read"]]) @policy(policies: [["email_policy"]])', $sdl);
+        $this->assertStringContainsString('interface Profile @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:profile"], ["admin"]]) {', $sdl);
+        $this->assertStringContainsString('scalar Email @authenticated @requiresScopes(scopes: [["email.read"]]) @policy(policies: [["email_policy"]])', $sdl);
+        $this->assertStringContainsString('enum Status @authenticated @requiresScopes(scopes: [["status.read"]]) @policy(policies: [["status_policy"]]) {', $sdl);
+        $this->assertStringNotContainsString('@scalar', $sdl);
     }
 
     private function _serviceSdl(): string
