@@ -1347,5 +1347,11 @@ final class BelongsToTest extends DBTestCase
                 ],
             ],
         ]);
+
+        $task->refresh();
+        $this->assertSame($otherUser->id, $task->user_id);
+
+        $otherUser->refresh();
+        $this->assertSame('updated', $otherUser->name);
     }
 }
