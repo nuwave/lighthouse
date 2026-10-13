@@ -54,6 +54,40 @@ final class QueryCacheTest extends TestCase
         $event->assertDispatchedTimes(KeyWritten::class, 1);
     }
 
+    public function testStoreModeWithRestrictedSerializableClasses(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', true);
+        $config->set('lighthouse.query_cache.mode', 'store');
+        $config->set('lighthouse.validation_cache.enable', false);
+
+        // An empty allowlist turns every unserialized object into __PHP_Incomplete_Class
+        $config->set('cache.stores.array.serialize', true);
+        $config->set('cache.serializable_classes', []);
+
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL;
+
+        $event = Event::fake(KeyWritten::class);
+
+        $this->graphQL($query)->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $this->graphQL($query)->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $event->assertDispatchedTimes(KeyWritten::class, 1);
+    }
+
     public function testDifferentQueriesHasDifferentKeys(): void
     {
         $config = $this->app->make(ConfigRepository::class);
