@@ -23,7 +23,7 @@ abstract class CanDirectiveTestBase extends TestCase
         GRAPHQL;
     }
 
-    protected function query(?string $foo = null): TestResponse
+    protected function doQuery(?string $foo = null): TestResponse
     {
         return $this->graphQL($this->getQuery(), ['foo' => $foo]);
     }
@@ -34,7 +34,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "adminOnly"');
 
-        $this->query()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        $this->doQuery()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
@@ -43,7 +43,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "superAdminOnly"');
 
-        $this->query()->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
+        $this->doQuery()->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
@@ -52,7 +52,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: ["superAdminOnly", "adminOnly"]');
 
-        $this->query()->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
+        $this->doQuery()->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testConcealsCustomMessage(): void
@@ -61,14 +61,14 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "superAdminOnly", action: EXCEPTION_NOT_AUTHORIZED');
 
-        $this->query()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        $this->doQuery()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testReturnsValue(): void
     {
         $this->schema = $this->getSchema('ability: "superAdminOnly", action: RETURN_VALUE, returnValue: null');
 
-        $this->query()->assertJson([
+        $this->doQuery()->assertJson([
             'data' => [
                 'user' => null,
             ],
@@ -85,7 +85,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "adminOnly"');
 
-        $this->query()->assertJson([
+        $this->doQuery()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -100,7 +100,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "guestOnly"');
 
-        $this->query()->assertJson([
+        $this->doQuery()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -119,7 +119,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: ["adminOnly", "alwaysTrue"]');
 
-        $this->query()->assertJson([
+        $this->doQuery()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -132,7 +132,7 @@ abstract class CanDirectiveTestBase extends TestCase
     {
         $this->schema = $this->getSchema('ability: "dependingOnArg", args: [false]');
 
-        $this->query()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        $this->doQuery()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void
@@ -143,7 +143,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "injectArgs", injectArgs: [true]');
 
-        $this->query('bar')->assertJson([
+        $this->doQuery('bar')->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -160,7 +160,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "argsWithInjectedArgs", args: { foo: "static" }, injectArgs: true');
 
-        $this->query('dynamic')->assertJson([
+        $this->doQuery('dynamic')->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',

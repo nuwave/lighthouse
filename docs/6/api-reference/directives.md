@@ -1602,8 +1602,7 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar EqValue
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2666,6 +2665,7 @@ directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 This may be useful to logically group arg resolvers.
+Must be used on a non-list input object type.
 
 ```graphql
 type Mutation {
@@ -4016,6 +4016,12 @@ directive @upsert(
   model: String
 
   """
+  Specify the columns by which to upsert the model.
+  Optional, by default `id` or the primary key of the model are used.
+  """
+  identifyingColumns: [String!]
+
+  """
   Specify the name of the relation on the parent model.
   This is only needed when using this directive as a nested arg
   resolver and if the name of the relation is not the arg name.
@@ -4034,6 +4040,16 @@ type Mutation {
 }
 ```
 
+When you pass `identifyingColumns`, Lighthouse will first try to match an existing model through those columns and only then fall back to `id`.
+All configured identifying columns must be present with non-null values, otherwise the upsert fails with a GraphQL error.
+
+```graphql
+type Mutation {
+  upsertUser(email: String!, name: String!): User!
+    @upsert(identifyingColumns: ["email"])
+}
+```
+
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
 
 ## @upsertMany
@@ -4048,6 +4064,12 @@ directive @upsertMany(
   This is only needed when the default model detection does not work.
   """
   model: String
+
+  """
+  Specify the columns by which to upsert the model.
+  Optional, by default `id` or the primary key of the model are used.
+  """
+  identifyingColumns: [String!]
 
   """
   Specify the name of the relation on the parent model.
@@ -4070,6 +4092,22 @@ input UpsertPostInput {
   title: String!
 }
 ```
+
+You can also use `identifyingColumns` with `@upsertMany`:
+
+```graphql
+type Mutation {
+  upsertUsers(inputs: [UpsertUserInput!]!): [User!]!
+    @upsertMany(identifyingColumns: ["email"])
+}
+
+input UpsertUserInput {
+  email: String!
+  name: String!
+}
+```
+
+For `@upsertMany`, all configured identifying columns must be present with non-null values for every input item, otherwise the upsert fails with a GraphQL error.
 
 ## @validator
 

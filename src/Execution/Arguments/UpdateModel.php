@@ -5,9 +5,12 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\PreSaveArgumentsAware;
 
-class UpdateModel implements ArgResolver
+class UpdateModel implements ArgResolver, PreSaveArgumentsAware
 {
+    use DelegatesPreSaveArguments;
+
     public const MISSING_PRIMARY_KEY_FOR_UPDATE = 'Missing primary key for update.';
 
     /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */

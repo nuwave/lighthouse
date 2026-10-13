@@ -213,7 +213,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
             });
 
         $task = factory(Task::class)->make();
-        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 

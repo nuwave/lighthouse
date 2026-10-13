@@ -2665,6 +2665,7 @@ directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 This may be useful to logically group arg resolvers.
+Must be used on a non-list input object type.
 
 ```graphql
 type Mutation {

@@ -168,7 +168,7 @@ jobs:
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: composer remove --dev --no-update larastan/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
+        run: composer remove --dev --no-update phpstan/phpstan-mockery phpbench/phpbench
 
       - name: "Remove Pennant for Laravel 9 because it is not compatible"
         if: matrix.laravel-version == '^9'
@@ -224,7 +224,7 @@ jobs:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
 
-      - run: composer remove --dev phpbench/phpbench rector/rector --no-update
+      - run: composer remove --dev phpbench/phpbench --no-update
 
       - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 

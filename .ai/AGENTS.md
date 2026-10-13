@@ -23,9 +23,9 @@ make bench          # Run PHPBench benchmarks
 ### Running a Single Test
 
 ```bash
-docker compose exec php vendor/bin/phpunit --filter=TestClassName
-docker compose exec php vendor/bin/phpunit --filter=testMethodName
-docker compose exec php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
+docker compose run --rm php vendor/bin/phpunit --filter=TestClassName
+docker compose run --rm php vendor/bin/phpunit --filter=testMethodName
+docker compose run --rm php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
 ```
 
 ## Architecture

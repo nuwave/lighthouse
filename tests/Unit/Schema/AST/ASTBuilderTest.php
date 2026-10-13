@@ -54,7 +54,7 @@ final class ASTBuilderTest extends TestCase
 
     public function testMergeTypeExtensionDirectives(): void
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -141,7 +141,7 @@ final class ASTBuilderTest extends TestCase
 
     public function testMergeInputExtensionDirectives(): void
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -195,7 +195,7 @@ final class ASTBuilderTest extends TestCase
 
     public function testMergeInterfaceExtensionDirectives(): void
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -226,7 +226,7 @@ final class ASTBuilderTest extends TestCase
 
     public function testMergeScalarExtensionDirectives(): void
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -279,7 +279,7 @@ final class ASTBuilderTest extends TestCase
 
     public function testMergeEnumExtensionDirectives(): void
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -332,7 +332,7 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowExtendingUndefinedScalar(): void
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'

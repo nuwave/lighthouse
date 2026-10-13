@@ -24,9 +24,7 @@ class Subscription
         }
 
         // Default to the configuration setting if not specified
-        if ($shouldQueue === null) {
-            $shouldQueue = config('lighthouse.subscriptions.queue_broadcasts', false);
-        }
+        $shouldQueue ??= config('lighthouse.subscriptions.queue_broadcasts', false);
 
         $subscription = $registry->subscription($subscriptionField);
         $broadcaster = Container::getInstance()->make(BroadcastsSubscriptions::class);

@@ -43,14 +43,14 @@ class QueryCache
 
     public function clear(?int $opcacheTTLHours, bool $opcacheOnly): void
     {
-        if (in_array($this->mode, ['store', 'hybrid'], true)
+        if (in_array($this->mode, ['store', 'hybrid'], strict: true)
             && ! $opcacheOnly
         ) {
             $store = $this->makeCacheStore();
             $store->clear();
         }
 
-        if (in_array($this->mode, ['opcache', 'hybrid'], true)) {
+        if (in_array($this->mode, ['opcache', 'hybrid'], strict: true)) {
             $files = $this->filesystem->glob($this->opcacheFilePath('*'));
 
             if (is_int($opcacheTTLHours)) {
@@ -80,8 +80,22 @@ class QueryCache
     protected function fromStoreOrParse(string $hash, \Closure $parse): DocumentNode
     {
         $store = $this->makeCacheStore();
+        // v2 holds arrays, which survive cache.serializable_classes
+        // Old workers still read DocumentNode from v1
+        $key = "lighthouse:query:v2:{$hash}";
 
-        return $store->remember(key: "lighthouse:query:{$hash}", ttl: $this->ttl, callback: $parse);
+        $astArray = $store->get(key: $key);
+        if (is_array($astArray)) {
+            $astInstance = AST::fromArray($astArray);
+            assert($astInstance instanceof DocumentNode, 'The cached AST array is expected to convert to a DocumentNode.');
+
+            return $astInstance;
+        }
+
+        $query = $parse();
+        $store->put(key: $key, value: $query->toArray(), ttl: $this->ttl);
+
+        return $query;
     }
 
     /** @param  \Closure(): DocumentNode  $parse */

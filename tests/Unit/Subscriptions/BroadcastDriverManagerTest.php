@@ -39,7 +39,7 @@ final class BroadcastDriverManagerTest extends TestCase
     {
         $broadcasterConfig = [];
 
-        $broadcaster = new class() implements Broadcaster {
+        $broadcaster = new class implements Broadcaster {
             public function authorized(Request $request): Response
             {
                 return new Response();
@@ -65,7 +65,7 @@ final class BroadcastDriverManagerTest extends TestCase
         });
 
         $resolvedBroadcaster = $this->broadcastDriverManager->driver('foo');
-        \PHPUnit\Framework\Assert::assertInstanceOf(Broadcaster::class, $resolvedBroadcaster);
+        $this->assertInstanceOf(Broadcaster::class, $resolvedBroadcaster);
 
         $this->assertSame(['driver' => 'foo'], $broadcasterConfig);
         $this->assertSame($broadcaster, $resolvedBroadcaster);
@@ -73,7 +73,7 @@ final class BroadcastDriverManagerTest extends TestCase
 
     public function testThrowsIfDriverDoesNotImplementInterface(): void
     {
-        $this->broadcastDriverManager->extend('foo', static fn (): object => new class() {});
+        $this->broadcastDriverManager->extend('foo', static fn (): object => new class {});
 
         $this->expectException(InvalidDriverException::class);
 

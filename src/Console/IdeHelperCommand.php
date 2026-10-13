@@ -201,6 +201,7 @@ GRAPHQL;
         return base_path() . '/programmatic-types.graphql';
     }
 
+    /** @deprecated TODO remove with v7 */
     public function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
@@ -211,6 +212,7 @@ GRAPHQL;
         $this->info("Wrote PHP definitions to {$filePath}.");
     }
 
+    /** @deprecated TODO remove with v7 */
     public static function phpIdeHelperPath(): string
     {
         return base_path() . '/_lighthouse_ide_helper.php';

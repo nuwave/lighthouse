@@ -2,8 +2,6 @@ parameters:
   level: 8 # TODO level up to max
   bootstrapFiles:
   - phpstan-bootstrap.php
-  stubFiles:
-  - _ide_helper.php
   paths:
   - benchmarks
   - src
@@ -21,6 +19,9 @@ parameters:
   # laravel/pennant requires Laravel 10
   - src/Pennant
   - tests/Integration/Pennant
+  # rector/rector is removed for PHPStan CI to avoid dependency conflicts
+  - src/Rector
+  - tests/Unit/Rector
   - src/Tracing/FederatedTracing/Proto # Generated classes from protobuf
   # Ignore errors caused by the absence of Lumen in the dev dependencies
   - tests/Unit/Testing/TestingTraitDummyLumen.php
