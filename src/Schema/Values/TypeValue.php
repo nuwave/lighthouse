@@ -19,13 +19,12 @@ class TypeValue
 
     public function __construct(
         protected TypeDefinitionNode $typeDefinition,
-        // TODO require in v7
-        protected ?DocumentAST $documentAST = null,
+        protected DocumentAST $documentAST,
     ) {}
 
     public function getDocumentAST(): DocumentAST
     {
-        return $this->documentAST ??= new DocumentAST();
+        return $this->documentAST;
     }
 
     /** Get the name of the node. */
