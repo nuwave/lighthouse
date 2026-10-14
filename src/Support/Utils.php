@@ -254,12 +254,16 @@ class Utils
         } catch (\ErrorException|\Error) {
         }
 
-        // Delete first, so concurrent requests can not compile the invalid file into OPcache again
+        // TODO remove when dropping PHP 8.0, it can not invalidate deleted files
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, force: true);
+        }
+
         $filesystem->delete($path);
 
-        // With opcache.validate_timestamps=0, the compiled file would otherwise be served forever
+        // After deleting, so concurrent requests cannot recompile the invalid file
         if (function_exists('opcache_invalidate')) {
-            opcache_invalidate($path, true);
+            opcache_invalidate($path, force: true);
         }
 
         return null;
