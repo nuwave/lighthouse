@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
+## v6.72.3
+
+### Fixed
+
+- Pass the value to result handlers such as `@globalId` when the field resolves to a chained promise, such as with `@with` https://github.com/nuwave/lighthouse/pull/2794
+
 ## v6.72.2
 
 ### Fixed
