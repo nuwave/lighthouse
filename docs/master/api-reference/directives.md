@@ -4129,6 +4129,51 @@ directive @validator(
 
 Read more in the [validation docs](../security/validation.md#validator-classes).
 
+## @void
+
+```graphql
+"""
+Mark a field that returns no value.
+
+The return type of the field will be changed to `Void!`, defined as `enum Void { VOID }`.
+Whatever result is returned from the resolver will be replaced with `VOID`.
+"""
+directive @void on FIELD_DEFINITION
+```
+
+To enable this directive, add the service provider to your `config/app.php`:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\Void\VoidServiceProvider::class,
+],
+```
+
+Lighthouse will register the following type in your schema:
+
+```graphql
+"""
+Returned by fields that complete without a value.
+
+It is a [unit type](https://en.wikipedia.org/wiki/Unit_type), so it has only one value.
+"""
+enum Void {
+  "The field completed successfully."
+  VOID
+}
+```
+
+Use this directive on mutations that return no value, see [motivation](https://github.com/graphql/graphql-spec/issues/906).
+
+```graphql
+type Mutation {
+  fireAndForget: _ @void
+}
+```
+
+Lighthouse will modify the definition of your field and have it return `Void!`.
+No matter what your resolver returns, the resulting value will always be `VOID`.
+
 ## @where
 
 ```graphql
