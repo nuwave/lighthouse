@@ -3,6 +3,7 @@
 namespace Tests\Unit\Support;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Support\Utils;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -42,16 +43,13 @@ final class UtilsTest extends TestCase
             }
         };
 
-        $directory = sys_get_temp_dir() . '/lighthouse-atomic-put-' . bin2hex(random_bytes(6));
-        $filesystem->makeDirectory($directory);
+        $disk = Storage::fake();
 
         try {
-            Utils::atomicPut(filesystem: $filesystem, path: "{$directory}/file.php", contents: '<?php return [];');
+            Utils::atomicPut(filesystem: $filesystem, path: $disk->path('file.php'), contents: '<?php return [];');
             $this->fail('Expected the write to fail.');
         } catch (\ErrorException) {
-            $this->assertSame([], $filesystem->files($directory));
-        } finally {
-            $filesystem->deleteDirectory($directory);
+            $this->assertSame([], $disk->allFiles());
         }
     }
 
@@ -64,16 +62,13 @@ final class UtilsTest extends TestCase
             }
         };
 
-        $directory = sys_get_temp_dir() . '/lighthouse-atomic-put-' . bin2hex(random_bytes(6));
-        $filesystem->makeDirectory($directory);
+        $disk = Storage::fake();
 
         try {
-            Utils::atomicPut(filesystem: $filesystem, path: "{$directory}/file.php", contents: '<?php return [];');
+            Utils::atomicPut(filesystem: $filesystem, path: $disk->path('file.php'), contents: '<?php return [];');
             $this->fail('Expected the move to fail.');
         } catch (\ErrorException) {
-            $this->assertSame([], $filesystem->files($directory));
-        } finally {
-            $filesystem->deleteDirectory($directory);
+            $this->assertSame([], $disk->allFiles());
         }
     }
 
@@ -88,16 +83,13 @@ final class UtilsTest extends TestCase
             }
         };
 
-        $directory = sys_get_temp_dir() . '/lighthouse-atomic-put-' . bin2hex(random_bytes(6));
-        $filesystem->makeDirectory($directory);
+        $disk = Storage::fake();
 
         try {
-            Utils::atomicPut(filesystem: $filesystem, path: "{$directory}/file.php", contents: '<?php return [];');
+            Utils::atomicPut(filesystem: $filesystem, path: $disk->path('file.php'), contents: '<?php return [];');
             $this->fail('Expected the write to fail.');
         } catch (\RuntimeException) {
-            $this->assertSame([], $filesystem->files($directory));
-        } finally {
-            $filesystem->deleteDirectory($directory);
+            $this->assertSame([], $disk->allFiles());
         }
     }
 
@@ -110,16 +102,61 @@ final class UtilsTest extends TestCase
             }
         };
 
-        $directory = sys_get_temp_dir() . '/lighthouse-atomic-put-' . bin2hex(random_bytes(6));
-        $filesystem->makeDirectory($directory);
+        $disk = Storage::fake();
 
         try {
-            Utils::atomicPut(filesystem: $filesystem, path: "{$directory}/file.php", contents: '<?php return [];');
+            Utils::atomicPut(filesystem: $filesystem, path: $disk->path('file.php'), contents: '<?php return [];');
             $this->fail('Expected the move to fail.');
         } catch (\RuntimeException) {
-            $this->assertSame([], $filesystem->files($directory));
-        } finally {
-            $filesystem->deleteDirectory($directory);
+            $this->assertSame([], $disk->allFiles());
         }
+    }
+
+    public function testRequireArrayOrForgetReturnsNullForMissingFile(): void
+    {
+        $disk = Storage::fake();
+
+        $this->assertNull(Utils::requireArrayOrForget(new Filesystem(), $disk->path('file.php')));
+    }
+
+    public function testRequireArrayOrForgetReturnsArray(): void
+    {
+        $disk = Storage::fake();
+        $disk->put('file.php', "<?php return ['foo' => 1];");
+
+        $this->assertSame(['foo' => 1], Utils::requireArrayOrForget(new Filesystem(), $disk->path('file.php')));
+        $this->assertTrue($disk->exists('file.php'));
+    }
+
+    #[DataProvider('invalidArrayFiles')]
+    public function testRequireArrayOrForgetDeletesInvalidFile(string $contents): void
+    {
+        $disk = Storage::fake();
+        $disk->put('file.php', $contents);
+
+        $this->assertNull(Utils::requireArrayOrForget(new Filesystem(), $disk->path('file.php')));
+        $this->assertFalse($disk->exists('file.php'));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function invalidArrayFiles(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'returns no array' => ['<?php return 1;'];
+        yield 'truncated' => ["<?php return array (\n  'kind' =>"];
+    }
+
+    public function testRequireArrayOrForgetReturnsNullWhenFileVanishesBeforeRequire(): void
+    {
+        $filesystem = new class extends Filesystem {
+            public function exists($path): bool
+            {
+                return true;
+            }
+        };
+
+        $disk = Storage::fake();
+
+        $this->assertNull(Utils::requireArrayOrForget($filesystem, $disk->path('file.php')));
     }
 }
