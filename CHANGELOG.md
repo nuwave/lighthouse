@@ -7,11 +7,17 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
-## Unreleased
+## v6.72.2
 
-### Added
+### Fixed
 
-- Add option `allowUnlimited` to `@paginate` and paginated relation directives and configuration option `pagination.allow_unlimited` to fetch all items with `first: null` https://github.com/nuwave/lighthouse/pull/2781
+- Fix `@delete`, `@forceDelete` and `@restore` rejecting arguments with builder directives that follow an input argument without builder directives https://github.com/nuwave/lighthouse/pull/2797
+
+## v6.72.1
+
+### Fixed
+
+- Fix ambiguous or doubly qualified columns in `HAS` conditions https://github.com/nuwave/lighthouse/pull/1472
 
 ## v6.72.0
 
