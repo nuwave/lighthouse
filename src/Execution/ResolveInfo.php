@@ -146,7 +146,9 @@ class ResolveInfo extends BaseResolveInfo
 
             $valueOrValues = $argument->value;
             if ($valueOrValues instanceof ArgumentSet) {
-                return self::wouldApplyArgBuilderDirectives($valueOrValues, $directiveFilter);
+                if (self::wouldApplyArgBuilderDirectives($valueOrValues, $directiveFilter)) {
+                    return true;
+                }
             }
 
             if (is_array($valueOrValues)) {

@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Str;
 
 class WhereConditionsHandler
 {
@@ -117,7 +118,7 @@ class WhereConditionsHandler
     }
 
     /**
-     * If the condition references a column, prefix it with the table name.
+     * Prefix unqualified columns of the condition and its nested AND/OR conditions with the table name.
      *
      * This is important for queries that can otherwise be ambiguous.
      * For example, ambiguity happens when multiple tables include a column named "id".
@@ -128,8 +129,17 @@ class WhereConditionsHandler
      */
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
-        if (isset($condition['column'])) {
+        if (isset($condition['column']) && ! str_contains(Str::before($condition['column'], '->'), '.')) {
             $condition['column'] = "{$model->getTable()}.{$condition['column']}";
+        }
+
+        foreach (['AND', 'OR'] as $boolean) {
+            if (isset($condition[$boolean])) {
+                $condition[$boolean] = array_map(
+                    fn (array $nestedCondition): array => $this->prefixConditionWithTableName($nestedCondition, $model),
+                    $condition[$boolean],
+                );
+            }
         }
 
         return $condition;
