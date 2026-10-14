@@ -266,6 +266,44 @@ final class DeleteDirectiveTest extends DBTestCase
         GRAPHQL)->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
     }
 
+    public function testDeletesWithBuilderDirectiveAfterInputWithoutBuilderDirectives(): void
+    {
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+        }
+
+        input SomeInput {
+            foo: String
+        }
+
+        type Mutation {
+            deleteTasks(options: SomeInput, id: ID! @eq): [Task!]! @delete
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            deleteTasks(options: { foo: "bar" }, id: $id) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $task->id,
+        ])->assertJson([
+            'data' => [
+                'deleteTasks' => [
+                    ['id' => "{$task->id}"],
+                ],
+            ],
+        ]);
+
+        $this->assertCount(0, Task::all());
+    }
+
     public function testDoesNotAcceptArgumentWithoutArgBuilderDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
