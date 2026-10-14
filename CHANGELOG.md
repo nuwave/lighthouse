@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
+## v6.72.4
+
+### Fixed
+
+- Fix UTF-8 encoding errors when paginated relation directives such as `@belongsToMany(type: PAGINATOR)` load related models with binary column values https://github.com/nuwave/lighthouse/pull/2790
+
 ## v6.72.3
 
 ### Fixed
