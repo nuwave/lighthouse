@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\GraphQL;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
@@ -40,12 +41,14 @@ class SchemaBuilder
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Use lazy type loading to prevent unnecessary work
-        $config->setQuery(
-            /** @return \GraphQL\Type\Definition\ObjectType */
-            fn (): Type => $this->typeRegistry->get(RootType::QUERY),
-        );
-        $config->setMutation(fn (): ?Type => $this->typeRegistry->search(RootType::MUTATION));
-        $config->setSubscription(fn (): ?Type => $this->typeRegistry->search(RootType::SUBSCRIPTION));
+        $config->setQuery(function (): ObjectType {
+            $query = $this->typeRegistry->get(RootType::QUERY);
+            assert($query instanceof ObjectType, 'The schema validates the root query type is an object type.');
+
+            return $query;
+        });
+        $config->setMutation(fn (): ?ObjectType => $this->searchObjectType(RootType::MUTATION));
+        $config->setSubscription(fn (): ?ObjectType => $this->searchObjectType(RootType::SUBSCRIPTION));
         $config->setTypeLoader(fn (string $name): ?Type => $this->typeRegistry->search($name));
 
         // Enables introspection to list all types in the schema
@@ -79,5 +82,13 @@ class SchemaBuilder
         $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
+    }
+
+    protected function searchObjectType(string $name): ?ObjectType
+    {
+        $type = $this->typeRegistry->search($name);
+        assert($type === null || $type instanceof ObjectType, 'The schema validates root types are object types.');
+
+        return $type;
     }
 }
