@@ -229,6 +229,10 @@ This query would retrieve all persons without any condition:
 }
 ```
 
+Outside of `HAS` conditions, Lighthouse passes column names to the query as they are.
+When the field uses a relation that joins tables, such as [@belongsToMany](../api-reference/directives.md#belongstomany), a column like `id` can be ambiguous.
+Qualify such columns with the table name, e.g. `@whereConditions(columns: ["roles.id"])`.
+
 ### @whereHasConditions
 
 ```graphql
@@ -349,6 +353,8 @@ This query would retrieve all persons, no matter if they have a role or not:
   }
 }
 ```
+
+Lighthouse qualifies column names with the table of the related model, unless they already contain a table name.
 
 ## Custom operator
 
