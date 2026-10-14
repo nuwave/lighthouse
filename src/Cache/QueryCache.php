@@ -103,11 +103,9 @@ class QueryCache
     {
         $path = $this->opcacheFilePath($hash);
 
-        if ($this->filesystem->exists($path)) {
-            $query = $this->requireOPcacheFile($path);
-            if ($query !== null) {
-                return $query;
-            }
+        $query = $this->requireOPcacheFile($path);
+        if ($query !== null) {
+            return $query;
         }
 
         $query = $parse();
@@ -123,11 +121,9 @@ class QueryCache
     {
         $path = $this->opcacheFilePath($hash);
 
-        if ($this->filesystem->exists($path)) {
-            $query = $this->requireOPcacheFile($path);
-            if ($query !== null) {
-                return $query;
-            }
+        $query = $this->requireOPcacheFile($path);
+        if ($query !== null) {
+            return $query;
         }
 
         $store = $this->makeCacheStore();

@@ -60,13 +60,11 @@ class ASTCache
     public function fromCacheOrBuild(callable $build): DocumentAST
     {
         $path = $this->path();
-        if ($this->filesystem->exists($path)) {
-            $astArray = Utils::requireArrayOrForget($this->filesystem, $path);
-            if ($astArray !== null) {
-                /** @var SerializableDocumentAST $astArray */
+        $astArray = Utils::requireArrayOrForget($this->filesystem, $path);
+        if ($astArray !== null) {
+            /** @var SerializableDocumentAST $astArray */
 
-                return DocumentAST::fromArray($astArray);
-            }
+            return DocumentAST::fromArray($astArray);
         }
 
         $documentAST = $build();

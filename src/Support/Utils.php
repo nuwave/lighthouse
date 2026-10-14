@@ -231,7 +231,7 @@ class Utils
     }
 
     /**
-     * Require a PHP file that is expected to return an array.
+     * Require a PHP file that is expected to return an array, or return null if it does not exist.
      *
      * If it returns something else or fails to parse, e.g. because it is empty or truncated
      * after a failed write, it is deleted and evicted from OPcache, so it can be rebuilt.
@@ -240,6 +240,10 @@ class Utils
      */
     public static function requireArrayOrForget(Filesystem $filesystem, string $path): ?array
     {
+        if (! $filesystem->exists($path)) {
+            return null;
+        }
+
         try {
             $contents = require $path;
             if (is_array($contents)) {
