@@ -9,6 +9,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.72.2
+
+### Fixed
+
+- Fix `@delete`, `@forceDelete` and `@restore` rejecting arguments with builder directives that follow an input argument without builder directives https://github.com/nuwave/lighthouse/pull/2797
+
+## v6.72.1
+
+### Fixed
+
+- Fix ambiguous or doubly qualified columns in `HAS` conditions https://github.com/nuwave/lighthouse/pull/1472
+
 ## v6.72.0
 
 ### Changed
