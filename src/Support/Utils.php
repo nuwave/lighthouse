@@ -245,7 +245,7 @@ class Utils
             if (is_array($contents)) {
                 return $contents;
             }
-        } catch (\ParseError) {
+        } catch (\ErrorException|\Error) {
         }
 
         // Delete first, so concurrent requests can not compile the invalid file into OPcache again
