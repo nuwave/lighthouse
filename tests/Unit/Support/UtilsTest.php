@@ -76,4 +76,50 @@ final class UtilsTest extends TestCase
             $filesystem->deleteDirectory($directory);
         }
     }
+
+    public function testAtomicPutThrowsAndDeletesTempFileWhenWriteReturnsFalse(): void
+    {
+        $filesystem = new class extends Filesystem {
+            public function put($path, $contents, $lock = false): int|bool
+            {
+                parent::put($path, substr($contents, 0, 3));
+
+                return false;
+            }
+        };
+
+        $directory = sys_get_temp_dir() . '/lighthouse-atomic-put-' . bin2hex(random_bytes(6));
+        $filesystem->makeDirectory($directory);
+
+        try {
+            Utils::atomicPut(filesystem: $filesystem, path: "{$directory}/file.php", contents: '<?php return [];');
+            $this->fail('Expected the write to fail.');
+        } catch (\RuntimeException) {
+            $this->assertSame([], $filesystem->files($directory));
+        } finally {
+            $filesystem->deleteDirectory($directory);
+        }
+    }
+
+    public function testAtomicPutThrowsAndDeletesTempFileWhenMoveReturnsFalse(): void
+    {
+        $filesystem = new class extends Filesystem {
+            public function move($path, $target): bool
+            {
+                return false;
+            }
+        };
+
+        $directory = sys_get_temp_dir() . '/lighthouse-atomic-put-' . bin2hex(random_bytes(6));
+        $filesystem->makeDirectory($directory);
+
+        try {
+            Utils::atomicPut(filesystem: $filesystem, path: "{$directory}/file.php", contents: '<?php return [];');
+            $this->fail('Expected the move to fail.');
+        } catch (\RuntimeException) {
+            $this->assertSame([], $filesystem->files($directory));
+        } finally {
+            $filesystem->deleteDirectory($directory);
+        }
+    }
 }
