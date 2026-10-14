@@ -225,7 +225,7 @@ class Utils
                 throw new \RuntimeException("Failed to move file {$tempPath} to {$path}.");
             }
         } catch (\Throwable $throwable) {
-            // Laravel converts the warning of a failed write or move to an exception, so clean up in either case
+            // put() or move() may also throw an ErrorException converted from a PHP warning
             $filesystem->delete($tempPath);
 
             throw $throwable;
@@ -233,10 +233,7 @@ class Utils
     }
 
     /**
-     * Require a PHP file that is expected to return an array, or return null if it does not exist.
-     *
-     * If it returns something else or fails to parse, e.g. because it is empty or truncated
-     * after a failed write, it is deleted and evicted from OPcache, so it can be rebuilt.
+     * Require a PHP file that returns an array, or return null and delete it from disk and OPcache if it does not.
      *
      * @return array<mixed>|null
      */

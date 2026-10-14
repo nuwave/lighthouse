@@ -32,7 +32,7 @@ final class UtilsTest extends TestCase
 
     public function testAtomicPutDeletesTempFileOnFailedWrite(): void
     {
-        // Simulates a full disk: partial contents are written, then Laravel converts the warning to an exception
+        // Simulates a full disk
         $filesystem = new class extends Filesystem {
             public function put($path, $contents, $lock = false): int|bool
             {
