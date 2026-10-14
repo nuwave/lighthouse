@@ -134,12 +134,13 @@ Follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md):
 - Link related issues
 - Add or update tests
 - Document user-facing changes in `/docs`
-- Update `CHANGELOG.md` for non-docs-only changes
+- Describe non-docs-only changes in the `## Changelog` section of the PR description
 
 ### Changelog
 
-Add entries to the `## Unreleased` section in [CHANGELOG.md](/CHANGELOG.md) for non-docs-only changes.
+Do not edit [CHANGELOG.md](/CHANGELOG.md) in a PR.
+Write entries for non-docs-only changes in the `## Changelog` section of the PR description.
 Use categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
-End each entry with a full PR URL: `https://github.com/nuwave/lighthouse/pull/<number>`.
+When releasing, copy them into a new versioned section of CHANGELOG.md and end each entry with the full PR URL: `https://github.com/nuwave/lighthouse/pull/<number>`.
 
 See [CONTRIBUTING.md](/CONTRIBUTING.md) for full guidelines.
