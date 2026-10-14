@@ -7,11 +7,39 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
-## Unreleased
+## v6.72.2
+
+### Fixed
+
+- Fix `@delete`, `@forceDelete` and `@restore` rejecting arguments with builder directives that follow an input argument without builder directives https://github.com/nuwave/lighthouse/pull/2797
+
+## v6.72.1
+
+### Fixed
+
+- Fix ambiguous or doubly qualified columns in `HAS` conditions https://github.com/nuwave/lighthouse/pull/1472
+
+## v6.72.0
 
 ### Changed
 
-- Override the default field resolver `GraphQL\Executor\Executor::defaultFieldResolver()` with `Nuwave\Lighthouse\LighthouseServiceProvider::defaultFieldResolver()` https://github.com/nuwave/lighthouse/pull/2693
+- Omit `locations` from errors of queries served from `query_cache.mode: store`, as opcache and hybrid modes already do https://github.com/nuwave/lighthouse/pull/2785
+
+### Fixed
+
+- Cache the query AST as an array in `query_cache.mode: store`, so it no longer requires allowing AST classes in `cache.serializable_classes` https://github.com/nuwave/lighthouse/pull/2785
+
+## v6.71.2
+
+### Fixed
+
+- Apply the `action` of `@canResolved` and friends when the field resolves to a promise, such as a batch loaded relation https://github.com/nuwave/lighthouse/pull/2786
+
+## v6.71.1
+
+### Fixed
+
+- Stop resolving built-in `@rules` like `url` to global classes, reference global rule classes as `"\\MyRule"` https://github.com/nuwave/lighthouse/pull/2792
 
 ## v6.71.0
 
