@@ -70,7 +70,7 @@ final class SchemaCacheTest extends TestCase
         ]);
     }
 
-    public function testRebuildsInvalidSchemaCacheFile(): void
+    public function testRebuildsInvalidFile(): void
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {

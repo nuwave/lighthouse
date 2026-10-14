@@ -279,7 +279,7 @@ final class QueryCacheTest extends TestCase
         $event->assertDispatchedTimes(KeyWritten::class, 0);
     }
 
-    public function testRebuildsInvalidQueryCacheFile(): void
+    public function testRebuildsInvalidFile(): void
     {
         $filesystem = Storage::fake();
 
@@ -304,7 +304,7 @@ final class QueryCacheTest extends TestCase
         $this->assertIsArray(require $filesystem->path($fileName));
     }
 
-    public function testRebuildsTruncatedQueryCacheFile(): void
+    public function testRebuildsTruncatedFile(): void
     {
         $filesystem = Storage::fake();
 
@@ -329,7 +329,7 @@ final class QueryCacheTest extends TestCase
         $this->assertIsArray(require $filesystem->path($fileName));
     }
 
-    public function testRebuildsInvalidQueryCacheFileFromInvalidStoreInHybridMode(): void
+    public function testRebuildsInvalidFileFromInvalidStoreInHybridMode(): void
     {
         $filesystem = Storage::fake();
 
