@@ -31,7 +31,7 @@ final class RouteRegistrationTest extends TestCase
         $routes = $router->getRoutes();
 
         $graphqlRoute = $routes->getByName('graphql');
-        assert($graphqlRoute instanceof Route);
+        $this->assertInstanceOf(Route::class, $graphqlRoute);
 
         $this->assertSame(
             ['GET', 'POST', 'HEAD'],

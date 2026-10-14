@@ -44,9 +44,7 @@ GRAPHQL;
 
         return $builder->whereHas(
             $this->directiveArgValue('relation'),
-            function (object $query): void {
-                assert($query instanceof EloquentBuilder);
-
+            function (EloquentBuilder $query): void {
                 $guards = $this->directiveArgValue('guards', AuthServiceProvider::guards());
                 $query->whereKey($this->authenticatedUserID($guards));
             },
@@ -58,7 +56,7 @@ GRAPHQL;
      *
      * @param  array<string>  $guards
      */
-    protected function authenticatedUserID(array $guards): int|null|string
+    protected function authenticatedUserID(array $guards): int|string|null
     {
         foreach ($guards as $guard) {
             $id = $this->authFactory->guard($guard)

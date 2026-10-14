@@ -17,7 +17,7 @@ final class ResolveInfoTest extends TestCase
 {
     public function testApplyArgBuilderDirectives(): void
     {
-        $directiveOne = new class() implements Directive, ArgBuilderDirective {
+        $directiveOne = new class implements Directive, ArgBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -28,7 +28,7 @@ final class ResolveInfoTest extends TestCase
                 return $builder->where('one', $value);
             }
         };
-        $directiveTwo = new class() implements Directive, ArgBuilderDirective {
+        $directiveTwo = new class implements Directive, ArgBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -39,7 +39,7 @@ final class ResolveInfoTest extends TestCase
                 return $builder->where('two', $value);
             }
         };
-        $directiveNested = new class() implements Directive, ArgBuilderDirective {
+        $directiveNested = new class implements Directive, ArgBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -50,7 +50,7 @@ final class ResolveInfoTest extends TestCase
                 return $builder->where('nested', $value);
             }
         };
-        $directiveIgnored = new class() implements Directive, ArgBuilderDirective {
+        $directiveIgnored = new class implements Directive, ArgBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -61,7 +61,7 @@ final class ResolveInfoTest extends TestCase
                 return $builder->where('ignored', $value);
             }
         };
-        $directiveWithoutInterface = new class() implements Directive {
+        $directiveWithoutInterface = new class implements Directive {
             public static function definition(): string
             {
                 return '';
@@ -95,15 +95,18 @@ final class ResolveInfoTest extends TestCase
         $argumentSet->arguments['b'] = $argumentB;
 
         $builder = User::query();
-        $resolveInfo = new class() extends ResolveInfo {
+        $resolveInfo = new class extends ResolveInfo {
             /** @phpstan-ignore-next-line no need to call parent `__construct` */
             public function __construct()
             {
                 // empty
             }
 
-            public static function applyArgBuilderDirectives(ArgumentSet $argumentSet, Relation|EloquentBuilder|QueryBuilder &$builder, callable $directiveFilter = null): void
-            {
+            public static function applyArgBuilderDirectives(
+                ArgumentSet $argumentSet,
+                Relation|EloquentBuilder|QueryBuilder &$builder,
+                ?callable $directiveFilter = null,
+            ): void {
                 parent::applyArgBuilderDirectives(
                     $argumentSet,
                     $builder,
@@ -118,31 +121,28 @@ final class ResolveInfoTest extends TestCase
             static fn (ArgBuilderDirective $directive): bool => $directive !== $directiveIgnored,
         );
 
-        self::assertSame(
+        $this->assertSame([
             [
-                [
-                    'type' => 'Basic',
-                    'column' => 'two',
-                    'operator' => '=',
-                    'value' => $value,
-                    'boolean' => 'and',
-                ],
-                [
-                    'type' => 'Basic',
-                    'column' => 'one',
-                    'operator' => '=',
-                    'value' => $value,
-                    'boolean' => 'and',
-                ],
-                [
-                    'type' => 'Basic',
-                    'column' => 'nested',
-                    'operator' => '=',
-                    'value' => $nested,
-                    'boolean' => 'and',
-                ],
+                'type' => 'Basic',
+                'column' => 'two',
+                'operator' => '=',
+                'value' => $value,
+                'boolean' => 'and',
             ],
-            $builder->toBase()->wheres,
-        );
+            [
+                'type' => 'Basic',
+                'column' => 'one',
+                'operator' => '=',
+                'value' => $value,
+                'boolean' => 'and',
+            ],
+            [
+                'type' => 'Basic',
+                'column' => 'nested',
+                'operator' => '=',
+                'value' => $nested,
+                'boolean' => 'and',
+            ],
+        ], $builder->toBase()->wheres);
     }
 }

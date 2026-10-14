@@ -13,11 +13,15 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
 
     protected function getStub(): string
     {
-        $stub = $this->option('full')
-            ? 'field_full'
-            : 'field_simple';
+        if (PHP_VERSION_ID >= 80200) {
+            return $this->option('full')
+                ? __DIR__ . '/stubs/field_full.php82.stub'
+                : __DIR__ . '/stubs/field_simple.php82.stub';
+        }
 
-        return __DIR__ . "/stubs/{$stub}.stub";
+        return $this->option('full')
+            ? __DIR__ . '/stubs/field_full.stub'
+            : __DIR__ . '/stubs/field_simple.stub';
     }
 
     /** @return array<int, array<int, mixed>> */
@@ -28,7 +32,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         ];
     }
 
-    /** @param string $path */
+    /** @param  string  $path */
     protected function handleTestCreation($path): bool
     {
         if (! $testFramework = $this->testFramework()) {

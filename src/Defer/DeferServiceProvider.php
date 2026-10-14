@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Defer;
 
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
@@ -19,7 +19,7 @@ class DeferServiceProvider extends ServiceProvider
         $this->app->singleton(CreatesResponse::class, Defer::class);
     }
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(ManipulateAST::class, fn (ManipulateAST $manipulateAST) => $this->handleManipulateAST($manipulateAST));

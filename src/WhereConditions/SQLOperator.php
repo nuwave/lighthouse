@@ -92,7 +92,7 @@ GRAPHQL;
             // method, e.g. ->where('some_col', '=', $value)
             $args[] = $operator;
         } else {
-            // We utilize the fact that the operators are named after Laravel's condition
+            // We use the fact that the operators are named after Laravel's condition
             // methods, so we can simply append the name, e.g. whereNull, whereNotBetween
             $method .= $operator;
         }
@@ -115,11 +115,11 @@ GRAPHQL;
 
     protected function operatorArity(string $operator): int
     {
-        if (in_array($operator, ['Null', 'NotNull'])) {
+        if (in_array($operator, ['Null', 'NotNull'], strict: true)) {
             return 1;
         }
 
-        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween'])) {
+        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween'], strict: true)) {
             return 2;
         }
 

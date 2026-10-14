@@ -29,9 +29,9 @@ class GraphQLController
         $operationOrOperations = $requestParser->parseRequest($request);
         $context = $createsContext->generate($request);
 
-        $result = $graphQL->executeOperationOrOperations($operationOrOperations, $context);
+        $resultOrResults = $graphQL->executeOperationOrOperations($operationOrOperations, $context);
 
-        $response = $createsResponse->createResponse($result);
+        $response = $createsResponse->createResponse($resultOrResults);
 
         $eventsDispatcher->dispatch(
             new EndRequest($response),

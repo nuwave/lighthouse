@@ -12,8 +12,7 @@ use Tests\TestCase;
 
 final class DirectiveFactoryTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory */
-    protected $directiveFactory;
+    protected DirectiveFactory $directiveFactory;
 
     protected function setUp(): void
     {
@@ -27,7 +26,7 @@ final class DirectiveFactoryTest extends TestCase
 
     public function testConvertDirectiveFromNodeToExecutable(): void
     {
-        $node = Parser::directiveDefinition(/** @lang GraphQL */ '
+        $node = Parser::directiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         "foo description"
         directive @foo(
             """
@@ -36,7 +35,7 @@ final class DirectiveFactoryTest extends TestCase
             """
             baz: Int
         ) repeatable on OBJECT
-        ');
+        GRAPHQL);
         $executable = $this->directiveFactory->handle($node);
 
         $this->assertSame('foo description', $executable->description);

@@ -12,7 +12,7 @@ final class HasManyThroughDirectiveTest extends DBTestCase
 {
     public function testQueryHasManyThroughRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
         }
@@ -24,29 +24,29 @@ final class HasManyThroughDirectiveTest extends DBTestCase
         type Query {
             task: Task! @first
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user);
         $post->task()->associate($task);
         $post->save();
 
         $comments = factory(Comment::class, 2)->make();
         foreach ($comments as $comment) {
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
         }
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             task {
                 postComments {
@@ -54,6 +54,6 @@ final class HasManyThroughDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(2, 'data.task.postComments');
+        GRAPHQL)->assertJsonCount(2, 'data.task.postComments');
     }
 }

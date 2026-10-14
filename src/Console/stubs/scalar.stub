@@ -1,26 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DummyNamespace;
 
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ScalarType;
 
-/**
- * Read more about scalars here https://webonyx.github.io/graphql-php/type-definitions/scalars
- */
+/** Read more about scalars here: https://webonyx.github.io/graphql-php/type-definitions/scalars. */
 final class DummyClass extends ScalarType
 {
-    /**
-     * Serializes an internal value to include in a response.
-     */
+    /** Serializes an internal value to include in a response. */
     public function serialize(mixed $value): mixed
     {
         // TODO validate if $value might be incorrect
     }
 
-    /**
-     * Parses an externally provided value (query variable) to use as an input
-     */
+    /** Parses an externally provided value (query variable) to use as an input. */
     public function parseValue(mixed $value): mixed
     {
         // TODO implement validation and transformation of $value

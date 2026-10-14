@@ -13,7 +13,7 @@ final class BroadcastDBTest extends DBTestCase
 {
     use EnablesSubscriptionServiceProvider;
 
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -30,7 +30,7 @@ final class BroadcastDBTest extends DBTestCase
     type Subscription {
         taskUpdated: Task
     }
-    ';
+    GRAPHQL;
 
     protected function setUp(): void
     {
@@ -53,13 +53,13 @@ final class BroadcastDBTest extends DBTestCase
             ->shouldReceive('broadcast')
             ->once();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             subscription UserUpdated {
                 taskUpdated {
                     name
                 }
             }
-        ');
+        GRAPHQL);
 
         Subscription::broadcast('taskUpdated', []);
     }
@@ -70,20 +70,20 @@ final class BroadcastDBTest extends DBTestCase
             ->shouldReceive('broadcast')
             ->once();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             subscription TaskUpdated {
                 taskUpdated {
                     name
                 }
             }
-        ');
+        GRAPHQL);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation {
                 updateTask(id: 1, name: "New name") {
                     name
                 }
             }
-        ');
+        GRAPHQL);
     }
 }

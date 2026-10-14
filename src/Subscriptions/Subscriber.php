@@ -8,16 +8,17 @@ use GraphQL\Utils\AST;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
 class Subscriber
 {
     /**
      * A unique key for the subscriber's channel.
      *
-     * This has to be unique for each subscriber, because each of them can send a different
-     * query and must receive a response that is specifically tailored towards that.
+     * This has to be unique for each subscriber.
+     * Each of them can send a different query.
+     * Each must receive a response tailored to that query.
      */
     public string $channel;
 
@@ -33,9 +34,7 @@ class Subscriber
     /**
      * The name of the queried field.
      *
-     * Guaranteed be be unique because of
-     *
-     * @see \GraphQL\Validator\Rules\SingleFieldSubscription
+     * Guaranteed to be unique because of @see \GraphQL\Validator\Rules\SingleFieldSubscription
      */
     public string $fieldName;
 
@@ -56,9 +55,7 @@ class Subscriber
          * @var array<string, mixed> $args
          */
         public array $args,
-        /**
-         * The context passed to the query.
-         */
+        /** The context passed to the query. */
         public GraphQLContext $context,
         ResolveInfo $resolveInfo,
     ) {
@@ -106,6 +103,7 @@ class Subscriber
         $this->topic = $data['topic'];
 
         $documentNode = AST::fromArray(
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             unserialize($data['query']),
         );
         assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
@@ -123,11 +121,15 @@ class Subscriber
     /** Generate a unique private channel name. */
     public static function uniqueChannelName(): string
     {
-        return 'private-lighthouse-' . Str::random(32) . '-' . time();
+        $channelType = config('lighthouse.subscriptions.encrypted_channels', false)
+            ? 'private-encrypted'
+            : 'private';
+
+        return $channelType . '-lighthouse-' . Str::random(32) . '-' . time();
     }
 
-    protected function contextSerializer(): ContextSerializer
+    protected function contextSerializer(): SerializesContext
     {
-        return Container::getInstance()->make(ContextSerializer::class);
+        return Container::getInstance()->make(SerializesContext::class);
     }
 }

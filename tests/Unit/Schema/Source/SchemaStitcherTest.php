@@ -31,13 +31,13 @@ final class SchemaStitcherTest extends TestCase
         parent::tearDown();
     }
 
-    protected function assertSchemaResultIsSame(string $expected): void
+    private function assertSchemaResultIsSame(string $expected): void
     {
         $schema = (new SchemaStitcher(self::ROOT_SCHEMA_PATH))->getSchemaString();
         $this->assertSame($expected, $schema);
     }
 
-    protected function putRootSchema(string $schema): void
+    private function putRootSchema(string $schema): void
     {
         \Safe\file_put_contents(self::ROOT_SCHEMA_PATH, $schema);
     }

@@ -8,7 +8,7 @@ final class HashDirectiveTest extends TestCase
 {
     public function testHashAnArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String! @hash): Foo @mock
         }
@@ -16,18 +16,18 @@ final class HashDirectiveTest extends TestCase
         type Foo {
             bar: String!
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver(static fn ($_, array $args): array => $args);
 
         $password = $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(bar: "password") {
                     bar
                 }
             }
-            ')
+            GRAPHQL)
             ->json('data.foo.bar');
 
         $this->assertNotSame('password', $password);
@@ -36,7 +36,7 @@ final class HashDirectiveTest extends TestCase
 
     public function testHashAnArgumentInInputObjectAndArray(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(input: UserInput!): User @mock
         }
@@ -52,11 +52,11 @@ final class HashDirectiveTest extends TestCase
             alt_passwords: [String!] @hash
             friends: [UserInput!]
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver(static fn ($_, array $args): array => $args['input']);
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(input: {
                 password: "password"
@@ -82,7 +82,7 @@ final class HashDirectiveTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $password = $result->json('data.user.password');
         $this->assertNotSame('password', $password);
@@ -117,7 +117,7 @@ final class HashDirectiveTest extends TestCase
 
     public function testHashWithRename(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(input: UserInput!): User @mock
         }
@@ -129,11 +129,11 @@ final class HashDirectiveTest extends TestCase
         input UserInput {
             password: String! @hash @rename(attribute: "password_renamed")
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver(static fn ($_, array $args): array => $args['input']);
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(input: {
                 password: "password"
@@ -141,7 +141,7 @@ final class HashDirectiveTest extends TestCase
                 password_renamed
             }
         }
-        ');
+        GRAPHQL);
 
         $password = $result->json('data.user.password_renamed');
         $this->assertNotSame('password', $password);

@@ -27,6 +27,11 @@ class SchemaBuilder
         );
     }
 
+    public function schemaHash(): string
+    {
+        return $this->astBuilder->documentAST()->hash;
+    }
+
     /** Build an executable schema from an AST. */
     protected function build(DocumentAST $documentAST): Schema
     {
@@ -44,7 +49,18 @@ class SchemaBuilder
         $config->setTypeLoader(fn (string $name): ?Type => $this->typeRegistry->search($name));
 
         // Enables introspection to list all types in the schema
-        $config->setTypes(fn (): array => $this->typeRegistry->possibleTypes());
+        $config->setTypes(
+            /** @return array<string, \GraphQL\Type\Definition\Type> */
+            fn (): array => $this->typeRegistry->possibleTypes(),
+        );
+
+        // Passing scalar overrides explicitly prevents the first lookup of a built-in scalar
+        // from discovering them by resolving the lazy types callable, which would eagerly
+        // build every type in the schema, see https://github.com/nuwave/lighthouse/issues/2771.
+        // TODO remove this check when the minimum version of webonyx/graphql-php includes the method
+        if (method_exists($config, 'setScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
+            $config->setScalarOverrides($this->typeRegistry->scalarOverrides());
+        }
 
         // There is no way to resolve directives lazily, so we convert them eagerly
         $directiveFactory = new DirectiveFactory(
@@ -59,6 +75,8 @@ class SchemaBuilder
         $config->setDirectives(
             array_merge(GraphQL::getStandardDirectives(), $directives),
         );
+
+        $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
     }

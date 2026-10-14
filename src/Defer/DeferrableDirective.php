@@ -77,13 +77,13 @@ GRAPHQL;
         }
 
         $skips = (new ClientDirective(Directive::SKIP_NAME))->forField($resolveInfo);
-        if (in_array([Directive::IF_ARGUMENT_NAME => true], $skips, true)) {
+        if (in_array([Directive::IF_ARGUMENT_NAME => true], $skips, strict: true)) {
             return false;
         }
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
 
-        return ! in_array([Directive::IF_ARGUMENT_NAME => false], $includes, true);
+        return ! in_array([Directive::IF_ARGUMENT_NAME => false], $includes, strict: true);
     }
 
     /** @param  array<array<string, mixed>|null>  $defers */

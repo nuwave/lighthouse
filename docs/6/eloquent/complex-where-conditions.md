@@ -2,29 +2,31 @@
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
-Adding query conditions ad-hoc can be cumbersome and limiting when you require
-manifold ways to filter query results.
-Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients
-and allow them to apply complex, dynamic WHERE conditions to queries.
+Adding query conditions ad-hoc can be cumbersome and limiting when you require manifold ways to filter query results.
+Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients and allow them to apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
+For Laravel 11 and higher, add the service provider to your `bootstrap/providers.php`:
 
 ```php
-'providers' => [
+return [
+    // ...
     \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
-],
+]
 ```
+
+For other versions, register the service provider `Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+```shell
+composer require mll-lab/graphql-php-scalars
+```
 
 ## Usage
 
-You can use this feature through a set of schema directives that enhance fields
-with advanced filter capabilities.
+You can use this feature through a set of schema directives that enhance fields with advanced filter capabilities.
 
 ### @whereConditions
 
@@ -83,13 +85,13 @@ type Person {
 }
 ```
 
-Lighthouse automatically generates definitions for an `Enum` type and an `Input` type
-that are restricted to the defined columns, so you do not have to specify them by hand.
+Lighthouse automatically generates definitions for an `Enum` type and an `Input` type that are restricted to the defined columns.
+You do not have to specify them by hand.
 The blank type named `_` will be changed to the actual type.
 Here are the types that will be included in the compiled schema:
 
 ```graphql
-"Dynamic WHERE conditions for the `where` argument on the query `people`."
+"Dynamic WHERE conditions for the `where` argument of the query `people`."
 input QueryPeopleWhereWhereConditions {
   "The column that is used for the condition."
   column: QueryPeopleWhereColumn
@@ -110,7 +112,7 @@ input QueryPeopleWhereWhereConditions {
   HAS: QueryPeopleWhereWhereConditionsRelation
 }
 
-"Allowed column names for the `where` argument on the query `people`."
+"Allowed column names for the `where` argument of the query `people`."
 enum QueryPeopleWhereColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
@@ -134,8 +136,8 @@ input QueryPeopleWhereWhereConditionsRelation {
 }
 ```
 
-Alternatively to the `columns` argument, you can also use `columnsEnum` in case you
-want to re-use a list of allowed columns. Here's how your schema could look like:
+Alternatively to the `columns` argument, you can also use `columnsEnum` in case you want to re-use a list of allowed columns.
+Here's how your schema could look like:
 
 ```graphql
 type Query {
@@ -161,8 +163,7 @@ Instead of creating enums for the allowed columns, it will simply use the existi
 
 It is recommended to either use the `columns` or the `columnsEnum` argument.
 When you don't define any allowed columns, clients can specify arbitrary column names as a `String`.
-This approach should by taken with care, as it carries
-potential performance and security risks and offers little type safety.
+This approach should by taken with care, as it carries potential performance and security risks and offers little type safety.
 
 A simple query for a person who is exactly 42 years old would look like this:
 
@@ -174,8 +175,7 @@ A simple query for a person who is exactly 42 years old would look like this:
 }
 ```
 
-Note that the operator defaults to `EQ` (`=`) if not given, so you could
-also omit it from the previous example and get the same result.
+Note that the operator defaults to `EQ` (`=`) if not given, so you could also omit it from the previous example and get the same result.
 
 The following query gets actors over age 37 who either have red hair or are at least 150cm:
 
@@ -200,8 +200,8 @@ The following query gets actors over age 37 who either have red hair or are at l
 }
 ```
 
-Some operators require passing lists of values - or no value at all. The following
-query gets people that have no hair and blue-ish eyes:
+Some operators require passing lists of values - or no value at all.
+The following query gets people that have no hair and blue-ish eyes:
 
 ```graphql
 {
@@ -228,6 +228,10 @@ This query would retrieve all persons without any condition:
   }
 }
 ```
+
+Outside of `HAS` conditions, Lighthouse passes column names to the query as they are.
+When the field uses a relation that joins tables, such as [@belongsToMany](../api-reference/directives.md#belongstomany), a column like `id` can be ambiguous.
+Qualify such columns with the table name, e.g. `@whereConditions(columns: ["roles.id"])`.
 
 ### @whereHasConditions
 
@@ -275,8 +279,7 @@ directive @whereHasConditions(
 ) on ARGUMENT_DEFINITION
 ```
 
-This directive works very similar to [@whereConditions](#whereconditions), except that
-the conditions are applied to a relation sub query:
+This directive works very similar to [@whereConditions](#whereconditions), except that the conditions are applied to a relation sub query:
 
 ```graphql
 type Query {
@@ -294,7 +297,7 @@ type Role {
 Again, Lighthouse will auto-generate an `input` and `enum` definition for your query:
 
 ```graphql
-"Dynamic WHERE conditions for the `hasRole` argument on the query `people`."
+"Dynamic WHERE conditions for the `hasRole` argument of the query `people`."
 input QueryPeopleHasRoleWhereConditions {
   "The column that is used for the condition."
   column: QueryPeopleHasRoleColumn
@@ -312,15 +315,14 @@ input QueryPeopleHasRoleWhereConditions {
   OR: [QueryPeopleHasRoleWhereConditions!]
 }
 
-"Allowed column names for the `hasRole` argument on the query `people`."
+"Allowed column names for the `hasRole` argument of the query `people`."
 enum QueryPeopleHasRoleColumn {
   NAME @enum(value: "name")
   ACCESS_LEVEL @enum(value: "access_level")
 }
 ```
 
-A simple query for a person who has an access level of at least 5, through one of
-their roles, looks like this:
+A simple query for a person who has an access level of at least 5, through one of their roles, looks like this:
 
 ```graphql
 {
@@ -352,13 +354,15 @@ This query would retrieve all persons, no matter if they have a role or not:
 }
 ```
 
+Lighthouse qualifies column names with the table of the related model, unless they already contain a table name.
+
 ## Custom operator
 
 If Lighthouse's default `SQLOperator` does not fit your use case, you can register a custom operator class.
-This may be necessary if your database uses different SQL operators then Lighthouse's default,
-or you want to extend/restrict the allowed operators.
+This may be necessary if your database uses different SQL operators then Lighthouse's default, or you want to extend/restrict the allowed operators.
 
-First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`. For example:
+First create a class that implements `Nuwave\Lighthouse\WhereConditions\Operator`.
+For example:
 
 ```php
 namespace App\GraphQL;
@@ -391,28 +395,18 @@ final class GraphQLServiceProvider extends ServiceProvider
 }
 ```
 
-Don't forget to register your new service provider in `config/app.php`.
-Make sure to add it after Lighthouse's `\Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class`:
+Don't forget to [register your new service provider in Laravel](https://laravel.com/docs/providers#registering-providers).
+Make sure to add it after Lighthouse's service provider:
 
 ```diff
-'providers' => [
-    /*
-     * Package Service Providers...
-     */
     \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
-
-    /*
-     * Application Service Providers...
-     */
 +   \App\GraphQL\GraphQLServiceProvider::class,
-],
 ```
 
 ## Custom handler
 
-If you want to take advantage of the schema generation that [@whereConditions](#whereconditions)
-and [@whereHasConditions](#wherehasconditions) provide, but customize the application of arguments
-to the query builder, you can provide a custom handler.
+If you want to take advantage of the schema generation that [@whereConditions](#whereconditions) and [@whereHasConditions](#wherehasconditions) provide.
+Customize the application of arguments to the query builder, you can provide a custom handler.
 
 ```graphql
 type Query {
@@ -422,8 +416,7 @@ type Query {
 }
 ```
 
-When a client passes `where`, your handler will be called with the query builder and
-the passed conditions:
+When a client passes `where`, your handler will be called with the query builder and the passed conditions:
 
 ```php
 namespace App;

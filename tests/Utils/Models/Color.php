@@ -23,18 +23,18 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Product> $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Product> $products
  * @property-read \Tests\Utils\Models\Employee|\Tests\Utils\Models\Contractor|null $creator
  */
 final class Color extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Product> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Product, $this> */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<Model, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<Model, $this> */
     public function creator(): MorphTo
     {
         return $this->morphTo();

@@ -10,7 +10,7 @@ class SimplePaginatorField
     /**
      * Resolve simple paginator info for connection.
      *
-     * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     * @param  \Illuminate\Pagination\Paginator<*, *>  $root
      *
      * @return array{
      *     count: int,
@@ -36,7 +36,7 @@ class SimplePaginatorField
     /**
      * Resolve data for connection.
      *
-     * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     * @param  \Illuminate\Pagination\Paginator<*, *>  $root
      *
      * @return \Illuminate\Support\Collection<int, mixed>
      */

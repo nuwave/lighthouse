@@ -19,7 +19,7 @@ class TransactionalMutations
     /**
      * @template TResult
      *
-     * @param  \Closure(): TResult $mutation
+     * @param  \Closure(): TResult  $mutation
      *
      * @return TResult
      */

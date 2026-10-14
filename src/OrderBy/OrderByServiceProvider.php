@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\OrderBy;
 
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
@@ -13,7 +13,7 @@ class OrderByServiceProvider extends ServiceProvider
 {
     public const DEFAULT_ORDER_BY_CLAUSE = 'OrderByClause';
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
@@ -86,9 +86,9 @@ GRAPHQL
     }
 
     /**
-     * We generate this in the same general shape as the input object with columns,
-     * even though it is unnecessarily complex for this specific case, to make it
-     * a non-breaking change when columns are added.
+     * We generate this in the same general shape as the input object with columns.
+     * It is unnecessarily complex for this specific case.
+     * This makes it a non-breaking change when columns are added.
      */
     public static function createRelationAggregateFunctionInput(string $name, string $description): InputObjectTypeDefinitionNode
     {

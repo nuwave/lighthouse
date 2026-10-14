@@ -9,11 +9,9 @@ final class CreateTestbenchCategoriesTable extends Migration
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table): void {
-            $table->increments('category_id');
+            $table->id('category_id');
             $table->string('name');
-
-            $table->unsignedInteger('parent_id')->nullable();
-
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
         });
     }

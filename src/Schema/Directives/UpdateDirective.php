@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 
-class UpdateDirective extends MutationExecutorDirective
+class UpdateDirective extends OneModelMutationDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Update an Eloquent model with the input values of the field.
+Update an Eloquent model with the given arguments.
 """
 directive @update(
   """
@@ -31,7 +31,7 @@ directive @update(
 GRAPHQL;
     }
 
-    protected function makeExecutionFunction(Relation $parentRelation = null): callable
+    protected function makeExecutionFunction(?Relation $parentRelation = null): callable
     {
         return new UpdateModel(new SaveModel($parentRelation));
     }

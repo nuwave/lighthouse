@@ -10,13 +10,13 @@ final class OrderByDirectiveTest extends TestCase
 {
     public function testGeneratesInputWithFullyQualifiedName(): void
     {
-        $schemaString = /** @lang GraphQL */ '
+        $schemaString = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 orderBy: _ @orderBy(columns: ["bar"])
             ): ID @mock
         }
-        ';
+        GRAPHQL;
 
         $schema = $this->buildSchema($schemaString);
         $input = $schema->getType(
@@ -30,7 +30,7 @@ final class OrderByDirectiveTest extends TestCase
 
     public function testGeneratesInputWithFullyQualifiedNameUsingRelations(): void
     {
-        $schemaString = /** @lang GraphQL */ '
+        $schemaString = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 orderBy: _ @orderBy(
@@ -42,7 +42,7 @@ final class OrderByDirectiveTest extends TestCase
                 )
             ): ID @mock
         }
-        ';
+        GRAPHQL;
 
         $schema = $this->buildSchema($schemaString);
 
@@ -82,7 +82,7 @@ final class OrderByDirectiveTest extends TestCase
 
     public function testValidatesOnlyColumnOrOneRelationIsUsed(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 orderBy: _ @orderBy(
@@ -94,10 +94,10 @@ final class OrderByDirectiveTest extends TestCase
                 )
             ): ID @mock
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(orderBy: [{
                     column: BAR
@@ -105,12 +105,12 @@ final class OrderByDirectiveTest extends TestCase
                     order: ASC
                 }])
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('orderBy.0.column', 'The order by.0.column field prohibits order by.0.foo / order by.0.baz from being present.')
             ->assertGraphQLValidationError('orderBy.0.foo', 'The order by.0.foo field prohibits order by.0.column / order by.0.baz from being present.');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(orderBy: [{
                     foo: { aggregate: COUNT }
@@ -118,7 +118,7 @@ final class OrderByDirectiveTest extends TestCase
                     order: ASC
                 }])
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('orderBy.0.foo', 'The order by.0.foo field prohibits order by.0.column / order by.0.baz from being present.')
             ->assertGraphQLValidationError('orderBy.0.baz', 'The order by.0.baz field prohibits order by.0.column / order by.0.foo from being present.');
     }

@@ -15,7 +15,7 @@ final class ScoutEnhancerTest extends TestCase
 {
     public function testEnhanceBuilder(): void
     {
-        $directiveOne = new class() implements Directive, ScoutBuilderDirective {
+        $directiveOne = new class implements Directive, ScoutBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -26,7 +26,7 @@ final class ScoutEnhancerTest extends TestCase
                 return $builder->where('one', $value);
             }
         };
-        $directiveTwo = new class() implements Directive, ScoutBuilderDirective {
+        $directiveTwo = new class implements Directive, ScoutBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -37,7 +37,7 @@ final class ScoutEnhancerTest extends TestCase
                 return $builder->where('two', $value);
             }
         };
-        $directiveNested = new class() implements Directive, ScoutBuilderDirective {
+        $directiveNested = new class implements Directive, ScoutBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -48,7 +48,7 @@ final class ScoutEnhancerTest extends TestCase
                 return $builder->where('nested', $value);
             }
         };
-        $directiveIgnored = new class() implements Directive, ScoutBuilderDirective {
+        $directiveIgnored = new class implements Directive, ScoutBuilderDirective {
             public static function definition(): string
             {
                 return '';
@@ -59,7 +59,7 @@ final class ScoutEnhancerTest extends TestCase
                 return $builder->where('ignored', $value);
             }
         };
-        $directiveWithoutInterface = new class() implements Directive {
+        $directiveWithoutInterface = new class implements Directive {
             public static function definition(): string
             {
                 return '';
@@ -96,13 +96,10 @@ final class ScoutEnhancerTest extends TestCase
         $enhancer = new ScoutEnhancer($argumentSet, $builder);
         $builder = $enhancer->enhanceBuilder(static fn (ScoutBuilderDirective $directive): bool => $directive !== $directiveIgnored);
 
-        self::assertSame(
-            [
-                'two' => $value,
-                'one' => $value,
-                'nested' => $nested,
-            ],
-            $builder->wheres,
-        );
+        $this->assertSame([
+            'two' => $value,
+            'one' => $value,
+            'nested' => $nested,
+        ], $builder->wheres);
     }
 }

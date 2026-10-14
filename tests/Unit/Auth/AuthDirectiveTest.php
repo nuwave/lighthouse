@@ -15,7 +15,7 @@ final class AuthDirectiveTest extends TestCase
         $user->name = 'foo';
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -23,15 +23,15 @@ final class AuthDirectiveTest extends TestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => $user->name,
@@ -48,7 +48,7 @@ final class AuthDirectiveTest extends TestCase
         $authFactory = $this->app->make(AuthFactory::class);
         $authFactory->guard('web')->setUser($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -56,15 +56,15 @@ final class AuthDirectiveTest extends TestCase
         type Query {
             user: User! @auth(guards: ["web"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => $user->name,
@@ -94,7 +94,7 @@ final class AuthDirectiveTest extends TestCase
         $authFactory = $this->app->make(AuthFactory::class);
         $authFactory->guard('api')->setUser($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -102,15 +102,15 @@ final class AuthDirectiveTest extends TestCase
         type Query {
             user: User! @auth(guards: ["web", "api"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => $user->name,

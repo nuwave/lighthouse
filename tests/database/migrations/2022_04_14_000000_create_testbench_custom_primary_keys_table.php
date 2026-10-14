@@ -9,9 +9,8 @@ final class CreateTestbenchCustomPrimaryKeysTable extends Migration
     public function up(): void
     {
         Schema::create('custom_primary_keys', function (Blueprint $table): void {
-            $table->increments('custom_primary_key_id');
-
-            $table->unsignedInteger('user_id')->nullable();
+            $table->id('custom_primary_key_id');
+            $table->unsignedBigInteger('user_id')->nullable();
         });
     }
 

@@ -3,7 +3,7 @@
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Location;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Location::class, static fn (Faker $faker): array => [
     'extra' => [
         'value' => $faker->word(),

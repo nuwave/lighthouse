@@ -11,11 +11,11 @@ final class ManipulateASTTest extends TestCase
 {
     public function testManipulateTheAST(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             bar: String
         }
-        ';
+        GRAPHQL;
 
         Event::listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
             $manipulateAST->documentAST->setTypeDefinition(
@@ -23,11 +23,11 @@ final class ManipulateASTTest extends TestCase
             );
         });
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => 42,
             ],

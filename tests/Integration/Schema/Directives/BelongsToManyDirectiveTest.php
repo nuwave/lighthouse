@@ -12,7 +12,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
 {
     public function testQueryBelongsToManyRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             roles: [Role!]! @belongsToMany
         }
@@ -24,17 +24,17 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 2;
         $roles = factory(Role::class, $rolesCount)->create();
         $user->roles()->attach($roles);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 roles {
@@ -42,12 +42,12 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount($rolesCount, 'data.user.roles');
+        GRAPHQL)->assertJsonCount($rolesCount, 'data.user.roles');
     }
 
     public function testNameRelationExplicitly(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             foo: [Role!] @belongsToMany(relation: "roles")
         }
@@ -59,17 +59,17 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 2;
         $roles = factory(Role::class, $rolesCount)->create();
         $user->roles()->attach($roles);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 foo {
@@ -77,12 +77,12 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount($rolesCount, 'data.user.foo');
+        GRAPHQL)->assertJsonCount($rolesCount, 'data.user.foo');
     }
 
     public function testQueryBelongsToManyPaginator(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             rolesPaginated: [Role!]! @belongsToMany(type: PAGINATOR, relation: "roles")
             rolesSimplePaginated: [Role!]! @belongsToMany(type: SIMPLE, relation: "roles")
@@ -95,10 +95,10 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 4;
@@ -106,7 +106,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         $user->roles()->attach($roles);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     rolesPaginated(first: 2) {
@@ -129,7 +129,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'user' => [
@@ -154,7 +154,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testQueryBelongsToManyRelayConnection(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
@@ -166,16 +166,16 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
         $user->roles()->attach($roles);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 roles(first: 2) {
@@ -190,7 +190,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'roles' => [
@@ -205,7 +205,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
         }
@@ -223,17 +223,17 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
         $meta = ['meta' => 'new'];
         $user->roles()->attach($roles, $meta);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 roles(first: 2) {
@@ -246,7 +246,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'roles' => [
@@ -259,9 +259,62 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
+    public function testQueryBelongsToManyRelayConnectionWithCustomEdgeHavingPivotFieldUsingDirective(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "UserRoleEdge")
+        }
+
+        type Role {
+            id: ID!
+        }
+
+        type UserRole {
+            meta: String
+        }
+
+        type UserRoleEdge {
+            node: Role!
+            cursor: String!
+            pivot: UserRole
+        }
+
+        type Query {
+            user: User! @auth
+        }
+        GRAPHQL;
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+        $this->be($user);
+
+        $roles = factory(Role::class, 3)->create();
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        pivot {
+                            meta
+                        }
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        GRAPHQL)->assertJsonPath('data.user.roles.edges.*.pivot', array_fill(0, 2, $meta))
+            ->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
     public function testQueryBelongsToManyPivot(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             roles: [Role!]! @belongsToMany
         }
@@ -278,10 +331,10 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 2;
@@ -289,7 +342,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         $meta = ['meta' => 'new'];
         $user->roles()->attach($roles, $meta);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 roles {
@@ -300,7 +353,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'roles' => [
@@ -316,9 +369,9 @@ final class BelongsToManyDirectiveTest extends DBTestCase
     public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
     {
         $this->expectExceptionObject(new DefinitionException(
-            'The edgeType argument on roles must reference an existing object type definition.',
+            'The `edgeType` argument of @belongsToMany on roles must reference an existing object type definition.',
         ));
-        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
         }
@@ -326,12 +379,12 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Role {
             id: ID!
         }
-        ');
+        GRAPHQL);
     }
 
     public function testQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             roles: [Role!]! @belongsToMany(type: CONNECTION)
         }
@@ -349,17 +402,17 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
         $meta = ['meta' => 'new'];
         $user->roles()->attach($roles, $meta);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 roles(first: 2) {
@@ -372,7 +425,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'roles' => [
@@ -387,7 +440,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testQueryPaginatedBelongsToManyWithDuplicates(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User]! @all
         }
@@ -400,13 +453,13 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Role {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
         $roles = factory(Role::class, 2)->create();
 
         $users = factory(User::class, 2)->create();
         foreach ($users as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
             $user->roles()->attach($roles);
         }
 
@@ -414,7 +467,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
             ->map(static fn (Role $role): array => ['id' => (string) $role->id])
             ->all();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
@@ -425,7 +478,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => $users
                     ->map(static fn (User $user): array => [
@@ -441,7 +494,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
 
     public function testQueryBelongsToManyNestedRelationships(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             roles: [Role!]! @belongsToMany(type: CONNECTION)
@@ -460,16 +513,16 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Query {
             user: User! @auth
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
         $user->roles()->attach($roles);
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 roles(first: 2) {
@@ -500,7 +553,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertTrue($result->json('data.user.roles.pageInfo.hasNextPage'));
 
@@ -515,7 +568,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
         $this->expectExceptionObject(new DefinitionException('Found invalid pagination type: foo'));
-        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             roles(first: Int! after: Int): [Role!]! @belongsToMany(type: "foo")
         }
@@ -523,6 +576,6 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         type Role {
             id: ID!
         }
-        ');
+        GRAPHQL);
     }
 }

@@ -2,12 +2,11 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateTimeTz;
 
 final class DateTimeTzTest extends DateScalarTestBase
 {
-    protected function scalarInstance(): DateScalar
+    protected function scalarInstance(): DateTimeTz
     {
         return new DateTimeTz();
     }

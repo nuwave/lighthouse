@@ -4,6 +4,7 @@ namespace Tests\Unit\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Http\Middleware\EnsureXHR;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\TestCase;
@@ -60,6 +61,7 @@ final class EnsureXHRTest extends TestCase
     }
 
     /** @dataProvider formContentTypes */
+    #[DataProvider('formContentTypes')]
     public function testForbidFormContentType(string $contentType): void
     {
         $middleware = new EnsureXHR();
@@ -76,16 +78,14 @@ final class EnsureXHRTest extends TestCase
         );
     }
 
-    /** @return array{array{string}} */
-    public static function formContentTypes(): array
+    /** @return iterable<array{string}> */
+    public static function formContentTypes(): iterable
     {
-        return [
-            ['application/x-www-form-urlencoded'],
-            ['multipart/form-data'],
-            ['text/plain'],
-            ['multipart/form-data; boundary=-------12345'],
-            ['text/plain; encoding=utf-8'],
-        ];
+        yield ['application/x-www-form-urlencoded'];
+        yield ['multipart/form-data'];
+        yield ['text/plain'];
+        yield ['multipart/form-data; boundary=-------12345'];
+        yield ['text/plain; encoding=utf-8'];
     }
 
     public function testForbidEmptyContentType(): void

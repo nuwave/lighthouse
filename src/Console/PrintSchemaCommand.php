@@ -24,6 +24,7 @@ lighthouse:print-schema
 {--D|disk= : The disk to write the file to}
 {--json : Output JSON instead of GraphQL SDL}
 {--federation : Include federation directives and exclude federation spec additions, like _service.sdl}
+{--sort : Sort all possible schema elements in alphabetical order}
 SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
@@ -42,14 +43,36 @@ SIGNATURE;
                 return;
             }
 
+            if ($this->option('sort')) {
+                $this->error('--sort option is not supported with --federation');
+
+                return;
+            }
+
             $filename = self::GRAPHQL_FEDERATION_FILENAME;
             $schemaString = FederationPrinter::print($schema);
         } elseif ($this->option('json')) {
+            if ($this->option('sort')) {
+                $this->error('--sort option is not supported with --json');
+
+                return;
+            }
+
             $filename = self::JSON_FILENAME;
             $schemaString = \Safe\json_encode(Introspection::fromSchema($schema));
         } else {
+            $options = $this->option('sort')
+                ? [
+                    'sortArguments' => true,
+                    'sortEnumValues' => true,
+                    'sortFields' => true,
+                    'sortInputFields' => true,
+                    'sortTypes' => true,
+                ]
+                : [];
+
             $filename = self::GRAPHQL_FILENAME;
-            $schemaString = SchemaPrinter::doPrint($schema);
+            $schemaString = SchemaPrinter::doPrint($schema, $options);
         }
 
         if ($this->option('write')) {
@@ -61,7 +84,8 @@ SIGNATURE;
                 return;
             }
 
-            $filesystemManager->disk($disk)->put($filename, $schemaString);
+            $filesystem = $filesystemManager->disk($disk);
+            $filesystem->put(path: $filename, contents: $schemaString);
             $this->info("Wrote schema to disk ({$disk}) as {$filename}.");
         } else {
             $this->info($schemaString);

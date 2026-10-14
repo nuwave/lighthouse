@@ -21,7 +21,15 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class FieldValue
 {
-    /** @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}> */
+    /**
+     * @var array<
+     *   string,
+     *   array{
+     *     0: array<string, mixed>,
+     *     1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   }
+     * >
+     */
     protected static array $transformedResolveArgs = [];
 
     /**
@@ -35,14 +43,9 @@ class FieldValue
     protected array $resolverWrappers = [];
 
     public function __construct(
-        /**
-         * The parent type of the field.
-         */
+        /** The parent type of the field. */
         protected TypeValue $parent,
-
-        /**
-         * The underlying AST definition of the Field.
-         */
+        /** The underlying AST definition of the field. */
         protected FieldDefinitionNode $field,
     ) {}
 
@@ -78,9 +81,9 @@ class FieldValue
         $parentName = $this->getParentName();
 
         return match ($parentName) {
-            RootType::QUERY => (array) config('lighthouse.namespaces.queries'),
-            RootType::MUTATION => (array) config('lighthouse.namespaces.mutations'),
-            RootType::SUBSCRIPTION => (array) config('lighthouse.namespaces.subscriptions'),
+            RootType::QUERY,
+            RootType::MUTATION,
+            RootType::SUBSCRIPTION => RootType::namespaces($parentName),
             default => array_map(
                 static fn (string $typesNamespace): string => "{$typesNamespace}\\{$parentName}",
                 (array) config('lighthouse.namespaces.types'),
@@ -168,7 +171,6 @@ class FieldValue
 
             if (! isset(self::$transformedResolveArgs[$path])) {
                 $argumentSetFactory = Container::getInstance()->make(ArgumentSetFactory::class);
-                assert($argumentSetFactory instanceof ArgumentSetFactory);
 
                 $argumentSet = $argumentSetFactory->fromResolveInfo($baseArgs, $baseResolveInfo);
                 foreach ($this->argumentSetTransformers as $transform) {

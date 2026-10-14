@@ -36,11 +36,7 @@ GRAPHQL;
         try {
             return $builder->{$scope}($value);
         } catch (\BadMethodCallException $badMethodCallException) {
-            throw new DefinitionException(
-                "{$badMethodCallException->getMessage()} in @{$this->name()} directive on {$this->nodeName()} argument.",
-                $badMethodCallException->getCode(),
-                $badMethodCallException->getPrevious(),
-            );
+            throw new DefinitionException("{$badMethodCallException->getMessage()} in @{$this->name()} directive on {$this->nodeName()} argument.", $badMethodCallException->getCode(), $badMethodCallException->getPrevious());
         }
     }
 }

@@ -1,7 +1,6 @@
 # Subscriptions: Getting Started
 
-Subscriptions allow GraphQL clients to observe specific events
-and receive updates from the server when those events occur.
+Subscriptions allow GraphQL clients to observe specific events and receive updates from the server when those events occur.
 
 ::: tip NOTE
 Much of the credit should be given to the [Ruby implementation](https://github.com/rmosolgo/graphql-ruby/blob/master/guides/subscriptions/overview.md) as they provided a great overview of how the backend should work.
@@ -28,8 +27,8 @@ If you want to use the Laravel Echo driver, you need to set the env `LIGHTHOUSE_
 Lighthouse returns the subscription channel as part of the response under `extensions`.
 You can configure which format is used with `subscriptions.version` in `lighthouse.php`.
 
-For new applications, version 2 is recommended. When upgrading, make sure
-your clients no longer depend on the redundant `channels` key from version 1.
+For new applications, version 2 is recommended.
+When upgrading, make sure your clients no longer depend on the redundant `channels` key from version 1.
 
 **Version 2 (Recommended)**
 
@@ -65,17 +64,17 @@ your clients no longer depend on the redundant `channels` key from version 1.
 ### Empty Response Optimization
 
 Lighthouse returns the subscription channel as part of the response under `extensions`.
-If `subscriptions.exclude_empty` in `lighthouse.php` is set to `true`,
-API responses without a subscription channel will not contain `lighthouse_subscriptions` in `extensions`.
-This optimizes performance by sending less data, but clients must anticipate this appropriately.
+If `subscriptions.exclude_empty` in `lighthouse.php` is set to `true`, API responses without a subscription channel will not contain `lighthouse_subscriptions` in `extensions`.
+This optimizes performance by sending less data,
+but clients must anticipate this appropriately.
 
 ## Expiring Subscriptions
 
 Subscriptions do not expire by themselves.
 Unless you delete a subscription, it will continue to broadcast events after the client has disconnected.
 
-The easiest way to expire subscriptions automatically is to use the env `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL`
-to set an expiration time in seconds (e.g. `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` to expire in one hour).
+The easiest way to expire subscriptions automatically is to use the env `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL` to set an expiration time in seconds (e.g.
+`LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` to expire in one hour).
 
 ### Pusher Expiration Webhook
 
@@ -89,4 +88,5 @@ The webhook URL will typically be:
 /graphql/subscriptions/webhook
 ```
 
-You can add the webhook in the Pusher Dashboard. Select the type `channel existence`.
+You can add the webhook in the Pusher Dashboard.
+Select the type `channel existence`.

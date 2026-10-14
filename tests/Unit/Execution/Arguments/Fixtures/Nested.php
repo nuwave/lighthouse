@@ -11,6 +11,8 @@ final class Nested extends BaseDirective implements ArgResolver
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ 'directive @nested on FIELD_DEFINITION';
+        return /** @lang GraphQL */ <<<'GRAPHQL'
+        directive @nested on FIELD_DEFINITION
+        GRAPHQL;
     }
 }

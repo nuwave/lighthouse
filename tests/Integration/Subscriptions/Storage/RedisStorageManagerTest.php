@@ -15,17 +15,17 @@ final class RedisStorageManagerTest extends TestCase
     use TestsRedis;
     use EnablesSubscriptionServiceProvider;
 
-    protected string $schema = /** @lang GraphQL */ '
-    type Task {
-        id: ID!
-        name: String!
-    }
-
-    type Subscription {
-        taskUpdated(id: ID!): Task
-        taskCreated: Task
-    }
-    ' . self::PLACEHOLDER_QUERY;
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+        }
+    
+        type Subscription {
+            taskUpdated(id: ID!): Task
+            taskCreated: Task
+        }
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testSubscriptionStoredWithPrefix(): void
     {
@@ -48,7 +48,7 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testDeleteSubscriber(): void
     {
-        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager $storage */
+        /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);
 
         $response = $this->querySubscription();
@@ -106,20 +106,22 @@ final class RedisStorageManagerTest extends TestCase
         ]);
 
         $createdSubscriber = $storage->subscribersByTopic('TASK_CREATED')->first();
-        self::assertNotNull($createdSubscriber);
+        $this->assertNotNull($createdSubscriber);
         $this->assertSame('1234.1234', $createdSubscriber->socket_id);
     }
 
     /** @param  array<string, mixed>  $headers */
-    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = []): TestResponse
+    private function querySubscription(string $topic = /** @lang GraphQL */ <<<'GRAPHQL'
+    taskUpdated(id: 123)
+    GRAPHQL, array $headers = []): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ "
+        return $this->graphQL(/** @lang GraphQL */ query: "
         subscription {
             {$topic} {
                 id
                 name
             }
         }
-        ", [], [], $headers);
+        ", headers: $headers);
     }
 }

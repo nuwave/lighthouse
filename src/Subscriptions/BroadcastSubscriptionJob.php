@@ -14,17 +14,11 @@ class BroadcastSubscriptionJob implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        /**
-         * The subscription field that was requested.
-         */
+        /** The subscription field that was requested. */
         public GraphQLSubscription $subscription,
-        /**
-         * The name of the field.
-         */
+        /** The name of the field. */
         public string $fieldName,
-        /**
-         * The root element to be passed when resolving the subscription.
-         */
+        /** The root element to be passed when resolving the subscription. */
         public mixed $root,
     ) {}
 

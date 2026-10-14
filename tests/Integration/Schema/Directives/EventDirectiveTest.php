@@ -14,7 +14,7 @@ final class EventDirectiveTest extends DBTestCase
             CompanyWasCreatedEvent::class,
         ]);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -22,18 +22,18 @@ final class EventDirectiveTest extends DBTestCase
 
         type Mutation {
             createCompany(name: String): Company @create
-                @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fixtures\\\\CompanyWasCreatedEvent")
+                @event(dispatch: "Tests\\Integration\\Schema\\Directives\\Fixtures\\CompanyWasCreatedEvent")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createCompany(name: "foo") {
                 id
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createCompany' => [
                     'id' => '1',

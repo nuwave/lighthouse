@@ -59,6 +59,12 @@ class ArgumentSet
         return isset($argument->value);
     }
 
+    /** Check if the ArgumentSet has a value with the given key. */
+    public function exists(string $key): bool
+    {
+        return array_key_exists($key, $this->arguments);
+    }
+
     /**
      * Add a value at the dot-separated path.
      *
@@ -72,7 +78,7 @@ class ArgumentSet
         while (count($keys) > 1) {
             $key = array_shift($keys);
 
-            // If the key doesn't exist at this depth, we will just create an empty ArgumentSet
+            // If the key doesn't exist at this depth, we will create an empty ArgumentSet
             // to hold the next value, allowing us to create the ArgumentSet to hold a final
             // value at the correct depth. Then we'll keep digging into the ArgumentSet.
             if (! isset($argumentSet->arguments[$key])) {

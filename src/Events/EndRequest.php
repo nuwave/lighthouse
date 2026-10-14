@@ -8,8 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Fires right after building the HTTP response in the GraphQLController.
  *
- * Can be used for logging or for measuring and monitoring
- * the time a request takes to resolve.
+ * Can be used for logging or for measuring and monitoring the time a request takes to resolve.
  *
  * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
@@ -19,9 +18,7 @@ class EndRequest
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The response that is about to be sent to the client.
-         */
+        /** The response that is about to be sent to the client. */
         public Response $response,
     ) {
         $this->moment = Carbon::now();

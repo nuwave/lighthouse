@@ -9,12 +9,10 @@ final class CreateTestbenchColorsTable extends Migration
     public function up(): void
     {
         Schema::create('colors', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('name');
-
-            $table->unsignedInteger('creator_id')->nullable();
+            $table->unsignedBigInteger('creator_id')->nullable();
             $table->string('creator_type')->nullable();
-
             $table->timestamps();
         });
     }

@@ -40,9 +40,7 @@ class ScoutEnhancer
 
     public function __construct(
         protected ArgumentSet $argumentSet,
-        /**
-         * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder
-         */
+        /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder */
         protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder,
     ) {
         $this->gather($this->argumentSet);
@@ -64,8 +62,8 @@ class ScoutEnhancer
         return $this->hasSearchArguments();
     }
 
-    /** @param (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null $directiveFilter */
-    public function enhanceBuilder(callable $directiveFilter = null): ScoutBuilder
+    /** @param  (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter */
+    public function enhanceBuilder(?callable $directiveFilter = null): ScoutBuilder
     {
         $scoutBuilder = $this->builder instanceof ScoutBuilder
             ? $this->builder
@@ -73,7 +71,7 @@ class ScoutEnhancer
 
         foreach ($this->argumentsWithScoutBuilderDirectives as $argument) {
             foreach ($argument->directives as $directive) {
-                if (! ($directive instanceof ScoutBuilderDirective)) {
+                if (! $directive instanceof ScoutBuilderDirective) {
                     continue;
                 }
 

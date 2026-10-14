@@ -1,16 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DummyNamespace;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final class DummyClass
 {
     public function __construct(
-        private TypeRegistry $typeRegistry;
+        private TypeRegistry $typeRegistry,
     ) {}
 
     /**
@@ -20,6 +20,6 @@ final class DummyClass
      */
     public function __invoke(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // TODO implement custom resolver logic - if the default is fine, just delete this class
+        // TODO implement custom resolver logic - if the default is fine, delete this class
     }
 }

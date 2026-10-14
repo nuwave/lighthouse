@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DummyNamespace;
 
@@ -14,9 +14,9 @@ final class DummyClass
      * @param  array{}  $args The field arguments passed by the client.
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context Shared between all fields.
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.
-     * @return mixed
+     * @return mixed The result of resolving the field, matching what was promised in the schema
      */
-    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
     {
         // TODO implement the resolver
     }

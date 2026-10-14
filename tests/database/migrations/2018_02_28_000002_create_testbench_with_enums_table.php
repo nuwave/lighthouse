@@ -9,7 +9,7 @@ final class CreateTestbenchWithEnumsTable extends Migration
     public function up(): void
     {
         Schema::create('with_enums', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('name')->nullable();
             $table->enum('type', ['A', 'B'])->nullable();
         });

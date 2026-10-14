@@ -4,7 +4,7 @@ namespace Tests\Integration\Subscriptions;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\ContextFactory;
-use Nuwave\Lighthouse\Subscriptions\Serializer;
+use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Tests\DBTestCase;
 use Tests\EnablesSubscriptionServiceProvider;
 use Tests\Utils\Models\User;
@@ -18,7 +18,7 @@ final class SerializerTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $contextFactory = new ContextFactory();
-        $serializer = new Serializer($contextFactory);
+        $serializer = new ContextSerializer($contextFactory);
 
         $request = new Request();
         $request->setUserResolver(static fn () => $user);

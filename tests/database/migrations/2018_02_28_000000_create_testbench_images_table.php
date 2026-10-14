@@ -9,12 +9,10 @@ final class CreateTestbenchImagesTable extends Migration
     public function up(): void
     {
         Schema::create('images', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('url')->nullable();
-
-            $table->unsignedInteger('imageable_id')->nullable();
+            $table->unsignedBigInteger('imageable_id')->nullable();
             $table->string('imageable_type')->nullable();
-
             $table->timestamps();
         });
     }

@@ -1,74 +1,62 @@
 <?php declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
-use Rector\CodeQuality\Rector\Concat\JoinStringConcatRector;
-use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
-use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
-use Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector;
-use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
-use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
-use Rector\CodingStyle\Rector\Class_\AddArrayDefaultToArrayPropertyRector;
-use Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector;
-use Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector;
-use Rector\CodingStyle\Rector\Closure\StaticClosureRector;
-use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\Config\RectorConfig;
-use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\SetList;
-use Rector\TypeDeclaration\Rector\ClassMethod\ArrayShapeFromConstantArrayReturnRector;
-use Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         SetList::CODE_QUALITY,
         SetList::CODING_STYLE,
         SetList::TYPE_DECLARATION,
+        SetList::RECTOR_PRESET,
         SetList::PHP_72,
         SetList::PHP_73,
         SetList::PHP_74,
         SetList::PHP_80,
-        PHPUnitSetList::PHPUNIT_80,
-        PHPUnitSetList::PHPUNIT_90,
-        PHPUnitSetList::PHPUNIT_91,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-        PHPUnitSetList::PHPUNIT_EXCEPTION,
-        PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD,
-        PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
-        PHPUnitSetList::REMOVE_MOCKS,
     ]);
     $rectorConfig->skip([
-        __DIR__ . '/tests/database/migrations', // Does not fit autoloading standards
-        CallableThisArrayToAnonymousFunctionRector::class, // Callable in array form is shorter and more efficient
-        IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
-        FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
-        JoinStringConcatRector::class => [
-            __DIR__ . '/tests/Integration/OrderBy/OrderByDirectiveTest.php', // Improves clarity
+        __DIR__ . '/src/Tracing/FederatedTracing/Proto', // Generated code
+        __DIR__ . '/tests/database/migrations', // Does not fit autoloader standards
+        __DIR__ . '/tests/LaravelPhpdocAlignmentFixer.php', // Copied from Laravel
+        __DIR__ . '/tests/Unit/Schema/Directives/MethodDirectiveTest.php', // System error: "Undefined array key 0"
+        Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class, // inefficient
+        Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
+        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class, // if($truthy) is fine, readable and efficient
+        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class, // if($truthy) is fine, readable and efficient
+        Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
+        Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector::class => [
+            __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
+            __DIR__ . '/benchmarks/BenchmarkTestCase.php', // exposes protected methods
         ],
-        RemoveExtraParametersRector::class => [
+        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class => [
+            __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // previous exception makes GraphQL\Error\Error not client-safe
+        ],
+        Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
+        Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector::class, // falsely removes $this->schema assignments in some tests
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector::class, // Makes assertions more brittle
+        Rector\PHPUnit\PHPUnit100\Rector\StmtsAwareInterface\WithConsecutiveRector::class, // messes up our custom withConsecutive replacement
+        Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class, // does not recognize mockResolver
+        Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector::class => [
             __DIR__ . '/src/Testing/TestResponseMixin.php', // mixins are weird
         ],
-        StaticClosureRector::class => [
-            __DIR__ . '/src/Testing/TestResponseMixin.php', // Cannot bind an instance to a static closure
-        ],
-        GetClassToInstanceOfRector::class => [
-            __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // We need to compare exact classes, not subclasses
-        ],
-        ExplicitBoolCompareRector::class, // if($truthy) is fine and very readable
-        EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
-        VarConstantCommentRector::class, // Noisy
-        UnSpreadOperatorRector::class, // Breaks some public APIs
-        AddArrayDefaultToArrayPropertyRector::class, // Break lazy initialization
-        AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
-        ArrayShapeFromConstantArrayReturnRector::class, // Sometimes too specific in methods that can be overridden
-        UnusedForeachValueToArrayKeysRector::class, // inefficient
+        Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
     ]);
     $rectorConfig->paths([
+        __DIR__ . '/benchmarks',
         __DIR__ . '/src',
         __DIR__ . '/tests',
         __DIR__ . '/.php-cs-fixer.php',
         __DIR__ . '/_ide_helper.php',
         __DIR__ . '/rector.php',
     ]);
-    $rectorConfig->phpstanConfig(__DIR__ . '/phpstan.neon');
+    $rectorConfig->bootstrapFiles([
+        // Rector uses PHPStan internally, which in turn requires Larastan to be set up correctly
+        __DIR__ . '/vendor/larastan/larastan/bootstrap.php',
+    ]);
+    $rectorConfig->phpstanConfigs([
+        __DIR__ . '/phpstan.neon',
+        __DIR__ . '/vendor/larastan/larastan/extension.neon',
+    ]);
 };

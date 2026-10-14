@@ -19,18 +19,18 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Post> $posts
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Task> $tasks
  */
 final class Tag extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Post, $this> */
     public function posts(): MorphToMany
     {
         return $this->morphedByMany(Post::class, 'taggable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Task> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Task, $this> */
     public function tasks(): MorphToMany
     {
         return $this->morphedByMany(Task::class, 'taggable');

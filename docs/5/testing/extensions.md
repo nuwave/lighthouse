@@ -1,12 +1,10 @@
 # Testing Lighthouse extensions
 
-When you extend Lighthouse with custom functionality, it is a great idea to test
-your extensions in isolation from the rest of your application.
+When you extend Lighthouse with custom functionality, it is a great idea to test your extensions in isolation from the rest of your application.
 
 ## Use a test schema
 
-When you enhance functionality related to the schema definition, such as adding
-a [custom directive](../custom-directives/getting-started.md), you need a test schema where you can use it.
+When you enhance functionality related to the schema definition, such as adding a [custom directive](../custom-directives/getting-started.md), you need a test schema where you can use it.
 Add the `UsesTestSchema` trait to your base test class, call `setUpTestSchema()` and define your test schema:
 
 ```php
@@ -40,8 +38,8 @@ class MyCustomDirectiveTest extends TestCase
 
 ## Mock resolvers
 
-When testing custom functionality through a dummy schema, you still need to have
-a way to resolve fields. Lighthouse provides a simple way to mock resolvers in a dummy schema.
+When testing custom functionality through a dummy schema, you still need to have a way to resolve fields.
+Lighthouse provides a simple way to mock resolvers in a dummy schema.
 
 Add the `MocksResolvers` trait to your test class:
 
@@ -90,9 +88,9 @@ public function testReverseField(): void
 }
 ```
 
-Since we get back an instance of PHPUnit's `InvocationMocker`, we can also assert
-that our resolver is called with certain values. Note that we are not passing an
-explicit resolver function here. The default resolver will simply return `null`.
+Since we get back an instance of PHPUnit's `InvocationMocker`, we can also assert that our resolver is called with certain values.
+Note that we are not passing an explicit resolver function here.
+The default resolver will simply return `null`.
 
 ```php
 public function testReverseInput(): void
@@ -118,8 +116,7 @@ public function testReverseInput(): void
 }
 ```
 
-If you have to handle the incoming resolver arguments dynamically, you can also
-pass a function that is called:
+If you have to handle the incoming resolver arguments dynamically, you can also pass a function that is called:
 
 ```php
 public function testReverseInput(): void
@@ -146,8 +143,8 @@ public function testReverseInput(): void
 }
 ```
 
-You might have a need to add multiple resolvers to a single schema. For that case,
-specify a unique `key` for the mock resolver (it defaults to `default`):
+You might have a need to add multiple resolvers to a single schema.
+For that case, specify a unique `key` for the mock resolver (it defaults to `default`):
 
 ```php
 public function testMultipleResolvers(): void

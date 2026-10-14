@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
+use GraphQL\Utils\Utils;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -33,8 +34,11 @@ class CountModelsLoader implements ModelsLoader
         $countAttributeName = Str::snake("{$relationName}_count");
 
         $count = $model->getAttribute($countAttributeName);
-        assert(is_int($count), 'avoid runtime check in production since the return type validates this anyway');
+        if (! is_numeric($count)) {
+            $nonNumericCount = Utils::printSafe($count);
+            throw new \Exception("Expected numeric count, got: {$nonNumericCount}.");
+        }
 
-        return $count;
+        return (int) $count;
     }
 }

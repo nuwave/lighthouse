@@ -4,6 +4,7 @@ namespace Tests\Unit\GlobalId;
 
 use Nuwave\Lighthouse\GlobalId\Base64GlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class Base64GlobalIdTest extends TestCase
@@ -40,6 +41,7 @@ final class Base64GlobalIdTest extends TestCase
     }
 
     /** @dataProvider provideInvalidGlobalIds */
+    #[DataProvider('provideInvalidGlobalIds')]
     public function testThrowsOnInvalidGlobalIds(string $invalidGlobalId): void
     {
         $this->expectException(GlobalIdException::class);

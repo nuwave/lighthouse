@@ -8,21 +8,21 @@ use Tests\Utils\Queries\Foo;
 
 final class GraphQLTest extends TestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
         foo: Int
         bar: String
     }
-    ';
+    GRAPHQL;
 
     public function testResolvesQueryViaPostRequest(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorFree()
             ->assertExactJson([
                 'data' => [
@@ -38,11 +38,11 @@ final class GraphQLTest extends TestCase
                 'graphql?'
                 . http_build_query(
                     [
-                        'query' => /** @lang GraphQL */ '
+                        'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                         {
                             foo
                         }
-                        ',
+                        GRAPHQL,
                     ],
                 ),
             )
@@ -57,14 +57,14 @@ final class GraphQLTest extends TestCase
     {
         $this
             ->postGraphQL([
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                     query Foo {
                         foo
                     }
                     query Bar {
                         bar
                     }
-                ',
+                GRAPHQL,
                 'operationName' => 'Bar',
             ])
             ->assertExactJson([
@@ -79,18 +79,18 @@ final class GraphQLTest extends TestCase
         $this
             ->postGraphQL([
                 [
-                    'query' => /** @lang GraphQL */ '
+                    'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                         {
                             foo
                         }
-                        ',
+                    GRAPHQL,
                 ],
                 [
-                    'query' => /** @lang GraphQL */ '
+                    'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                         {
                             bar
                         }
-                        ',
+                    GRAPHQL,
                 ],
             ])
             ->assertExactJson([

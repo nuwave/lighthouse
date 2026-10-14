@@ -9,9 +9,8 @@ final class CreateTestbenchAlternateConnectionsTable extends Migration
     public function up(): void
     {
         Schema::create('alternate_connections', function (Blueprint $table): void {
-            $table->increments('id');
-
-            $table->unsignedInteger('user_id')->nullable();
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
         });
     }
 

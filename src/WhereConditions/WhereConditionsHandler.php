@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Str;
 
 class WhereConditionsHandler
 {
@@ -23,7 +24,7 @@ class WhereConditionsHandler
     public function __invoke(
         object $builder,
         array $whereConditions,
-        Model $model = null,
+        ?Model $model = null,
         string $boolean = 'and',
     ): void {
         if ($builder instanceof EloquentBuilder) {
@@ -31,9 +32,8 @@ class WhereConditionsHandler
         }
 
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
-            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->whereNested(
-                function ($builder) use ($andConnectedConditions, $model): void {
+                function (QueryBuilder|EloquentBuilder $builder) use ($andConnectedConditions, $model): void {
                     foreach ($andConnectedConditions as $condition) {
                         $this->__invoke($builder, $condition, $model);
                     }
@@ -43,9 +43,8 @@ class WhereConditionsHandler
         }
 
         if ($orConnectedConditions = $whereConditions['OR'] ?? null) {
-            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->whereNested(
-                function ($builder) use ($orConnectedConditions, $model): void {
+                function (QueryBuilder|EloquentBuilder $builder) use ($orConnectedConditions, $model): void {
                     foreach ($orConnectedConditions as $condition) {
                         $this->__invoke($builder, $condition, $model, 'or');
                     }
@@ -62,7 +61,6 @@ class WhereConditionsHandler
                 $hasRelationConditions['amount'],
                 $hasRelationConditions['condition'] ?? null,
             );
-            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->addNestedWhereQuery($nestedBuilder, $boolean);
         }
 
@@ -78,14 +76,14 @@ class WhereConditionsHandler
         string $relation,
         string $operator,
         int $amount,
-        array $condition = null,
+        ?array $condition = null,
     ): QueryBuilder {
         return $model
             ->newQuery()
             ->whereHas(
                 $relation,
                 $condition
-                    ? function ($builder) use ($condition): void {
+                    ? function (EloquentBuilder $builder) use ($condition): void {
                         $this->__invoke(
                             $builder,
                             $this->prefixConditionWithTableName(
@@ -95,7 +93,7 @@ class WhereConditionsHandler
                             $builder->getModel(),
                         );
                     }
-                    : null,
+                : null,
                 $operator,
                 $amount,
             )
@@ -120,10 +118,10 @@ class WhereConditionsHandler
     }
 
     /**
-     * If the condition references a column, prefix it with the table name.
+     * Prefix unqualified columns of the condition and its nested AND/OR conditions with the table name.
      *
-     * This is important for queries which can otherwise be ambiguous, for
-     * example when multiple tables with a column "id" are involved.
+     * This is important for queries that can otherwise be ambiguous.
+     * For example, ambiguity happens when multiple tables include a column named "id".
      *
      * @param  array<string, mixed>  $condition
      *
@@ -131,8 +129,17 @@ class WhereConditionsHandler
      */
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
-        if (isset($condition['column'])) {
+        if (isset($condition['column']) && ! str_contains(Str::before($condition['column'], '->'), '.')) {
             $condition['column'] = "{$model->getTable()}.{$condition['column']}";
+        }
+
+        foreach (['AND', 'OR'] as $boolean) {
+            if (isset($condition[$boolean])) {
+                $condition[$boolean] = array_map(
+                    fn (array $nestedCondition): array => $this->prefixConditionWithTableName($nestedCondition, $model),
+                    $condition[$boolean],
+                );
+            }
         }
 
         return $condition;

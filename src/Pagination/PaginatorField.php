@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 class PaginatorField
 {
     /**
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<mixed>  $paginator
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<*, *>  $paginator
      *
      * @return array{
      *     count: int,
@@ -36,12 +36,15 @@ class PaginatorField
     }
 
     /**
-     * @param  \Illuminate\Contracts\Pagination\Paginator<mixed>  $paginator
+     * @template TKey of array-key
+     * @template TValue
      *
-     * @return array<int, mixed>
+     * @param  \Illuminate\Contracts\Pagination\Paginator<TKey, TValue>  $paginator
+     *
+     * @return array<TKey, TValue>
      */
     public function dataResolver(Paginator $paginator): array
     {
-        return $paginator->items();
+        return $paginator->items(); // @phpstan-ignore return.type (mismatch when Paginator has only 1 generic type)
     }
 }

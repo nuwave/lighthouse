@@ -15,7 +15,7 @@ directive @show(
   Specify which environments may use this field, e.g. ["testing"].
   """
   env: [String!]!
-) repeatable on FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 

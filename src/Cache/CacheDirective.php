@@ -67,16 +67,16 @@ GRAPHQL;
                 : $this->cacheRepository;
 
             $cacheKey = $this->cacheKeyAndTags->key(
-                $context->user(),
-                $isPrivate,
-                $parentName,
-                $rootID,
-                $fieldName,
-                $args,
-                $path,
+                user: $context->user(),
+                isPrivate: $isPrivate,
+                parentName: $parentName,
+                id: $rootID,
+                fieldName: $fieldName,
+                args: $args,
+                path: $path,
             );
 
-            // We found a matching value in the cache, so we can just return early without actually running the query.
+            // We found a matching value in the cache, so we can return early without actually running the query.
             $value = $cache->get($cacheKey);
             if ($value !== null) {
                 // Deferring the result will allow nested deferred resolves to be bundled together, see https://github.com/nuwave/lighthouse/pull/2270#discussion_r1072414584.
@@ -109,12 +109,8 @@ GRAPHQL;
             $resolved = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
-                ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
-                    $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
-                }
-            : static function ($result) use ($cacheKey, $cache): void {
-                $cache->forever($cacheKey, $result);
-            };
+                ? static fn ($result): bool => $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge))
+                : static fn ($result): bool => $cache->forever($cacheKey, $result);
 
             Resolved::handle($resolved, $storeInCache);
 

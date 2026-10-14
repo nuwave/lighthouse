@@ -9,14 +9,15 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     /**
      * Get the desired class name from the input.
      *
-     * As a typical workflow would be to write the schema first and then copy-paste
-     * a field name to generate a class for it, we uppercase it so the user does
-     * not run into unnecessary errors. You're welcome.
+     * A typical workflow is to write the schema first and then copy-paste a field name.
+     * This command generates a class for that field.
+     * We uppercase it so the user does not run into unnecessary errors.
+     * You're welcome.
      */
     protected function getNameInput(): string
     {
         $name = $this->argument('name');
-        if (! is_string($name)) {
+        if (! is_string($name)) { // @phpstan-ignore function.alreadyNarrowedType (necessary in some dependency versions)
             throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 
@@ -78,7 +79,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         }
 
         // We could not determine a common part of the configured namespaces,
-        // so we just assume the user will prefer the first one in the list.
+        // so we assume the user will prefer the first one in the list.
         if ($matching === []) {
             return $preferredNamespaceFallback;
         }

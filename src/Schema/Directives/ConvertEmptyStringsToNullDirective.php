@@ -16,7 +16,10 @@ class ConvertEmptyStringsToNullDirective extends BaseDirective implements ArgSan
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Replaces `""` with `null`.
+Replaces incoming empty strings `""` with `null`.
+
+When used upon fields, empty strings for non-nullable inputs will pass unchanged.
+Only explicitly placing this on non-nullable inputs will force the conversion.
 """
 directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 GRAPHQL;
@@ -41,12 +44,13 @@ GRAPHQL;
     {
         foreach ($argumentSet->arguments as $argument) {
             $namedType = $argument->namedType();
-            if (
-                $namedType !== null
+            $argumentValue = $argument->value;
+
+            $isNullableStringType = $namedType !== null
                 && $namedType->name === ScalarType::STRING
-                && ! $namedType->nonNull
-            ) {
-                $argument->value = $this->sanitize($argument->value);
+                && ! $namedType->nonNull;
+            if ($isNullableStringType || $argumentValue instanceof ArgumentSet) {
+                $argument->value = $this->sanitize($argumentValue);
             }
         }
 
@@ -60,10 +64,8 @@ GRAPHQL;
      */
     protected function transformLeaf(mixed $value): mixed
     {
-        if ($value === '') {
-            return null;
-        }
-
-        return $value;
+        return $value === ''
+            ? null
+            : $value;
     }
 }

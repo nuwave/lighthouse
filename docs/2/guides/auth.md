@@ -11,8 +11,7 @@ type Query {
 }
 ```
 
-Sending the following query will return the authenticated user's info
-or `null` if the request is not authenticated.
+Sending the following query will return the authenticated user's info or `null` if the request is not authenticated.
 
 ```graphql
 query Me {
@@ -32,11 +31,9 @@ Use the [@can](../api-reference/directives.md#can) directive to leverage [Larave
 
 ### Apply auth middleware
 
-Lighthouse allows you to configure global middleware that is run for every
-request to your endpoint, but also define it on a per-field basis.
+Lighthouse allows you to configure global middleware that is run for every request to your endpoint, but also define it on a per-field basis.
 
-Use the [@middleware](../api-reference/directives.md#middleware) directive to apply Laravel middleware,
-such as the `auth` middleware, to selected fields of your GraphQL endpoint.
+Use the [@middleware](../api-reference/directives.md#middleware) directive to apply Laravel middleware, such as the `auth` middleware, to selected fields of your GraphQL endpoint.
 
 ```graphql
 type Query {

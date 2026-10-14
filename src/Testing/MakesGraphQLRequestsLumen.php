@@ -8,8 +8,8 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Http\Responses\MemoryStream;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use PHPUnit\Framework\Assert;
@@ -19,8 +19,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Testing helpers for making requests to the GraphQL endpoint.
  *
  * @mixin \Laravel\Lumen\Testing\Concerns\MakesHttpRequests
+ *
+ * @deprecated lumen support will be removed in the next major version
  */
-trait MakesGraphQLRequestsLumen
+trait MakesGraphQLRequestsLumen // @phpstan-ignore trait.unused (hard to set up testing for)
 {
     /**
      * Stores the result of the introspection query.
@@ -261,15 +263,15 @@ trait MakesGraphQLRequestsLumen
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         // binding an instance to the container, so it can be spied on
-        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster => new LogBroadcaster(
+        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): LogBroadcaster => new LogBroadcaster(
             $config->get('lighthouse.subscriptions.broadcasters.log'),
         ));
 
-        $broadcastManager = $app->make(BroadcastManager::class);
-        assert($broadcastManager instanceof BroadcastManager);
+        $broadcastDriverManager = $app->make(BroadcastDriverManager::class);
+        assert($broadcastDriverManager instanceof BroadcastDriverManager);
 
         // adding a custom driver which is a spied version of log driver
-        $broadcastManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
+        $broadcastDriverManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
 
         // set the custom driver as the default driver
         $config->set('lighthouse.subscriptions.broadcaster', 'mock');

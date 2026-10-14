@@ -1,12 +1,10 @@
 # Extending Lighthouse
 
-Lighthouse offers various extension points which can be utilized by package developers
-as well as end users.
+Lighthouse offers various extension points which can be used by package and application developers.
 
 ## The Event System
 
-Lighthouse offers a unified way of hooking into the complete execution lifecycle
-through [Laravel's event system](https://laravel.com/docs/events).
+Lighthouse offers a unified way of hooking into the complete execution lifecycle through [Laravel's event system](https://laravel.com/docs/events).
 You may use any Service Provider to register listeners.
 
 A complete list of all dispatched events is available [in the events API reference](../api-reference/events.md).
@@ -18,13 +16,13 @@ Add your custom directives to Lighthouse by listening for the [`RegisterDirectiv
 ```php
 namespace SomeVendor\SomePackage;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 final class SomePackageServiceProvider extends ServiceProvider
 {
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
@@ -36,16 +34,15 @@ final class SomePackageServiceProvider extends ServiceProvider
 
 ## Changing the default resolver
 
-Lighthouse will fall back to using [webonyx's default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver)
-for non-root fields, [see resolver precedence](../the-basics/fields.md#resolver-precedence).
-You may overwrite this by passing a `callable` to `GraphQL\Executor\Executor::setDefaultFieldResolver()`.
+Lighthouse will fall back to using [webonyx's default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver) for non-root fields, [see resolver precedence](../the-basics/fields.md#resolver-precedence).
+
+You may override this by calling `GraphQL\Executor\Executor::setDefaultFieldResolver()` in your service provider's `boot()` method.
 
 ## Use a custom `GraphQLContext`
 
 The context is the third argument of any resolver function.
 
-You may replace the default `\Nuwave\Lighthouse\Schema\Context` with your own
-implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+You may replace the default `Nuwave\Lighthouse\Schema\Context` with your own implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
 The following example is just a starting point of what you can do:
 
 ```php
@@ -73,8 +70,8 @@ final class MyContext implements GraphQLContext
 }
 ```
 
-You need a factory that creates an instance of `\Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
-This factory class needs to implement `\Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
+You need a factory that creates an instance of `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+This factory class needs to implement `Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
 
 ```php
 namespace App\GraphQL;

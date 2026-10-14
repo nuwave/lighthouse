@@ -31,9 +31,9 @@ GRAPHQL;
         $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             $start = $this->tracing->timestamp();
             $result = $resolver($root, $args, $context, $resolveInfo);
-            $end = $this->tracing->timestamp();
 
-            Resolved::handle($result, function () use ($resolveInfo, $start, $end): void {
+            Resolved::handle($result, function () use ($resolveInfo, $start): void {
+                $end = $this->tracing->timestamp();
                 $this->tracing->record($resolveInfo, $start, $end);
             });
 

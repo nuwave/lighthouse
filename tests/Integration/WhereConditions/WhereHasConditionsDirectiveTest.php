@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
@@ -12,7 +14,7 @@ use Tests\Utils\Models\User;
 
 final class WhereHasConditionsDirectiveTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type User {
         id: ID!
         name: String
@@ -78,7 +80,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
             hasChildren: _ @whereHasConditions(columns: ["id"])
         ): [Location!]! @all
     }
-    ';
+    GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
@@ -90,13 +92,14 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testExistenceWithEmptyCondition(): void
     {
-        factory(User::class)->create([
-            'company_id' => null,
-        ]);
+        $userWithoutCompany = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithoutCompany);
+        $userWithoutCompany->company()->dissociate();
+        $userWithoutCompany->save();
 
         factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 hasCompany: {}
@@ -104,7 +107,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -119,7 +122,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 hasCompany: null
@@ -127,7 +130,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -142,7 +145,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             withoutRelation(
                 hasCompany: {
@@ -153,7 +156,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'withoutRelation' => [
                     [
@@ -168,7 +171,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 hasCompany: {
@@ -187,7 +190,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -213,7 +216,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
 
         $user->roles()->attach($role);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: Mixed!) {
             users(
                 hasRoles: {
@@ -224,7 +227,89 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
+            'id' => $role->getKey(),
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $user->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasBelongsToManyWithNestedAndOr(): void
+    {
+        factory(User::class)->create();
+
+        /** @var Role $role */
+        $role = factory(Role::class)->create();
+
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $user->roles()->attach($role);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: Mixed!) {
+            users(
+                hasRoles: {
+                    AND: [
+                        {
+                            column: "id",
+                            value: $id
+                        }
+                    ]
+                    OR: [
+                        {
+                            column: "id",
+                            value: $id
+                        }
+                    ]
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $role->getKey(),
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $user->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasBelongsToManyWithQualifiedColumn(): void
+    {
+        factory(User::class)->create();
+
+        /** @var Role $role */
+        $role = factory(Role::class)->create();
+
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $user->roles()->attach($role);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: Mixed!) {
+            users(
+                hasRoles: {
+                    column: "roles.id",
+                    value: $id
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL, [
             'id' => $role->getKey(),
         ])->assertExactJson([
             'data' => [
@@ -273,7 +358,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
         $postWithCategoryWithParentWithFooPosts = factory(Post::class)->create();
         $postWithCategoryWithParentWithFooPosts->categories()->attach($categoryWithParentWithFooPosts);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(
                 hasCategories: {
@@ -289,7 +374,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'posts' => [
                     [
@@ -334,7 +419,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
         $post5 = factory(Post::class)->create();
         $post5->categories()->attach($category5);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($categoryId: Mixed!) {
             posts(
                 hasCategories: {
@@ -371,7 +456,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'categoryId' => $category3->getKey(),
         ])->assertExactJson([
             'data' => [
@@ -409,7 +494,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
         $post = factory(Post::class)->create();
         $post->categories()->attach($category4);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($hasCategories: WhereConditions) {
             posts(hasCategories: $hasCategories) {
                 id
@@ -433,7 +518,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'hasCategories' => [
                 'HAS' => [
                     'relation' => 'parent.parent.parent',
@@ -476,15 +561,15 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasBelongsToSameTableRelationship(): void
     {
-        /** @var \Tests\Utils\Models\Location $parent */
+        /** @var Location $parent */
         $parent = factory(Location::class)->create();
 
-        /** @var \Tests\Utils\Models\Location $child */
+        /** @var Location $child */
         $child = factory(Location::class)->make();
         $child->parent()->associate($parent);
         $child->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($hasParent: QueryLocationsHasParentWhereHasConditions) {
             locations(hasParent: $hasParent) {
                 id
@@ -496,7 +581,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'hasParent' => [
                 'column' => 'ID',
                 'value' => $parent->id,
@@ -518,15 +603,15 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasHasManySameTableRelationship(): void
     {
-        /** @var \Tests\Utils\Models\Location $parent */
+        /** @var Location $parent */
         $parent = factory(Location::class)->create();
 
-        /** @var \Tests\Utils\Models\Location $child */
+        /** @var Location $child */
         $child = factory(Location::class)->make();
         $child->parent()->associate($parent);
         $child->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($hasChildren: QueryLocationsHasChildrenWhereHasConditions) {
             locations(hasChildren: $hasChildren) {
                 id
@@ -538,7 +623,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'hasChildren' => [
                 'column' => 'ID',
                 'value' => $child->id,
@@ -558,5 +643,54 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testQualifiesJSONColumnWithDottedPath(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Location {
+            id: ID!
+        }
+
+        type Query {
+            locations(hasChildren: _ @whereHasConditions): [Location!]! @all
+        }
+        GRAPHQL;
+
+        /** @var Location $parent */
+        $parent = factory(Location::class)->create();
+
+        /** @var Location $child */
+        $child = factory(Location::class)->make();
+        $child->extra = ['a.b' => 'foo'];
+        $child->parent()->associate($parent);
+        $child->save();
+
+        $queries = [];
+        DB::listen(static function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            locations(
+                hasChildren: {
+                    column: "extra->a.b",
+                    value: "foo"
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'locations' => [
+                    [
+                        'id' => (string) $parent->id,
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertMatchesRegularExpression('/`laravel_reserved_\d+`\.`extra`/', $queries[0]);
     }
 }

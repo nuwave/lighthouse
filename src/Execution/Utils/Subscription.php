@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 class Subscription
 {
     /** Broadcast subscription to client(s). */
-    public static function broadcast(string $subscriptionField, mixed $root, bool $shouldQueue = null): void
+    public static function broadcast(string $subscriptionField, mixed $root, ?bool $shouldQueue = null): void
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
@@ -24,9 +24,7 @@ class Subscription
         }
 
         // Default to the configuration setting if not specified
-        if ($shouldQueue === null) {
-            $shouldQueue = config('lighthouse.subscriptions.queue_broadcasts', false);
-        }
+        $shouldQueue ??= config('lighthouse.subscriptions.queue_broadcasts', false);
 
         $subscription = $registry->subscription($subscriptionField);
         $broadcaster = Container::getInstance()->make(BroadcastsSubscriptions::class);

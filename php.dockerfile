@@ -1,4 +1,4 @@
-FROM php:8.1-cli
+FROM php:8.3-cli
 
 WORKDIR /workdir
 
@@ -15,6 +15,7 @@ RUN apt-get update && \
         mysqli \
         pdo_mysql \
         intl \
+        bcmath \
     && rm -rf /var/lib/apt/lists/* \
     && pecl install \
         xdebug \
@@ -29,8 +30,8 @@ ARG USER_ID
 ARG GROUP_ID
 
 RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
-    groupadd --force --gid ${GROUP_ID} ${USER} &&\
-    useradd --no-log-init  --create-home --uid ${USER_ID} --gid ${GROUP_ID} ${USER} \
+    groupadd --force --gid=${GROUP_ID} ${USER} &&\
+    useradd --no-log-init  --create-home --uid=${USER_ID} --gid=${GROUP_ID} ${USER} \
 ;fi
 
 USER ${USER}

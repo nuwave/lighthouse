@@ -8,13 +8,9 @@ namespace Nuwave\Lighthouse\Execution;
 class ExtensionsResponse
 {
     public function __construct(
-        /**
-         * Will be used as the key in the response map.
-         */
+        /** Will be used as the key in the response map. */
         public string $key,
-        /**
-         * JSON-encodable content of the extension.
-         */
+        /** JSON-encodable content of the extension. */
         public mixed $content,
     ) {}
 }

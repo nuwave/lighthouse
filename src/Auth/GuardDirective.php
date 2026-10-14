@@ -30,7 +30,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Run authentication through one or more guards.
+Run authentication through one or more guards from `config/auth.php`.
 
 This is run per field and may allow unauthenticated
 users to still receive partial results.
@@ -92,11 +92,11 @@ GRAPHQL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 }

@@ -110,7 +110,7 @@ GRAPHQL;
      *
      * @param  (\GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node)|\GraphQL\Language\AST\FieldDefinitionNode  $definition
      */
-    protected function setFullClassnameOnDirective(Node &$definition, string $classCandidate): void
+    protected function setFullClassnameOnDirective(Node $definition, string $classCandidate): void
     {
         $validatorClass = $this->namespaceValidatorClass($classCandidate);
 

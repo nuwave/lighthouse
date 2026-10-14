@@ -4,6 +4,7 @@ namespace Tests\Unit\Pagination;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class PaginationTypeTest extends TestCase
@@ -13,6 +14,7 @@ final class PaginationTypeTest extends TestCase
      *
      * @param  string  $type An invalid type
      */
+    #[DataProvider('invalidPaginationTypes')]
     public function testThrowsExceptionForUnsupportedTypes(string $type): void
     {
         self::expectExceptionObject(new DefinitionException("Found invalid pagination type: {$type}"));

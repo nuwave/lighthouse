@@ -13,7 +13,7 @@ final class RenameDirectiveTest extends TestCase
             'baz' => 'asdf',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Foo @mock
         }
@@ -21,15 +21,15 @@ final class RenameDirectiveTest extends TestCase
         type Foo {
             bar: String! @rename(attribute: "baz")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo {
                 bar
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'bar' => 'asdf',
@@ -42,17 +42,17 @@ final class RenameDirectiveTest extends TestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: String! @rename
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testRenameArgument(): void
@@ -63,19 +63,19 @@ final class RenameDirectiveTest extends TestCase
                 ['bar' => 'something'],
             );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 baz: String @rename(attribute: "bar")
             ): Boolean @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(baz: "something")
         }
-        ');
+        GRAPHQL);
     }
 
     public function testRenameListOfInputs(): void
@@ -90,7 +90,7 @@ final class RenameDirectiveTest extends TestCase
                 ],
             );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 input: [FooInput]
@@ -100,9 +100,9 @@ final class RenameDirectiveTest extends TestCase
         input FooInput {
             baz: String @rename(attribute: "bar")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(
                 input: [
@@ -112,6 +112,6 @@ final class RenameDirectiveTest extends TestCase
                 ]
             )
         }
-        ');
+        GRAPHQL);
     }
 }

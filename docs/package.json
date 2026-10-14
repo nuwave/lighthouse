@@ -13,6 +13,6 @@
     "scripts": {
         "start": "vuepress dev .",
         "build": "vuepress build .",
-        "prettify": "prettier --write --tab-width=2 **/**/*.md **/*.js .vuepress/*.js"
+        "prettify": "prettier --write --tab-width=2 --list-different **/**/*.md **/*.js .vuepress/*.js"
     }
 }

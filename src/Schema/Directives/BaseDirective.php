@@ -90,7 +90,7 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get a Closure that is defined through an argument on the directive.
+     * Get a Closure that is defined through an argument of the directive.
      *
      * @api
      */
@@ -118,11 +118,11 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the value of an argument on the directive.
+     * Get the value of an argument of the directive.
      *
      * @api
      *
-     * @param mixed $default Use this over `??` to preserve explicit `null`
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
      * @return mixed The argument value or the default
      */
@@ -167,7 +167,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
-        callable $determineMatch = null,
+        ?callable $determineMatch = null,
     ): string {
         $namespaceForDirective = ASTHelper::namespaceForDirective(
             $this->definitionNode,
@@ -179,9 +179,7 @@ abstract class BaseDirective implements Directive
             array_unshift($namespacesToTry, $namespaceForDirective);
         }
 
-        if ($determineMatch === null) {
-            $determineMatch = 'class_exists';
-        }
+        $determineMatch ??= 'class_exists';
 
         $className = Utils::namespaceClassname($classCandidate, $namespacesToTry, $determineMatch);
 
@@ -204,7 +202,10 @@ abstract class BaseDirective implements Directive
      *
      * This validates that exactly two non-empty parts are given, not that the method exists.
      *
-     * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
+     * @return array{
+     *   0: string,
+     *   1: string,
+     * } Contains two entries: [string $className, string $methodName]
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {
@@ -217,17 +218,21 @@ abstract class BaseDirective implements Directive
             count($argumentParts) > 2
             || empty($argumentParts[0])
         ) {
-            throw new DefinitionException(
-                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'",
-            );
+            throw new DefinitionException("Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'");
         }
 
-        /** @var array{0: string, 1?: string} $argumentParts */
+        /** @var array{
+         *   0: string,
+         *   1?: string,
+         * } $argumentParts */
         if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
 
-        /** @var array{0: string, 1: string} $argumentParts */
+        /** @var array{
+         *   0: string,
+         *   1: string,
+         * } $argumentParts */
 
         return $argumentParts;
     }

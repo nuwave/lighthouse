@@ -33,7 +33,7 @@ directive @namespace repeatable on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
-    protected function addNamespacesToFields(ObjectTypeDefinitionNode|ObjectTypeExtensionNode &$objectType): void
+    protected function addNamespacesToFields(ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType): void
     {
         $namespaceDirective = $this->directiveNode->cloneDeep();
 

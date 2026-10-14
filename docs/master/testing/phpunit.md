@@ -52,18 +52,19 @@ abstract class TestCase extends BaseTestCase
 The most natural way of testing your GraphQL API is to run actual GraphQL queries.
 
 The `graphQL` test helper runs a query on your GraphQL endpoint and returns a `TestResponse`.
+For GraphQL literals, prefer `/** @lang GraphQL */` plus nowdoc (`<<<'GRAPHQL'`).
 
 ```php
 public function testQueriesPosts(): void
 {
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         posts {
             id
             title
         }
     }
-    ');
+    GRAPHQL);
 }
 ```
 
@@ -72,13 +73,13 @@ If you want to use variables within your query, pass an associative array as the
 ```php
 public function testCreatePost(): void
 {
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($title: String!) {
             createPost(title: $title) {
                 id
             }
         }
-    ', [
+    GRAPHQL, [
         'title' => 'Automatic testing proven to reduce stress levels in developers'
     ]);
 }
@@ -89,7 +90,7 @@ You can run a subscription query the same way.
 ```php
 public function testPostsSubscription(): void
 {
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         subscription {
             onPostCreated {
@@ -97,17 +98,15 @@ public function testPostsSubscription(): void
             }
         }
     }
-    ');
+    GRAPHQL);
 }
 ```
 
 ## Assertions
 
-Now that we know how to query our server in tests, we need to make sure the
-returned results match our expectations.
+Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work quite
-well with the JSON data returned by GraphQL.
+The returned `TestResponse` conveniently offers assertions that work quite well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
@@ -116,14 +115,14 @@ public function testQueriesPosts(): void
 {
     $post = factory(Post::class)->create();
 
-    $this->graphQL(/** @lang GraphQL */ '
+    $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         posts {
             id
             title
         }
     }
-    ')->assertJson([
+    GRAPHQL)->assertJson([
         'data' => [
             'posts' => [
                 [
@@ -141,28 +140,33 @@ You can also extract data from the response and use it within any assertion.
 ```php
 public function testOrdersUsersByName(): void
 {
-    factory(User::class)->create(['name' => 'Oliver']);
-    factory(User::class)->create(['name' => 'Chris']);
-    factory(User::class)->create(['name' => 'Benedikt']);
+    $oliver = factory(User::class)->make();
+    $oliver->name = 'Oliver';
+    $oliver->save();
 
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $chris = factory(User::class)->make();
+    $chris->name = 'Chris';
+    $chris->save();
+
+    $benedikt = factory(User::class)->make();
+    $benedikt->name = 'Benedikt';
+    $benedikt->save();
+
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         users(orderBy: "name") {
             name
         }
     }
-    ');
+    GRAPHQL);
 
     $names = $response->json("data.*.name");
 
-    $this->assertSame(
-        [
-            'Benedikt',
-            'Chris',
-            'Oliver',
-        ],
-        $names
-    );
+    $this->assertSame([
+        'Benedikt',
+        'Chris',
+        'Oliver',
+    ], $names);
 }
 ```
 
@@ -227,7 +231,7 @@ $spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broa
 Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
 Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#ide-helper) to get proper autocompletion:
 
-```bash
+```shell
 php artisan lighthouse:ide-helper
 ```
 
@@ -237,30 +241,27 @@ For example, you might want to ensure that validation works properly:
 
 ```php
 $this
-    ->graphQL(/** @lang GraphQL */ '
+    ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     mutation {
         createUser(email: "invalid email")
     }
-    ')
+    GRAPHQL)
     ->assertGraphQLValidationKeys(['email']);
 ```
 
 ## Testing Errors
 
-Depending on your debug and error handling configuration, Lighthouse catches most if
-not all errors produced within queries and includes them within the result.
+Depending on your debug and error handling configuration, Lighthouse catches most if not all errors produced within queries and includes them within the result.
 
-One way to test for errors is to examine the `TestResponse`, either by looking
-at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins)
-such as `assertGraphQLErrorMessage()`:
+One way to test for errors is to examine the `TestResponse`, either by looking at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins) such as `assertGraphQLErrorMessage()`:
 
 ```php
 $this
-    ->graphQL(/** @lang GraphQL */ '
+    ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     mutation {
         shouldTriggerSomeError
     }
-    ')
+    GRAPHQL)
     ->assertGraphQLErrorMessage($expectedMessage);
 ```
 
@@ -271,27 +272,26 @@ You must disable Lighthouse's error handling with `rethrowGraphQLErrors()` to en
 $this->rethrowGraphQLErrors();
 
 $this->expectException(SomethingWentWrongException::class);
-$this->graphQL(/** @lang GraphQL */ '
+$this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     oops
 }
-');
+GRAPHQL);
 ```
 
 ## Simulating File Uploads
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
 
-Since multipart form requests are tricky to construct, you can just use the `multipartGraphQL`
-helper method.
+Since multipart form requests are tricky to construct, you can use the `multipartGraphQL` helper method.
 
 ```php
 $operations = [
-    'query' => /** @lang GraphQL */ '
+    'query' => /** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($file: Upload!) {
             upload(file: $file)
         }
-    ',
+    GRAPHQL,
     'variables' => [
         'file' => null,
     ],
@@ -310,10 +310,10 @@ $this->multipartGraphQL($operations, $map, $file);
 
 ## Introspection
 
-If you create or manipulate parts of your schema programmatically, you might
-want to test that. You can use introspection to query your final schema in tests.
+If you create or manipulate parts of your schema programmatically, you might want to test that.
+You can use introspection to query your final schema in tests.
 
-Lighthouse uses the introspection query from [`\GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
+Lighthouse uses the introspection query from [`GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
 
 The `introspect()` helper method runs the full introspection query against your schema.
 
@@ -344,12 +344,12 @@ When sending requests with field containing `@defer`, use the `streamGraphQL()` 
 It automatically captures the full streamed response and provides you the returned chunks.
 
 ```php
-$chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+$chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     now
     later @defer
 }
-');
+GRAPHQL);
 
 $this->assertSame(
     [
@@ -377,8 +377,7 @@ $this->setUpDeferStream();
 
 ## Lumen
 
-Because the `TestResponse` class is not available in Lumen, you must use a different
-test trait:
+Because the `TestResponse` class is not available in Lumen, you must use a different test trait:
 
 ```diff
 <?php
@@ -393,18 +392,17 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 }
 ```
 
-All the test helpers are called the same as in `MakesGraphQLRequest`, the only
-difference is that they return `$this` instead of a `TestResponse`.
+All the test helpers are called the same as in `MakesGraphQLRequest`, the only difference is that they return `$this` instead of a `TestResponse`.
 Assertions work differently as a result:
 
 ```php
 public function testHelloWorld(): void
 {
-    $this->graphQL(/** @lang GraphQL */ '
+    $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         hello
     }
-    ')->seeJson([
+    GRAPHQL)->seeJson([
         'data' => [
             'hello' => 'world',
         ],
