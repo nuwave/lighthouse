@@ -7,19 +7,27 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
-## Unreleased
+## v6.72.2
 
-### Added
+### Fixed
 
-- Support custom root type names through the schema definition `schema { query: RootQuery }` https://github.com/nuwave/lighthouse/pull/2077
+- Fix `@delete`, `@forceDelete` and `@restore` rejecting arguments with builder directives that follow an input argument without builder directives https://github.com/nuwave/lighthouse/pull/2797
+
+## v6.72.1
+
+### Fixed
+
+- Fix ambiguous or doubly qualified columns in `HAS` conditions https://github.com/nuwave/lighthouse/pull/1472
+
+## v6.72.0
 
 ### Changed
 
-- Require `DocumentAST` as the second constructor argument of `TypeValue` https://github.com/nuwave/lighthouse/pull/2077
+- Omit `locations` from errors of queries served from `query_cache.mode: store`, as opcache and hybrid modes already do https://github.com/nuwave/lighthouse/pull/2785
 
-### Deprecated
+### Fixed
 
-- Deprecate `RootType::isRootType()`, use `DocumentAST::isRootType()` https://github.com/nuwave/lighthouse/pull/2077
+- Cache the query AST as an array in `query_cache.mode: store`, so it no longer requires allowing AST classes in `cache.serializable_classes` https://github.com/nuwave/lighthouse/pull/2785
 
 ## v6.71.2
 

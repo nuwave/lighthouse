@@ -25,7 +25,7 @@ Before you release a new version, make sure to familiarize yourself with:
 - [Previous GitHub Releases](https://github.com/nuwave/lighthouse/releases)
 
 To create a new release, follow these steps:
-1. Consider the entries in the [`CHANGELOG unreleased section`](CHANGELOG.md#unreleased).
+1. Copy the `## Changelog` sections of the pull requests merged since the last release into [`CHANGELOG.md`](CHANGELOG.md), appending each pull request URL.
 Add missing entries if needed.
 2. Based on those entries and the previous version, define the next version number.
 Add it to [`CHANGELOG.md`](CHANGELOG.md).
@@ -165,7 +165,8 @@ Those elements are guaranteed to not change until the next major release.
 
 We keep a [changelog](/CHANGELOG.md) to inform users about changes in our releases.
 
-When you change something notable, add it to the top of the file in the `Unreleased` section.
+When you change something notable, describe it in the `## Changelog` section of your pull request description, not in `CHANGELOG.md`.
+Maintainers copy it into `CHANGELOG.md` when releasing.
 Documentation-only changes do not require a changelog entry.
 
 Choose the appropriate type for your change:
@@ -177,7 +178,7 @@ Choose the appropriate type for your change:
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-Then, add a short description of your change and close it off with a link to your PR.
+Then, add a short description of your change.
 
 ## Code Guidelines
 
