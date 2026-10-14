@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -659,5 +660,59 @@ GRAPHQL;
         $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
 
         return $typeRegistry->get('Admin');
+    }
+
+    public function testNestedUpsertByIdentifyingColumnWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $otherUser = factory(User::class)->create();
+        $otherUsersTask = factory(Task::class)->make();
+        $otherUsersTask->name = 'existing-task';
+        $otherUsersTask->difficulty = 1;
+        $otherUsersTask->user()->associate($otherUser);
+        $otherUsersTask->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+        }
+
+        type User {
+            id: Int
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks", identifyingColumns: ["name"])
+        }
+
+        input UpdateTaskInput {
+            name: String!
+            difficulty: Int
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!) {
+            updateUser(input: {
+                id: $userID
+                tasks: [{ name: "existing-task", difficulty: 2 }]
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherUsersTask->refresh();
+        $this->assertSame(1, $otherUsersTask->difficulty);
+        $this->assertSame($otherUser->id, $otherUsersTask->user_id);
     }
 }

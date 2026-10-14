@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
@@ -545,5 +546,95 @@ final class HasOneTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testDeleteHasOneWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $otherTasksPost = factory(Post::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $postID: ID!) {
+            updateTask(input: {
+                id: $taskID
+                post: {
+                    delete: $postID
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'postID' => $otherTasksPost->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $this->assertNotNull(Post::find($otherTasksPost->id));
+    }
+
+    public function testUpdateHasOneWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $otherTask = factory(Task::class)->create();
+        $otherTasksPost = factory(Post::class)->make();
+        $otherTasksPost->title = 'original';
+        $otherTasksPost->task()->associate($otherTask);
+        $otherTasksPost->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $postID: ID!) {
+            updateTask(input: {
+                id: $taskID
+                post: {
+                    update: { id: $postID, title: "hacked" }
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'postID' => $otherTasksPost->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherTasksPost->refresh();
+        $this->assertSame('original', $otherTasksPost->title);
+        $this->assertSame($otherTask->id, $otherTasksPost->task_id);
+    }
+
+    public function testUpsertHasOneWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $otherTask = factory(Task::class)->create();
+        $otherTasksPost = factory(Post::class)->make();
+        $otherTasksPost->title = 'original';
+        $otherTasksPost->task()->associate($otherTask);
+        $otherTasksPost->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $postID: ID!) {
+            updateTask(input: {
+                id: $taskID
+                post: {
+                    upsert: { id: $postID, title: "hacked" }
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'postID' => $otherTasksPost->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherTasksPost->refresh();
+        $this->assertSame('original', $otherTasksPost->title);
+        $this->assertSame($otherTask->id, $otherTasksPost->task_id);
     }
 }

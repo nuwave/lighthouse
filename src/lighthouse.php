@@ -404,6 +404,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Nested Mutations Scope To Parent
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, the nested operations delete, disconnect, update and upsert
+    | only act on models related to the parent, otherwise they throw an error.
+    | Will be removed with v7, which always scopes them.
+    |
+    */
+
+    'nested_mutations_scope_to_parent' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |

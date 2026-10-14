@@ -2,8 +2,10 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
+use Tests\Utils\Models\Task;
 
 final class MorphToManyTest extends DBTestCase
 {
@@ -361,5 +363,39 @@ final class MorphToManyTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testUpsertMorphToManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $otherTask = factory(Task::class)->create();
+        $otherTasksTag = factory(Tag::class)->make();
+        $otherTasksTag->name = 'original';
+        $otherTasksTag->save();
+        $otherTask->tags()->attach($otherTasksTag);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $tagID: ID!) {
+            upsertTask(input: {
+                id: $taskID
+                name: "task"
+                tags: {
+                    upsert: [{ id: $tagID, name: "hacked" }]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'tagID' => $otherTasksTag->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherTasksTag->refresh();
+
+        $this->assertSame('original', $otherTasksTag->name);
+        $this->assertCount(0, $task->tags()->get());
     }
 }

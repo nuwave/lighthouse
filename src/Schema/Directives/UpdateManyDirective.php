@@ -33,6 +33,6 @@ GRAPHQL;
 
     protected function makeExecutionFunction(?Relation $parentRelation = null): callable
     {
-        return new UpdateModel(new SaveModel($parentRelation));
+        return new UpdateModel(new SaveModel($parentRelation), $parentRelation);
     }
 }

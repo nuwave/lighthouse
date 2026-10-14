@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToOne implements ArgResolver
@@ -36,21 +37,19 @@ class NestedOneToOne implements ArgResolver
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation), $relation));
 
             $updateModel($relation->make(), $args->arguments['update']->value);
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation), parentRelation: $relation));
 
             $upsertModel($relation->first() ?? $relation->make(), $args->arguments['upsert']->value);
         }
 
         if ($args->has('delete')) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain(),
-            );
+            ParentRelationScope::delete($relation, Arr::wrap($args->arguments['delete']->toPlain()));
         }
     }
 }

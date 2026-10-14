@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use GraphQL\Error\Error;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\PreSaveArgumentsAware;
@@ -17,8 +18,11 @@ class UpdateModel implements ArgResolver, PreSaveArgumentsAware
     protected $previous;
 
     /** @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous */
-    public function __construct(callable $previous)
-    {
+    public function __construct(
+        callable $previous,
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null */
+        protected ?Relation $parentRelation = null,
+    ) {
         $this->previous = $previous;
     }
 
@@ -33,7 +37,9 @@ class UpdateModel implements ArgResolver, PreSaveArgumentsAware
             ?? throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
         assert($id instanceof Argument);
 
-        $model = $model->newQuery()->findOrFail($id->value);
+        $model = $this->parentRelation !== null && ParentRelationScope::applies($this->parentRelation)
+            ? ParentRelationScope::findManyOrFail($this->parentRelation, [$id->value])->firstOrFail()
+            : $model->newQuery()->findOrFail($id->value);
 
         return ($this->previous)($model, $args);
     }
