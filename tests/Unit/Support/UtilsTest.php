@@ -54,4 +54,26 @@ final class UtilsTest extends TestCase
             $filesystem->deleteDirectory($directory);
         }
     }
+
+    public function testAtomicPutDeletesTempFileOnFailedMove(): void
+    {
+        $filesystem = new class extends Filesystem {
+            public function move($path, $target): bool
+            {
+                throw new \ErrorException('rename(): Permission denied');
+            }
+        };
+
+        $directory = sys_get_temp_dir() . '/lighthouse-atomic-put-' . bin2hex(random_bytes(6));
+        $filesystem->makeDirectory($directory);
+
+        try {
+            Utils::atomicPut(filesystem: $filesystem, path: "{$directory}/file.php", contents: '<?php return [];');
+            $this->fail('Expected the move to fail.');
+        } catch (\ErrorException) {
+            $this->assertSame([], $filesystem->files($directory));
+        } finally {
+            $filesystem->deleteDirectory($directory);
+        }
+    }
 }

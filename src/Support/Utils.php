@@ -220,14 +220,16 @@ class Utils
             if ($filesystem->put(path: $tempPath, contents: $contents) === false) {
                 throw new \RuntimeException("Failed to write file {$tempPath}.");
             }
+
+            if ($filesystem->move(path: $tempPath, target: $path) === false) {
+                throw new \RuntimeException("Failed to move file {$tempPath} to {$path}.");
+            }
         } catch (\Throwable $throwable) {
-            // Laravel converts the warning of a failed write to an exception, so clean up in either case
+            // Laravel converts the warning of a failed write or move to an exception, so clean up in either case
             $filesystem->delete($tempPath);
 
             throw $throwable;
         }
-
-        $filesystem->move(path: $tempPath, target: $path);
     }
 
     /**
