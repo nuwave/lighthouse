@@ -100,6 +100,52 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testReturnValueActionAppliesToBatchloadedRelation(): void
+    {
+        $viewer = new User();
+        $viewer->name = 'not an admin';
+        $this->be($viewer);
+
+        $company = factory(Company::class)->create();
+
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            company: Company @first
+        }
+
+        type Company {
+            users: [User!]
+                @canResolved(ability: "adminOnly", action: RETURN_VALUE, returnValue: null)
+                @hasMany
+        }
+
+        type User {
+            name: String
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            company {
+                users {
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'company' => [
+                    'users' => null,
+                ],
+            ],
+        ])->assertJsonMissingPath('errors');
+    }
+
     public function testChecksAgainstMissingResolvedModelWithFind(): void
     {
         $user = new User();
