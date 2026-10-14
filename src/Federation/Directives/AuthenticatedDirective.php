@@ -15,9 +15,6 @@ class AuthenticatedDirective extends BaseDirective
 Indicates to composition that the target element is accessible only to authenticated users.
 
 ```graphql
-extend schema
-    @link(url: "https://specs.apollo.dev/federation/v2.9", import: ["@authenticated"])
-
 type User @key(fields: "id") @authenticated {
   id: ID!
   email: String!

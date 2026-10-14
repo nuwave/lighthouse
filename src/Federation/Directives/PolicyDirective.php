@@ -15,9 +15,6 @@ class PolicyDirective extends BaseDirective
 Indicates to composition that the target element is restricted based on authorization policies.
 
 ```graphql
-extend schema
-    @link(url: "https://specs.apollo.dev/federation/v2.9", import: ["@policy"])
-
 type User @key(fields: "id")
 @policy(policies: [["read:user"], ["admin"]]) {
   id: ID!

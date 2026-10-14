@@ -28,9 +28,8 @@ See [the Apollo documentation on federated directives](https://www.apollographql
 ```graphql
 extend schema
   @link(
-    url: "https://specs.apollo.dev/federation/v2.9"
+    url: "https://specs.apollo.dev/federation/v2.3"
     import: [
-      "@authenticated"
       "@composeDirective"
       "@extends"
       "@external"
@@ -38,10 +37,8 @@ extend schema
       "@interfaceObject"
       "@key"
       "@override"
-      "@policy"
       "@provides"
       "@requires"
-      "@requiresScopes"
       "@shareable"
       "@tag"
     ]
