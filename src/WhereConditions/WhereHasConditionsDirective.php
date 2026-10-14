@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 
+// TODO remove once whereConditions has full type safety
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string
