@@ -7,12 +7,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
-## Unreleased
-
-### Fixed
-
-- Rebuild query and schema cache files that do not return an array or fail to parse, e.g. when empty or truncated after a failed write, instead of failing every request https://github.com/nuwave/lighthouse/pull/2800
-
 ## v6.72.2
 
 ### Fixed
