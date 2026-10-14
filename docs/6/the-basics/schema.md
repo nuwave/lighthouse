@@ -59,3 +59,26 @@ type Subscription {
   newUser: User
 }
 ```
+
+### Custom root type names
+
+To give root types other names, list them in a [schema definition](https://spec.graphql.org/October2021/#sec-Schema).
+Lighthouse still looks up their field resolvers in the namespaces configured for queries, mutations and subscriptions.
+
+```graphql
+schema {
+  query: RootQuery
+  mutation: RootMutation
+}
+
+type RootQuery {
+  me: User
+}
+
+type RootMutation {
+  createUser(name: String!): User
+}
+```
+
+Once the schema definition exists, only the types it lists are root types.
+A type named `Mutation` that is not listed is a regular object type.

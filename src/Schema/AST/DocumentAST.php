@@ -7,6 +7,7 @@ use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\Location;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\SchemaDefinitionNode;
 use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
@@ -27,11 +29,13 @@ use Nuwave\Lighthouse\Support\Utils;
  * - leveraging lazy instantiation of schema types
  *
  * @phpstan-type ClassNameToObjectTypeName array<class-string, list<string>>
+ * @phpstan-type RootTypes array{Query: string, Mutation?: string, Subscription?: string}
  * @phpstan-type SerializableDocumentAST array{
  *     types: array<int, array<string, mixed>>,
  *     directives: array<int, array<string, mixed>>,
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
  *     schemaExtensions: array<int, array<string, mixed>>,
+ *     rootTypes?: RootTypes,
  *     hash: string,
  * }
  *
@@ -46,6 +50,8 @@ class DocumentAST implements Arrayable
     public const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
 
     public const SCHEMA_EXTENSIONS = 'schemaExtensions';
+
+    public const ROOT_TYPES = 'rootTypes';
 
     public const HASH = 'hash';
 
@@ -90,6 +96,19 @@ class DocumentAST implements Arrayable
 
     /** @var array<int, SchemaExtensionNode> */
     public array $schemaExtensions = [];
+
+    /**
+     * Maps the default root type names to the actual ones.
+     *
+     * @see https://spec.graphql.org/October2021/#sec-Root-Operation-Types
+     *
+     * @var RootTypes
+     */
+    public array $rootTypes = [
+        RootType::QUERY => RootType::QUERY,
+        RootType::MUTATION => RootType::MUTATION,
+        RootType::SUBSCRIPTION => RootType::SUBSCRIPTION,
+    ];
 
     /** A hash of the schema. */
     public string $hash;
@@ -147,6 +166,16 @@ class DocumentAST implements Arrayable
                 $instance->typeExtensions[$definition->getName()->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
+            } elseif ($definition instanceof SchemaDefinitionNode) {
+                if (count($definition->directives) > 0) {
+                    throw new DefinitionException('Directives on the schema definition are not supported. Use `extend schema` instead.');
+                }
+
+                if (isset($schemaDefinition)) {
+                    throw new DefinitionException('The schema must not have more than one schema definition.');
+                }
+
+                $schemaDefinition = $definition;
             } elseif ($definition instanceof SchemaExtensionNode) {
                 $instance->schemaExtensions[] = $definition;
             } else {
@@ -154,7 +183,47 @@ class DocumentAST implements Arrayable
             }
         }
 
+        $schemaNodes = array_filter([$schemaDefinition ?? null, ...$instance->schemaExtensions]);
+        $explicitRootTypes = [];
+        foreach ($schemaNodes as $schemaNode) {
+            foreach ($schemaNode->operationTypes as $operationType) {
+                $defaultName = ucfirst($operationType->operation);
+                if (isset($explicitRootTypes[$defaultName])) {
+                    throw new DefinitionException("The root type for {$operationType->operation} must not be defined more than once.");
+                }
+
+                $explicitRootTypes[$defaultName] = $operationType->type->name->value;
+            }
+        }
+
+        $rootTypes = isset($schemaDefinition)
+            ? $explicitRootTypes
+            : array_merge($instance->rootTypes, $explicitRootTypes);
+
+        // Strict per spec, even for federation subgraphs that would get their query type added later
+        if (! isset($rootTypes[RootType::QUERY])) {
+            throw new DefinitionException('The schema definition must define the query root type.');
+        }
+
+        $duplicateRootTypes = array_diff_key($rootTypes, array_unique($rootTypes));
+        if ($duplicateRootTypes !== []) {
+            $duplicates = implode(', ', array_unique($duplicateRootTypes));
+            throw new DefinitionException("The root types must all be different, found duplicates: {$duplicates}.");
+        }
+
+        $instance->rootTypes = $rootTypes;
+
         return $instance;
+    }
+
+    public function defaultRootTypeName(string $typeName): ?string
+    {
+        return array_search($typeName, $this->rootTypes, strict: true) ?: null;
+    }
+
+    public function isRootType(string $typeName): bool
+    {
+        return in_array($typeName, $this->rootTypes, strict: true);
     }
 
     /**
@@ -202,6 +271,7 @@ class DocumentAST implements Arrayable
             self::DIRECTIVES => array_map([AST::class, 'toArray'], $this->directives),
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
             self::SCHEMA_EXTENSIONS => array_map([AST::class, 'toArray'], $this->schemaExtensions),
+            self::ROOT_TYPES => $this->rootTypes,
             self::HASH => $this->hash,
         ];
     }
@@ -241,6 +311,8 @@ class DocumentAST implements Arrayable
             self::SCHEMA_EXTENSIONS => $schemaExtensions,
             self::HASH => $this->hash,
         ] = $ast;
+        // TODO remove fallback in v7, schema caches of older versions lack root types
+        $this->rootTypes = $ast[self::ROOT_TYPES] ?? $this->rootTypes;
 
         // Use the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.

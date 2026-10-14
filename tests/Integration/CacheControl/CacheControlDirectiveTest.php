@@ -107,6 +107,27 @@ final class CacheControlDirectiveTest extends DBTestCase
         ];
     }
 
+    public function testCustomRootTypeIsPrivate(): void
+    {
+        $this->mockResolver(1);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: RootQuery
+        }
+
+        type RootQuery {
+            default: ID @mock
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            default
+        }
+        ')->assertHeader('Cache-Control', 'no-cache, private');
+    }
+
     public function testInheritanceWithNonScalar(): void
     {
         $this->mockResolver([

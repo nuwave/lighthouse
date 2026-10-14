@@ -16,7 +16,6 @@ use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\RootType;
 
 class CacheControlServiceProvider extends ServiceProvider
 {
@@ -29,12 +28,18 @@ class CacheControlServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(StartExecution::class, function (StartExecution $startExecution): void {
-            $typeInfo = new TypeInfo($startExecution->schema);
+            $schema = $startExecution->schema;
+            $typeInfo = new TypeInfo($schema);
+            $rootTypes = [
+                $schema->getQueryType(),
+                $schema->getMutationType(),
+                $schema->getSubscriptionType(),
+            ];
             $cacheControl = $this->app->make(CacheControl::class);
 
             // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type
             $visitorWithTypeInfo = Visitor::visitWithTypeInfo($typeInfo, [
-                NodeKind::FIELD => function (FieldNode $_) use ($typeInfo, $cacheControl): void {
+                NodeKind::FIELD => function (FieldNode $_) use ($rootTypes, $typeInfo, $cacheControl): void {
                     $field = $typeInfo->getFieldDef();
                     if ($field === null) {
                         return;
@@ -49,7 +54,7 @@ class CacheControlServiceProvider extends ServiceProvider
                         $parent = $typeInfo->getParentType();
                         assert($parent instanceof NamedType);
 
-                        if (RootType::isRootType($parent->name())) {
+                        if (in_array($parent, $rootTypes, strict: true)) {
                             $cacheControl->addMaxAge(0);
                             $cacheControl->setPrivate();
                         } else {

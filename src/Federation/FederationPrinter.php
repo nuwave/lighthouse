@@ -17,7 +17,6 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Federation\Directives\ComposeDirectiveDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
@@ -30,7 +29,6 @@ use Nuwave\Lighthouse\Federation\Directives\ProvidesDirective;
 use Nuwave\Lighthouse\Federation\Directives\RequiresDirective;
 use Nuwave\Lighthouse\Federation\Directives\ShareableDirective;
 use Nuwave\Lighthouse\Federation\Directives\TagDirective;
-use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
 {
@@ -70,8 +68,9 @@ class FederationPrinter
             unset($types[$type]);
         }
 
-        $originalQueryType = Arr::pull($types, RootType::QUERY);
-        assert($originalQueryType instanceof ObjectType);
+        $originalQueryType = $schema->getQueryType();
+        assert($originalQueryType instanceof ObjectType, 'federation always adds fields to the query type');
+        unset($types[$originalQueryType->name]);
 
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
@@ -79,16 +78,26 @@ class FederationPrinter
         );
         $newQueryType = $queryFieldsWithoutFederation !== []
             ? new ObjectType([
-                'name' => RootType::QUERY,
+                'name' => $originalQueryType->name,
                 'fields' => $queryFieldsWithoutFederation,
                 'interfaces' => $originalQueryType->getInterfaces(),
             ])
             : null;
         $config->setQuery($newQueryType);
 
-        $config->setMutation(Arr::pull($types, RootType::MUTATION));
+        $mutationType = $schema->getMutationType();
+        if ($mutationType !== null) {
+            unset($types[$mutationType->name]);
+        }
 
-        $config->setSubscription(Arr::pull($types, RootType::SUBSCRIPTION));
+        $config->setMutation($mutationType);
+
+        $subscriptionType = $schema->getSubscriptionType();
+        if ($subscriptionType !== null) {
+            unset($types[$subscriptionType->name]);
+        }
+
+        $config->setSubscription($subscriptionType);
 
         $config->setTypes($types);
 

@@ -41,23 +41,12 @@ class SchemaBuilder
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Always set Query since it is required
-        $query = $this->typeRegistry->get(RootType::QUERY);
+        $query = $this->typeRegistry->get($documentAST->rootTypes[RootType::QUERY]);
         assert($query instanceof ObjectType);
         $config->setQuery($query);
 
-        // Mutation and Subscription are optional, so only add them
-        // if they are present in the schema
-        if (isset($documentAST->types[RootType::MUTATION])) {
-            $mutation = $this->typeRegistry->get(RootType::MUTATION);
-            assert($mutation instanceof ObjectType);
-            $config->setMutation($mutation);
-        }
-
-        if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
-            $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
-            assert($subscription instanceof ObjectType);
-            $config->setSubscription($subscription);
-        }
+        $config->setMutation($this->optionalRootType($documentAST, RootType::MUTATION));
+        $config->setSubscription($this->optionalRootType($documentAST, RootType::SUBSCRIPTION));
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
@@ -95,5 +84,23 @@ class SchemaBuilder
         $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
+    }
+
+    /** A root type with its default name is optional, one with a custom name must be defined. */
+    protected function optionalRootType(DocumentAST $documentAST, string $defaultName): ?ObjectType
+    {
+        $typeName = $documentAST->rootTypes[$defaultName] ?? null;
+        if ($typeName === null) {
+            return null;
+        }
+
+        if ($typeName === $defaultName && ! isset($documentAST->types[$typeName])) {
+            return null;
+        }
+
+        $type = $this->typeRegistry->get($typeName);
+        assert($type instanceof ObjectType, 'root types are object types');
+
+        return $type;
     }
 }

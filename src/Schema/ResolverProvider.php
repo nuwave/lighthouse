@@ -19,13 +19,14 @@ class ResolverProvider implements ProvidesResolver
         $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
 
         if ($resolverClass === null) {
-            if (RootType::isRootType($fieldValue->getParentName())) {
+            $documentAST = $fieldValue->getParent()->getDocumentAST();
+            if ($documentAST->isRootType($fieldValue->getParentName())) {
                 $this->throwMissingResolver($fieldValue);
             }
 
             // Return any non-null value to continue nested field resolution
             // when the root Query type is returned as part of the result.
-            if (ASTHelper::getUnderlyingTypeName($fieldValue->getField()) === RootType::QUERY) {
+            if (ASTHelper::getUnderlyingTypeName($fieldValue->getField()) === $documentAST->rootTypes[RootType::QUERY]) {
                 return static fn (): bool => true;
             }
 
@@ -53,9 +54,10 @@ class ResolverProvider implements ProvidesResolver
     /** @return never */
     protected function throwMissingResolver(FieldValue $fieldValue): void
     {
-        // Since we already know we are on the root type, this is either
-        // query, mutation or subscription
-        $parent = lcfirst($fieldValue->getParentName());
+        $documentAST = $fieldValue->getParent()->getDocumentAST();
+        $defaultRootTypeName = $documentAST->defaultRootTypeName($fieldValue->getParentName());
+        assert($defaultRootTypeName !== null, 'only called for fields of root types');
+        $parent = lcfirst($defaultRootTypeName);
         $fieldName = $fieldValue->getFieldName();
         $proposedResolverClass = ucfirst($fieldName);
 

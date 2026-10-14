@@ -16,10 +16,14 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 {
     protected static function printSchemaDefinition(Schema $schema): string
     {
-        $result = '';
+        $result = (string) parent::printSchemaDefinition($schema);
 
         $schemaExtensionDirectives = FederationHelper::schemaExtensionDirectives($schema);
         if ($schemaExtensionDirectives !== []) {
+            if ($result !== '') {
+                $result .= "\n\n";
+            }
+
             $result .= 'extend schema' . self::printDirectives($schemaExtensionDirectives);
         }
 

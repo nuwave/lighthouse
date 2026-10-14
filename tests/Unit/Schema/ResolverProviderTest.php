@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -55,13 +56,14 @@ final class ResolverProviderTest extends TestCase
 
     private function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
     {
-        $queryType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+        $schema = /** @lang GraphQL */ <<<GRAPHQL
         type {$parentTypeName} {
             {$fieldDefinition}
         }
-        GRAPHQL);
+        GRAPHQL;
+        $queryType = Parser::objectTypeDefinition($schema);
 
-        $typeValue = new TypeValue($queryType);
+        $typeValue = new TypeValue($queryType, DocumentAST::fromSource($schema));
 
         return new FieldValue(
             $typeValue,
