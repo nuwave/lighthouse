@@ -128,6 +128,7 @@ final class UtilsTest extends TestCase
         $this->assertTrue($disk->exists('file.php'));
     }
 
+    /** @dataProvider invalidArrayFiles */
     #[DataProvider('invalidArrayFiles')]
     public function testRequireArrayOrForgetDeletesInvalidFile(string $contents): void
     {
