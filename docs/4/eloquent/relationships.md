@@ -36,19 +36,17 @@ type Post {
 }
 ```
 
-Because Laravel relationships can be accessed just like regular properties on your model,
-the default field resolver will work just fine.
+Because Laravel relationships can be accessed just like regular properties on your model, the default field resolver will work just fine.
 
 ## Avoiding the N+1 performance problem
 
 When accessing Eloquent relationships as properties, the relationship data is "lazy loaded".
 This means the relationship data is not actually loaded until you first access the property.
 
-This leads to a common performance pitfall that comes with the nested nature of GraphQL queries:
-the so-called N+1 query problem. [Learn more](../performance/n-plus-one.md).
+This leads to a common performance pitfall that comes with the nested nature of GraphQL queries: the so-called N+1 query problem.
+[Learn more](../performance/n-plus-one.md).
 
-When you decorate your relationship fields with Lighthouse's built-in relationship
-directives, queries are automatically combined through a technique called _batch loading_.
+When you decorate your relationship fields with Lighthouse's built-in relationship directives, queries are automatically combined through a technique called _batch loading_.
 That means you get fewer database requests and better performance without doing much work.
 
 > Batch loading might not provide ideal performance for all use cases. You can turn
@@ -56,8 +54,7 @@ That means you get fewer database requests and better performance without doing 
 
 ## One To One
 
-Use the [@hasOne](../api-reference/directives.md#hasone) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one)
-between two types in your schema.
+Use the [@hasOne](../api-reference/directives.md#hasone) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one) between two types in your schema.
 
 ```graphql
 type User {
@@ -93,8 +90,7 @@ type Comment {
 
 ## Many To Many
 
-While [many-to-many relationships](https://laravel.com/docs/eloquent-relationships#many-to-many)
-are a bit more work to set up in Laravel, defining them in Lighthouse is a breeze.
+While [many-to-many relationships](https://laravel.com/docs/eloquent-relationships#many-to-many) are a bit more work to set up in Laravel, defining them in Lighthouse is a breeze.
 Use the [@belongsToMany](../api-reference/directives.md#belongstomany) directive to define it.
 
 ```graphql
@@ -113,9 +109,8 @@ type Role {
 
 ## Renaming relations
 
-When you define a relation, Lighthouse assumes that the field and the relationship
-method have the same name. If you need to name your field differently, you have to
-specify the name of the method.
+When you define a relation, Lighthouse assumes that the field and the relationship method have the same name.
+If you need to name your field differently, you have to specify the name of the method.
 
 ```graphql
 type Post {

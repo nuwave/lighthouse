@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
@@ -8,24 +8,10 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 
 class EchoSubscriptionEvent implements ShouldBroadcastNow
 {
-    /**
-     * @var string
-     */
-    public $channel;
-
-    /**
-     * @var mixed the data to broadcast
-     */
-    public $data;
-
-    /**
-     * @param  mixed  $data  the data to broadcast
-     */
-    public function __construct(string $channel, $data)
-    {
-        $this->channel = $channel;
-        $this->data = $data;
-    }
+    public function __construct(
+        public string $channel,
+        public mixed $data,
+    ) {}
 
     public function broadcastOn(): Channel
     {

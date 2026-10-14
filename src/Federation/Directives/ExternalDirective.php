@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation\Directives;
 
 use GraphQL\Executor\Executor;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -27,15 +27,13 @@ directive @external on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-            // The parent might just hold a foreign key to the external object, in which case we just return that.
-            return is_scalar($root)
-                ? $root
-                : (Executor::getDefaultFieldResolver())($root, $args, $context, $resolveInfo);
-        });
+        $defaultFieldResolver = Executor::getDefaultFieldResolver();
 
-        return $fieldValue;
+        // The parent might just hold a foreign key to the external object, in which case we just return that.
+        return static fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed => is_scalar($root)
+            ? $root
+            : $defaultFieldResolver($root, $args, $context, $resolveInfo);
     }
 }

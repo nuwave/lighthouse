@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution;
 
@@ -11,15 +11,9 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
 class ValidationRulesProvider implements ProvidesValidationRules
 {
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
-    public function __construct(ConfigRepository $configRepository)
-    {
-        $this->configRepository = $configRepository;
-    }
+    public function __construct(
+        protected ConfigRepository $configRepository,
+    ) {}
 
     public function validationRules(): ?array
     {
@@ -27,6 +21,6 @@ class ValidationRulesProvider implements ProvidesValidationRules
             QueryComplexity::class => new QueryComplexity($this->configRepository->get('lighthouse.security.max_query_complexity', 0)),
             QueryDepth::class => new QueryDepth($this->configRepository->get('lighthouse.security.max_query_depth', 0)),
             DisableIntrospection::class => new DisableIntrospection($this->configRepository->get('lighthouse.security.disable_introspection', 0)),
-        ] + DocumentValidator::defaultRules();
+        ] + DocumentValidator::allRules();
     }
 }

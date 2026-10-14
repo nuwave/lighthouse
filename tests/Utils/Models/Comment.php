@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
@@ -18,18 +18,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $post_id
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Tests\Utils\Models\Post $post
  */
-class Comment extends Model
+final class Comment extends Model
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Post, $this> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);

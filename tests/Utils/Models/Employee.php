@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
@@ -15,20 +15,22 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property string $position
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
  * @property-read \Tests\Utils\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Color> $colors
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Color> $colors
  */
-class Employee extends Model
+final class Employee extends Model
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\User, $this> */
     public function user(): MorphOne
     {
         return $this->morphOne(User::class, 'person');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Color, $this> */
     public function colors(): MorphMany
     {
         return $this->morphMany(Color::class, 'creator');

@@ -1,10 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait RelationDirectiveHelpers
 {
@@ -12,35 +14,44 @@ trait RelationDirectiveHelpers
 
     abstract protected function nodeName(): string;
 
-    /**
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     protected function scopes(): array
     {
-        return $this->directiveArgValue('scopes')
-            ?? [];
+        return $this->directiveArgValue('scopes', []);
     }
 
     protected function relation(): string
     {
-        return $this->directiveArgValue('relation')
-            ?? $this->nodeName();
+        return $this->directiveArgValue('relation', $this->nodeName());
     }
 
     /**
-     * @return \Closure(\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation): void
+     * @param  array<string, mixed>  $args
+     *
+     * @return \Closure(\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>, mixed=): void
      */
-    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
+    protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
-        return function (object $builder) use ($resolveInfo): void {
-            /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $builder */
+        return function (object $builder, mixed $specificRoot = null) use ($root, $args, $context, $resolveInfo): void {
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
 
-            $resolveInfo->argumentSet->enhanceBuilder(
+            assert($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder);
+
+            $resolveInfo->enhanceBuilder(
                 $builder,
-                $this->scopes()
+                $this->scopes(),
+                /**
+                 * Sometimes overridden to use a different model than the usual root.
+                 *
+                 * @see \Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader::loadRelatedModels
+                 * @see \Tests\Integration\Schema\Directives\BuilderDirectiveTest::testCallsCustomBuilderMethodOnFieldWithSpecificModel
+                 */
+                $specificRoot ?? $root,
+                $args,
+                $context,
+                $resolveInfo,
             );
         };
     }
@@ -56,7 +67,7 @@ trait RelationDirectiveHelpers
         $path = $resolveInfo->path;
 
         // In case we have no args, we can combine eager loads that are the same
-        if ([] === $args) {
+        if ($args === []) {
             array_pop($path);
         }
 

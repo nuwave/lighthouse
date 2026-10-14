@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
@@ -6,24 +6,14 @@ use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class ArgumentTypeNodeConverter extends TypeNodeConverter
 {
-    /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
-     *
-     * @return \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType
-     */
-    protected function nonNull($type): object
+    protected function nonNull(mixed $type): ListType|NamedType
     {
         $type->nonNull = true;
 
         return $type;
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
-     *
-     * @return \Nuwave\Lighthouse\Execution\Arguments\ListType
-     */
-    protected function listOf($type): object
+    protected function listOf(mixed $type): ListType
     {
         return new ListType($type);
     }

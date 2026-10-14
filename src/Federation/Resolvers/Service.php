@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation\Resolvers;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Federation\FederationPrinter;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -13,7 +13,7 @@ class Service
      *
      * @return array{sdl: string}
      */
-    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         return [
             'sdl' => FederationPrinter::print($resolveInfo->schema),

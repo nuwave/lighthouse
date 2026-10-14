@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
@@ -13,8 +13,8 @@ class SubscriptionController
         return $broadcaster->authorize($request);
     }
 
-    public function webhook(Request $request, BroadcastManager $broadcastManager): Response
+    public function webhook(Request $request, BroadcastDriverManager $broadcastDriverManager): Response
     {
-        return $broadcastManager->hook($request);
+        return $broadcastDriverManager->hook($request);
     }
 }

@@ -1,42 +1,38 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use InvalidArgumentException;
 
 abstract class LighthouseGeneratorCommand extends GeneratorCommand
 {
     /**
      * Get the desired class name from the input.
      *
-     * As a typical workflow would be to write the schema first and then copy-paste
-     * a field name to generate a class for it, we uppercase it so the user does
-     * not run into unnecessary errors. You're welcome.
+     * A typical workflow is to write the schema first and then copy-paste a field name.
+     * This command generates a class for that field.
+     * We uppercase it so the user does not run into unnecessary errors.
+     * You're welcome.
      */
     protected function getNameInput(): string
     {
         $name = $this->argument('name');
-        if (! is_string($name)) {
-            throw new InvalidArgumentException('You must the name for the class to generate.');
+        if (! is_string($name)) { // @phpstan-ignore function.alreadyNarrowedType (necessary in some dependency versions)
+            throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 
         return ucfirst(trim($name));
     }
 
-    /**
-     * @param  string  $rootNamespace
-     */
+    /** @param  string  $rootNamespace */
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespaces = config('lighthouse.namespaces.' . $this->namespaceConfigKey());
+        $namespaces = config("lighthouse.namespaces.{$this->namespaceConfigKey()}");
 
         return static::commonNamespace((array) $namespaces);
     }
 
-    /**
-     * Get the config key that holds the default namespaces for the class.
-     */
+    /** Get the config key that holds the default namespaces for the class. */
     abstract protected function namespaceConfigKey(): string;
 
     /**
@@ -48,13 +44,11 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     public static function commonNamespace(array $namespaces): string
     {
-        if ([] === $namespaces) {
-            throw new InvalidArgumentException(
-                'A default namespace is required for code generation.'
-            );
+        if ($namespaces === []) {
+            throw new \InvalidArgumentException('A default namespace is required for code generation.');
         }
 
-        if (1 === count($namespaces)) {
+        if (count($namespaces) === 1) {
             return reset($namespaces);
         }
 
@@ -64,7 +58,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         // If the strings are sorted, any prefix common to all strings
         // will be common to the sorted first and last strings.
         // All the strings in the middle can be ignored.
-        \Safe\sort($namespaces);
+        sort($namespaces);
 
         $firstParts = explode('\\', reset($namespaces));
         $lastParts = explode('\\', end($namespaces));
@@ -85,8 +79,8 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         }
 
         // We could not determine a common part of the configured namespaces,
-        // so we just assume the user will prefer the first one in the list.
-        if ([] === $matching) {
+        // so we assume the user will prefer the first one in the list.
+        if ($matching === []) {
             return $preferredNamespaceFallback;
         }
 

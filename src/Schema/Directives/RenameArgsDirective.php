@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class RenameArgsDirective extends BaseDirective implements FieldMiddleware
 {
@@ -20,23 +20,34 @@ directive @renameArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
-        $resolver = $fieldValue->getResolver();
+        $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->rename($argumentSet));
+    }
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $resolveInfo->argumentSet->rename();
+    protected function rename(ArgumentSet &$argumentSet): ArgumentSet
+    {
+        foreach ($argumentSet->arguments as $name => $argument) {
+            // Recursively apply the renaming to nested inputs.
+            // We look for further ArgumentSet instances, they
+            // might be contained within an array.
+            Utils::applyEach(
+                function ($value): void {
+                    if ($value instanceof ArgumentSet) {
+                        $this->rename($value);
+                    }
+                },
+                $argument->value,
+            );
 
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+            $maybeRenameDirective = $argument->directives->first(static fn (Directive $directive): bool => $directive instanceof RenameDirective);
+
+            if ($maybeRenameDirective instanceof RenameDirective) {
+                $argumentSet->arguments[$maybeRenameDirective->attributeArgValue()] = $argument;
+                unset($argumentSet->arguments[$name]);
+            }
+        }
+
+        return $argumentSet;
     }
 }

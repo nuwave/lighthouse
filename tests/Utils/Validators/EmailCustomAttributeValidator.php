@@ -1,13 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Validators;
 
 use Nuwave\Lighthouse\Validation\Validator;
 
-class EmailCustomAttributeValidator extends Validator
+final class EmailCustomAttributeValidator extends Validator
 {
-    public const MESSAGE = 'The email address must be a valid email address.';
-
+    /** @return array{email: array<string>} */
     public function rules(): array
     {
         return [
@@ -15,6 +14,7 @@ class EmailCustomAttributeValidator extends Validator
         ];
     }
 
+    /** @return array{email: string} */
     public function attributes(): array
     {
         return ['email' => 'email address'];

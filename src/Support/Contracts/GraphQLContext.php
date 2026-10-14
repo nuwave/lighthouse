@@ -1,20 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\Request;
+
+/**
+ * Singleton accessible in all resolvers.
+ *
+ * @api
+ */
 interface GraphQLContext
 {
     /**
      * Get an instance of the authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * May be null since some fields may be accessible without authentication.
      */
-    public function user();
+    public function user(): ?Authenticatable;
+
+    /** Set the authenticated user. */
+    public function setUser(?Authenticatable $user): void;
 
     /**
      * Get an instance of the current HTTP request.
      *
-     * @return \Illuminate\Http\Request
+     * May be null if GraphQL is run outside the context of an HTTP request.
      */
-    public function request();
+    public function request(): ?Request;
 }

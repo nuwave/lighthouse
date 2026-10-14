@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
@@ -6,8 +6,12 @@ use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\TestResponse;
+use Nuwave\Lighthouse\Http\Responses\MemoryStream;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -24,91 +28,90 @@ trait MakesGraphQLRequests
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Testing\TestResponse|null
+     * @var \Illuminate\Testing\TestResponse<\Symfony\Component\HttpFoundation\Response>
      */
-    protected $introspectionResult;
+    protected TestResponse $introspectionResult;
+
+    /** Used to test deferred queries. */
+    protected MemoryStream $deferStream;
 
     /**
-     * Used to test deferred queries.
+     * Execute a GraphQL operation as if it was sent as a request to the server.
      *
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
-     */
-    protected $deferStream;
-
-    /**
-     * Execute a query as if it was sent as a request to the server.
-     *
-     * @param  string  $query  The GraphQL query to send
+     * @param  string  $query  The GraphQL operation to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
-     *
-     * @return \Illuminate\Testing\TestResponse
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
     protected function graphQL(
         string $query,
         array $variables = [],
         array $extraParams = [],
-        array $headers = []
-    ) {
+        array $headers = [],
+        array $routeParams = [],
+    ): TestResponse {
         $params = ['query' => $query];
 
-        if ([] !== $variables) {
+        if ($variables !== []) {
             $params += ['variables' => $variables];
         }
 
         $params += $extraParams;
 
-        return $this->postGraphQL($params, $headers);
+        return $this->postGraphQL($params, $headers, $routeParams);
     }
 
     /**
-     * Execute a POST to the GraphQL endpoint.
+     * Send a POST request to the GraphQL endpoint.
      *
      * Use this over graphQL() when you need more control or want to
      * test how your server behaves on incorrect inputs.
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
-     *
-     * @return \Illuminate\Testing\TestResponse
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
-    protected function postGraphQL(array $data, array $headers = [])
+    protected function postGraphQL(array $data, array $headers = [], array $routeParams = []): TestResponse
     {
+        $this->refreshSchemaCacheIfNecessary();
+
         return $this->postJson(
-            $this->graphQLEndpointUrl(),
+            $this->graphQLEndpointUrl($routeParams),
             $data,
-            $headers
+            $headers,
         );
     }
 
     /**
-     * Send a multipart form request to GraphQL.
+     * Send a multipart form request to the GraphQL endpoint.
      *
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
      * @param  array<string, mixed>|array<int, array<string, mixed>>  $operations
-     * @param  array<int|string, array<int, string>>  $map
-     * @param  array<int|string, \Illuminate\Http\Testing\File>|array<int|string, array>  $files
+     * @param  array<array<int, string>>  $map
+     * @param  array<\Illuminate\Http\UploadedFile>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
-     *
-     * @return \Illuminate\Testing\TestResponse
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
     protected function multipartGraphQL(
         array $operations,
         array $map,
         array $files,
-        array $headers = []
-    ) {
+        array $headers = [],
+        array $routeParams = [],
+    ): TestResponse {
+        $this->refreshSchemaCacheIfNecessary();
+
         $parameters = [
-            'operations' => json_encode($operations),
-            'map' => json_encode($map),
+            'operations' => \Safe\json_encode($operations),
+            'map' => \Safe\json_encode($map),
         ];
 
         return $this->call(
             'POST',
-            $this->graphQLEndpointUrl(),
+            $this->graphQLEndpointUrl($routeParams),
             $parameters,
             [],
             $files,
@@ -116,23 +119,20 @@ trait MakesGraphQLRequests
                 [
                     'Content-Type' => 'multipart/form-data',
                 ],
-                $headers
-            ))
+                $headers,
+            )),
         );
     }
 
     /**
-     * Execute the introspection query on the GraphQL server.
+     * Send the introspection query to the GraphQL server.
      *
-     * @return \Illuminate\Testing\TestResponse
+     * Returns the cached first result on repeated calls.
      */
-    protected function introspect()
+    protected function introspect(): TestResponse
     {
-        if (null !== $this->introspectionResult) {
-            return $this->introspectionResult;
-        }
-
-        return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
+        return $this->introspectionResult
+            ??= $this->graphQL(Introspection::getIntrospectionQuery());
     }
 
     /**
@@ -162,29 +162,23 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if (null === $this->introspectionResult) {
-            $this->introspect();
-        }
-
-        $results = $this->introspectionResult->json($path);
-
         return Arr::first(
-            $results,
-            static function (array $result) use ($name): bool {
-                return $result['name'] === $name;
-            }
+            $this->introspect()->json($path),
+            static fn (array $result): bool => $result['name'] === $name,
         );
     }
 
     /**
      * Return the full URL to the GraphQL endpoint.
+     *
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
-    protected function graphQLEndpointUrl(): string
+    protected function graphQLEndpointUrl(array $routeParams = []): string
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        $routeName = $config->get('lighthouse.route.name');
 
-        return route($config->get('lighthouse.route.name'));
+        return route($routeName, $routeParams);
     }
 
     /**
@@ -201,39 +195,74 @@ trait MakesGraphQLRequests
         string $query,
         array $variables = [],
         array $extraParams = [],
-        array $headers = []
+        array $headers = [],
     ): array {
-        if (null === $this->deferStream) {
+        if (! isset($this->deferStream)) {
             $this->setUpDeferStream();
         }
 
         $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
-        if (! $response->baseResponse instanceof StreamedResponse) {
+        /** @var mixed $baseResponse Laravel type hint is wrong */
+        $baseResponse = $response->baseResponse;
+        if (! $baseResponse instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
         }
 
-        $response->send();
+        $baseResponse->send();
 
         return $this->deferStream->chunks;
     }
 
-    /**
-     * Set up the stream to make queries with `@defer`.
-     */
+    /** Set up the stream to make queries with `@defer`. */
     protected function setUpDeferStream(): void
     {
         $this->deferStream = new MemoryStream();
 
-        Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
-            return $this->deferStream;
-        });
+        Container::getInstance()->singleton(
+            CanStreamResponse::class,
+            fn (): MemoryStream => $this->deferStream,
+        );
     }
 
+    /** Configure an error handler that rethrows all errors passed to it. */
     protected function rethrowGraphQLErrors(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
+    }
+
+    /**
+     * @deprecated use TestsSubscriptions
+     * TODO remove in the next major version
+     */
+    protected function setUpSubscriptionEnvironment(): void
+    {
+        $app = Container::getInstance();
+
+        $config = $app->make(ConfigRepository::class);
+        $config->set('lighthouse.subscriptions.queue_broadcasts', false);
+        $config->set('lighthouse.subscriptions.storage', 'array');
+        $config->set('lighthouse.subscriptions.storage_ttl', null);
+
+        // binding an instance to the container, so it can be spied on
+        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): LogBroadcaster => new LogBroadcaster(
+            $config->get('lighthouse.subscriptions.broadcasters.log'),
+        ));
+
+        $broadcastDriverManager = $app->make(BroadcastDriverManager::class);
+
+        // adding a custom driver which is a spied version of log driver
+        $broadcastDriverManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
+
+        // set the custom driver as the default driver
+        $config->set('lighthouse.subscriptions.broadcaster', 'mock');
+    }
+
+    protected function refreshSchemaCacheIfNecessary(): void
+    {
+        if (in_array(RefreshesSchemaCache::class, class_uses_recursive(static::class), strict: true)) {
+            $this->refreshSchemaCache(); // @phpstan-ignore method.notFound (present in RefreshesSchemaCache)
+        }
     }
 }

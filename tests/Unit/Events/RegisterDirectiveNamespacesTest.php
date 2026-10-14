@@ -1,31 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Events;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Tests\Integration\Events\FieldDirective as TestFieldDirective;
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
 
-class RegisterDirectiveNamespacesTest extends TestCase
+final class RegisterDirectiveNamespacesTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
+    protected DirectiveLocator $directiveLocator;
 
     protected function getEnvironmentSetUp($app): void
     {
-        $app->make('events')->listen(
-            RegisterDirectiveNamespaces::class,
-            function (): array {
-                return [
-                    'Tests\\Utils\\Directives',
-                    'Tests\\Integration\\Events',
-                ];
-            }
-        );
+        $dispatcher = $app->make(Dispatcher::class);
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): array => [
+            'Tests\\Utils\\Directives',
+            'Tests\\Integration\\Events',
+        ]);
 
         $this->directiveLocator = $app->make(DirectiveLocator::class);
 

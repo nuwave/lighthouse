@@ -1,15 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;
+use Tests\Utils\Directives\GlobalFieldMiddlewareDirective;
 
-class FieldMiddlewareTest extends TestCase
+final class FieldMiddlewareTest extends TestCase
 {
     public function testTransformsArgsBeforeCustomFieldMiddleware(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(id: ID! @trim): Foo @customFieldMiddleware
         }
@@ -17,15 +18,15 @@ class FieldMiddlewareTest extends TestCase
         type Foo {
             id: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(id: "   foo   ") {
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'id' => 'foo',
@@ -36,7 +37,7 @@ class FieldMiddlewareTest extends TestCase
 
     public function testFieldMiddlewareResolveInDefinitionOrder(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @guard
@@ -47,14 +48,37 @@ class FieldMiddlewareTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertGraphQLErrorCategory(AuthenticationException::CATEGORY);
+        GRAPHQL)->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
+    }
+
+    public function testHydratesGlobalFieldMiddleware(): void
+    {
+        config(['lighthouse.field_middleware' => [
+            GlobalFieldMiddlewareDirective::class,
+        ]]);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Boolean
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => true,
+            ],
+        ]);
     }
 }

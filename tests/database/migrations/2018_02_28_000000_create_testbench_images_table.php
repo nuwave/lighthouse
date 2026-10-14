@@ -1,20 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchImagesTable extends Migration
+final class CreateTestbenchImagesTable extends Migration
 {
     public function up(): void
     {
         Schema::create('images', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('url')->nullable();
-
-            $table->unsignedInteger('imageable_id')->nullable();
+            $table->unsignedBigInteger('imageable_id')->nullable();
             $table->string('imageable_type')->nullable();
-
             $table->timestamps();
         });
     }

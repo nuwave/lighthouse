@@ -1,11 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -20,14 +25,14 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     use GeneratesRelationsEnum;
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  the builder used to resolve the field
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
      * @param  array<string, mixed>  $value  the client given value of the argument
      */
-    protected function handle($builder, array $value): void
+    protected function handle(QueryBuilder|EloquentBuilder|Relation $builder, array $value): void
     {
         $handler = $this->directiveHasArgument('handler')
             ? $this->getResolverFromArgument('handler')
-            : app(WhereConditionsHandler::class);
+            : Container::getInstance()->make(WhereConditionsHandler::class);
 
         $handler($builder, $value);
     }
@@ -36,41 +41,51 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
+        $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
+        $this->validateMutuallyExclusiveArguments(['relations', 'relationsEnum']);
+
         $hasAllowedColumns = $this->hasAllowedColumns();
         $hasAllowedRelations = $this->hasAllowedRelations();
 
         if ($hasAllowedColumns || $hasAllowedRelations) {
-            $qualifiedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
-            $argDefinition->type = Parser::namedType($qualifiedWhereConditionsName);
+            $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
+            $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
+            $allowedColumnsEnumName = $hasAllowedColumns
+                ? $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType)
+                : 'String';
+            $allowedRelationsEnumName = $hasAllowedRelations
+                ? $this->generateRelationsEnum($documentAST, $argDefinition, $parentField, $parentType)
+                : 'String';
 
-            $documentAST->setTypeDefinition(
-                WhereConditionsServiceProvider::createWhereConditionsInputType(
-                    $qualifiedWhereConditionsName,
-                    "Dynamic WHERE conditions for Query.{$parentField->name->value}.{$argDefinition->name->value}.",
-                    $hasAllowedColumns
-                        ? $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType)
-                        : 'String'
+            $documentAST
+                ->setTypeDefinition(
+                    WhereConditionsServiceProvider::createWhereConditionsInputType(
+                        $restrictedWhereConditionsName,
+                        "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument of the query `{$parentField->name->value}`.",
+                        $allowedColumnsEnumName,
+                    ),
                 )
-            );
-
-            $documentAST->setTypeDefinition(
-                WhereConditionsServiceProvider::createHasConditionsInputType(
-                    $qualifiedWhereConditionsName,
-                    "Dynamic HAS conditions for Query.{$parentField->name->value}.{$argDefinition->name->value}.",
-                    $hasAllowedRelations
-                        ? $this->generateRelationsEnum($documentAST, $argDefinition, $parentField, $parentType)
-                        : 'String'
+                ->setTypeDefinition(
+                    WhereConditionsServiceProvider::createHasConditionInputType(
+                        $restrictedWhereConditionsName,
+                        "Dynamic WHERE HAS conditions for the `{$argDefinition->name->value}` argument of the query `{$parentField->name->value}`.",
+                        'String',
+                    ),
                 )
-            );
+                ->setTypeDefinition(
+                    WhereConditionsServiceProvider::createHasConditionsInputType(
+                        $restrictedWhereConditionsName,
+                        "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument of the query `{$parentField->name->value}`.",
+                        $allowedRelationsEnumName,
+                    ),
+                );
         } else {
             $argDefinition->type = Parser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);
         }
     }
 
-    /**
-     * Get the suffix that will be added to generated input types.
-     */
+    /** Get the suffix that will be added to generated input types. */
     abstract protected function generatedInputSuffix(): string;
 }

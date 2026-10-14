@@ -1,12 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class FieldDirective extends BaseDirective implements FieldResolver
@@ -24,37 +21,19 @@ directive @field(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
-
-  """
-  Supply additional data to the resolver.
-  """
-  args: [String!]
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
         $namespacedClassName = $this->namespaceClassName(
             $className,
-            RootType::defaultNamespaces($fieldValue->getParentName())
+            $fieldValue->parentNamespaces(),
         );
 
-        $resolver = Utils::constructResolver($namespacedClassName, $methodName);
-
-        $additionalData = $this->directiveArgValue('args');
-
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
-                return $resolver(
-                    $root,
-                    array_merge($args, ['directive' => $additionalData]),
-                    $context,
-                    $resolveInfo
-                );
-            }
-        );
+        return Utils::constructResolver($namespacedClassName, $methodName);
     }
 }

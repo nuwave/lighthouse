@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Directives;
 
-use Closure;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -15,6 +14,9 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Broadcast the results of a mutation to subscribed clients.
+
+Ensure you place this after other field middleware directives that may transform the
+result to broadcast the final value.
 """
 directive @broadcast(
   """
@@ -31,20 +33,15 @@ directive @broadcast(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        // Ensure this is run after the other field middleware directives
-        $fieldValue = $next($fieldValue);
-
         $subscriptionField = $this->directiveArgValue('subscription');
         $shouldQueue = $this->directiveArgValue('shouldQueue');
 
-        $fieldValue->resultHandler(function ($root) use ($subscriptionField, $shouldQueue) {
+        $fieldValue->resultHandler(static function ($root) use ($subscriptionField, $shouldQueue) {
             Subscription::broadcast($subscriptionField, $root, $shouldQueue);
 
             return $root;
         });
-
-        return $fieldValue;
     }
 }

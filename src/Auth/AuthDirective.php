@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Auth;
 
@@ -10,15 +10,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class AuthDirective extends BaseDirective implements FieldResolver
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $authFactory;
-
-    public function __construct(AuthFactory $authFactory)
-    {
-        $this->authFactory = $authFactory;
-    }
+    public function __construct(
+        protected AuthFactory $authFactory,
+    ) {}
 
     public static function definition(): string
     {
@@ -28,28 +22,39 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Specify which guard to use, e.g. "api".
+  Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        return $fieldValue->setResolver(
-            function (): ?Authenticatable {
-                /** @var string|null $guard */
-                $guard = $this->directiveArgValue('guard')
-                    ?? AuthServiceProvider::guard();
+        return function (): ?Authenticatable {
+            $guards = $this->directiveArgValue('guards', AuthServiceProvider::guards());
+            assert(is_array($guards));
 
-                // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
-                return $this
-                    ->authFactory
-                    ->guard($guard)
-                    ->user();
+            return $this->authenticatedUser($guards);
+        };
+    }
+
+    /**
+     * Return the first logged-in user to any of the given guards.
+     *
+     * @param  array<string>  $guards
+     */
+    protected function authenticatedUser(array $guards): ?Authenticatable
+    {
+        foreach ($guards as $guard) {
+            $user = $this->authFactory->guard($guard)
+                ->user();
+            if ($user !== null) {
+                return $user;
             }
-        );
+        }
+
+        return null;
     }
 }

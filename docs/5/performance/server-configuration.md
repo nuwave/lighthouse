@@ -9,5 +9,4 @@ If you have the freedom to install it on your server, it's an easy way to get a 
 
 ## Xdebug
 
-Enabling Xdebug and having an active debug session slows down execution by
-an order of magnitude.
+Enabling Xdebug and having an active debug session slows down execution by an order of magnitude.

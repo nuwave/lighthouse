@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\BatchLoader;
 
@@ -11,35 +11,30 @@ use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 class RelationBatchLoader
 {
     /**
-     * @var \Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader
-     */
-    protected $relationLoader;
-
-    /**
-     * A map from unique keys to parent model instances.
+     * Map from unique model keys to model instances.
      *
      * @var array<string, \Illuminate\Database\Eloquent\Model>
      */
-    protected $parents = [];
+    protected array $parents = [];
 
     /**
-     * Marks when the actual batch loading happened.
+     * Map from unique model keys to the results of batch loading.
      *
-     * @var bool
+     * @var array<string, mixed>
      */
-    protected $hasResolved = false;
+    protected array $results = [];
 
-    public function __construct(ModelsLoader $relationLoader)
-    {
-        $this->relationLoader = $relationLoader;
-    }
+    /** Marks when the actual batch loading happened. */
+    protected bool $hasResolved = false;
+
+    public function __construct(
+        protected ModelsLoader $modelsLoader,
+    ) {}
 
     /**
      * Schedule loading a relation off of a concrete model.
      *
-     * This returns effectively a promise that will resolve to
-     * the result of loading the relation.
-     *
+     * This returns what is essentially a promise that resolves to the result of loading the relation.
      * As a side effect, the model will then hold the relation.
      */
     public function load(Model $model): Deferred
@@ -52,34 +47,28 @@ class RelationBatchLoader
                 $this->resolve();
             }
 
-            // When we are deep inside a nested query, we can come across the
-            // same model in two different paths, so this might be another
-            // model instance then $model.
-            $parent = $this->parents[$modelKey];
-
-            return $this->relationLoader->extract($parent);
+            return $this->results[$modelKey];
         });
     }
 
-    public function resolve(): void
+    protected function resolve(): void
     {
         $parentModels = new EloquentCollection($this->parents);
 
         // Monomorphize the models to simplify eager loading relations onto them
         $parentsGroupedByClass = $parentModels->groupBy(
-            /**
-             * @return class-string<\Illuminate\Database\Eloquent\Model>
-             */
-            static function (Model $model): string {
-                return get_class($model);
-            },
-            true
+            /** @return class-string<\Illuminate\Database\Eloquent\Model> */
+            static fn (Model $model): string => $model::class,
+            true,
         );
 
         foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-            // TODO remove when Larastan fixes their inference https://github.com/nunomaduro/larastan/pull/1054
-            // @phpstan-ignore-next-line Parameter #1 $parents of method Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader::load() expects Illuminate\Database\Eloquent\Collection, Illuminate\Support\Collection<(int|string), mixed> given.
-            $this->relationLoader->load($parentsOfSameClass);
+            $this->modelsLoader->load($parentsOfSameClass);
+        }
+
+        foreach ($parentModels as $model) {
+            $modelKey = ModelKey::build($model);
+            $this->results[$modelKey] = $this->modelsLoader->extract($model);
         }
 
         $this->hasResolved = true;

@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions;
 
 use Illuminate\Http\Request;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -12,29 +11,29 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
 
-class SubscriptionTest extends TestCase
+final class SubscriptionTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
+            [SubscriptionServiceProvider::class],
         );
     }
 
     public function testBroadcastSubscriptionFromField(): void
     {
         $subscriptionField = 'onPostCreated';
-        $this->schema .= /** @lang GraphQL */ "
+        $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
         type Subscription {
-            ${subscriptionField}: ID
+            {$subscriptionField}: ID
         }
-        ";
+        GRAPHQL;
 
         $broadcaster = $this->createMock(SubscriptionBroadcaster::class);
         $this->app->instance(BroadcastsSubscriptions::class, $broadcaster);
@@ -47,7 +46,7 @@ class SubscriptionTest extends TestCase
             ->with(
                 $this->isInstanceOf(GraphQLSubscription::class),
                 $subscriptionField,
-                $root
+                $root,
             );
 
         Subscription::broadcast($subscriptionField, $root);
@@ -55,15 +54,14 @@ class SubscriptionTest extends TestCase
 
     public function testBroadcastProgrammaticallyRegisteredSubscription(): void
     {
-        $subscriptionRegistry = app(SubscriptionRegistry::class);
-
-        $subscription = new class() extends GraphQLSubscription {
+        $subscriptionRegistry = $this->app->make(SubscriptionRegistry::class);
+        $subscription = new class extends GraphQLSubscription {
             public function authorize(Subscriber $subscriber, Request $request): bool
             {
                 return true;
             }
 
-            public function filter(Subscriber $subscriber, $root): bool
+            public function filter(Subscriber $subscriber, mixed $root): bool
             {
                 return true;
             }
@@ -86,13 +84,13 @@ class SubscriptionTest extends TestCase
 
     public function testThrowsOnInvalidSubscriptionField(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Subscription {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         Subscription::broadcast('unknownField', []);
     }

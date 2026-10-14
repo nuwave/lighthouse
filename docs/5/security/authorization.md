@@ -3,8 +3,7 @@
 Not every user in your application may be allowed to see all data or do any action.
 You can control what they can do by enforcing authorization rules.
 
-Before you can apply authorization, make sure you cover [authentication](authentication.md) first - it's
-a prerequisite to have your users logged in before checking what they can do.
+Before you can apply authorization, make sure you cover [authentication](authentication.md) first - it's a prerequisite to have your users logged in before checking what they can do.
 
 ## Utilize the Viewer pattern
 
@@ -39,8 +38,7 @@ type Note {
 }
 ```
 
-Now, authenticated users can query for items that belong to them and are naturally
-limited to seeing just those.
+Now, authenticated users can query for items that belong to them and are naturally limited to seeing just those.
 
 ```graphql
 {
@@ -57,8 +55,7 @@ limited to seeing just those.
 ## Restrict fields through policies
 
 Lighthouse allows you to restrict field operations to a certain group of users.
-Use the [@can](../api-reference/directives.md#can) directive
-to leverage [Laravel Policies](https://laravel.com/docs/authorization) for authorization.
+Use the [@can](../api-reference/directives.md#can) directive to leverage [Laravel Policies](https://laravel.com/docs/authorization) for authorization.
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
 Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
@@ -89,12 +86,16 @@ class PostPolicy
 ### Protect specific model instances
 
 For some models, you may want to restrict access for specific instances of a model.
-Set the `query` argument to `true` to have Lighthouse fetch the queried model(s)
-before checking permissions against them:
+Set the `resolved` argument to `true` to have Lighthouse check permissions against the resolved model instances.
+
+> This will actually run the field before checking permissions, do not use in mutations.
 
 ```graphql
 type Query {
-  post(id: ID! @eq): Post @can(ability: "view", query: true) @find @softDeletes
+  post(id: ID! @eq): Post
+    @can(ability: "view", resolved: true)
+    @find
+    @softDeletes
 }
 ```
 
@@ -107,9 +108,6 @@ class PostPolicy
     }
 }
 ```
-
-Arguments with directives such as `@eq` will constrain the query builder.
-Additional constraints for [soft deleting](../eloquent/soft-deleting.md) also apply.
 
 ### Passing additional arguments
 
@@ -132,8 +130,7 @@ class PostPolicy
 }
 ```
 
-You can pass along the client given input data as arguments to the policy checks
-with the `injectArgs` argument:
+You can pass along the client given input data as arguments to the policy checks with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
@@ -151,8 +148,7 @@ class PostPolicy
 }
 ```
 
-When you combine both ways of passing arguments, the policy will be passed the `injectArgs` as
-the second parameter and the static `args` as the third parameter:
+When you combine both ways of passing arguments, the policy will be passed the `injectArgs` as the second parameter and the static `args` as the third parameter:
 
 ```php
 class PostPolicy
@@ -163,15 +159,12 @@ class PostPolicy
 
 ## Custom field restrictions
 
-For applications with role management, it is common to hide some model attributes from a
-certain group of users. At the moment, Laravel and Lighthouse offer no canonical solution
-for this.
+For applications with role management, it is common to hide some model attributes from a certain group of users.
+At the moment, Laravel and Lighthouse offer no canonical solution for this.
 
-A great way to implement something that fits your use case is to create
-[a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware).
+A great way to implement something that fits your use case is to create [a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware).
 Field middleware allows you to intercept field access and conditionally hide them.
-You can hide a field by returning `null` instead of calling the final resolver, or maybe even
-abort execution by throwing an error.
+You can hide a field by returning `null` instead of calling the final resolver, or maybe even abort execution by throwing an error.
 
 The following directive `@canAccess` is an example implementation, make sure to adapt it to your needs.
 It assumes a simple role system where a `User` has a single attribute `$role`.
@@ -208,29 +201,27 @@ GRAPHQL;
     {
         $originalResolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
-                    $requiredRole = $this->directiveArgValue('requiredRole');
-                    // Throw in case of an invalid schema definition to remind the developer
-                    if ($requiredRole === null) {
-                        throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
-                    }
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
+            $requiredRole = $this->directiveArgValue('requiredRole');
+            // Throw in case of an invalid schema definition to remind the developer
+            if ($requiredRole === null) {
+                throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
+            }
 
-                    $user = $context->user();
-                    if (
-                        // Unauthenticated users don't get to see anything
-                        ! $user
-                        // The user's role has to match have the required role
-                        || $user->role !== $requiredRole
-                    ) {
-                        return null;
-                    }
+            $user = $context->user();
+            if (
+                // Unauthenticated users don't get to see anything
+                ! $user
+                // The user's role has to match have the required role
+                || $user->role !== $requiredRole
+            ) {
+                return null;
+            }
 
-                    return $originalResolver($root, $args, $context, $resolveInfo);
-                }
-            )
-        );
+            return $originalResolver($root, $args, $context, $resolveInfo);
+        });
+
+        return $next($fieldValue);
     }
 }
 ```

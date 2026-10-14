@@ -1,8 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Scout;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Laravel\Scout\Searchable;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
@@ -10,101 +12,75 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ */
 class ScoutEnhancer
 {
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-     */
-    protected $argumentSet;
-
-    /**
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    protected $builder;
-
     /**
      * Provide the actual search value.
      *
      * @var array<Argument>
      */
-    protected $searchArguments = [];
+    protected array $searchArguments = [];
 
     /**
      * Should not be there when @search is used.
      *
      * @var array<Argument>
      */
-    protected $argumentsWithOnlyArgBuilders = [];
+    protected array $argumentsWithOnlyArgBuilders = [];
 
     /**
      * Can enhance the scout builders.
      *
      * @var array<Argument>
      */
-    protected $argumentsWithScoutBuilderDirectives = [];
+    protected array $argumentsWithScoutBuilderDirectives = [];
 
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     */
-    public function __construct(ArgumentSet $argumentSet, object $builder)
-    {
-        $this->argumentSet = $argumentSet;
-        $this->builder = $builder;
-
+    public function __construct(
+        protected ArgumentSet $argumentSet,
+        /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder */
+        protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder,
+    ) {
         $this->gather($this->argumentSet);
     }
 
     public function hasSearchArguments(): bool
     {
-        return count($this->searchArguments) > 0;
+        return $this->searchArguments !== [];
     }
 
-    public function enhanceBuilder(): ScoutBuilder
+    public function canEnhanceBuilder(): bool
     {
-        if (count($this->searchArguments) > 1) {
-            throw new ScoutException('Found more than 1 argument with @search.');
-        }
-        $searchArgument = $this->searchArguments[0];
+        return $this->hasSearchArguments()
+            || $this->builder instanceof ScoutBuilder;
+    }
 
-        if (count($this->argumentsWithOnlyArgBuilders) > 0) {
-            throw new ScoutException('Found arg builder arguments that do not work with @search');
-        }
+    public function wouldEnhanceBuilder(): bool
+    {
+        return $this->hasSearchArguments();
+    }
 
-        if (! $this->builder instanceof EloquentBuilder) {
-            throw new ScoutException('Can only get Model from \Illuminate\Database\Eloquent\Builder, got: ' . get_class($this->builder));
-        }
-        $model = $this->builder->getModel();
-
-        if (! Utils::classUsesTrait($model, Searchable::class)) {
-            throw new ScoutException('Model class ' . get_class($model) . ' does not implement trait ' . Searchable::class);
-        }
-
-        // @phpstan-ignore-next-line Can not use traits as types
-        /**
-         * @psalm-suppress UndefinedDocblockClass
-         *
-         * @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $model
-         */
-        $scoutBuilder = $model::search($searchArgument->toPlain());
-
-        /**
-         * We know this argument has this directive, because that is how we found it.
-         *
-         * @var \Nuwave\Lighthouse\Scout\SearchDirective $searchDirective
-         */
-        $searchDirective = $searchArgument
-            ->directives
-            ->first(Utils::instanceofMatcher(SearchDirective::class));
-
-        $searchDirective->search($scoutBuilder);
+    /** @param  (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter */
+    public function enhanceBuilder(?callable $directiveFilter = null): ScoutBuilder
+    {
+        $scoutBuilder = $this->builder instanceof ScoutBuilder
+            ? $this->builder
+            : $this->enhanceEloquentBuilder();
 
         foreach ($this->argumentsWithScoutBuilderDirectives as $argument) {
-            /** @var \Nuwave\Lighthouse\Scout\ScoutBuilderDirective $scoutBuilderDirective */
-            $scoutBuilderDirective = $argument
-                ->directives
-                ->first(Utils::instanceofMatcher(ScoutBuilderDirective::class));
+            foreach ($argument->directives as $directive) {
+                if (! $directive instanceof ScoutBuilderDirective) {
+                    continue;
+                }
 
-            $scoutBuilderDirective->handleScoutBuilder($scoutBuilder, $argument->toPlain());
+                if ($directiveFilter !== null && ! $directiveFilter($directive)) {
+                    continue;
+                }
+
+                $directive->handleScoutBuilder($scoutBuilder, $argument->toPlain());
+            }
         }
 
         return $scoutBuilder;
@@ -138,13 +114,53 @@ class ScoutEnhancer
             }
 
             Utils::applyEach(
-                function ($value) {
+                function ($value): void {
                     if ($value instanceof ArgumentSet) {
                         $this->gather($value);
                     }
                 },
-                $argument->value
+                $argument->value,
             );
         }
+    }
+
+    protected function enhanceEloquentBuilder(): ScoutBuilder
+    {
+        if (count($this->searchArguments) > 1) {
+            throw new ScoutException('Found more than 1 argument with @search.');
+        }
+
+        $searchArgument = $this->searchArguments[0];
+
+        if ($this->argumentsWithOnlyArgBuilders !== []) {
+            throw new ScoutException('Found arg builder arguments that do not work with @search.');
+        }
+
+        if (! $this->builder instanceof EloquentBuilder) {
+            $eloquentBuilderClass = EloquentBuilder::class;
+            $thisBuilderClass = $this->builder::class;
+            throw new ScoutException("Can only get Model from {$eloquentBuilderClass}, got: {$thisBuilderClass}.");
+        }
+
+        $model = $this->builder->getModel();
+
+        $searchableTraitClass = Searchable::class;
+        if (! Utils::classUsesTrait($model, $searchableTraitClass)) {
+            $modelClass = $model::class;
+            throw new ScoutException("Model class {$modelClass} does not implement trait {$searchableTraitClass}.");
+        }
+
+        // @phpstan-ignore-next-line Can not use traits as types
+        /** @var \Illuminate\Database\Eloquent\Model&\Laravel\Scout\Searchable $model */
+        $scoutBuilder = $model::search($searchArgument->toPlain());
+
+        $searchDirective = $searchArgument
+            ->directives
+            ->first(Utils::instanceofMatcher(SearchDirective::class));
+        assert($searchDirective instanceof SearchDirective);
+
+        $searchDirective->search($scoutBuilder);
+
+        return $scoutBuilder;
     }
 }

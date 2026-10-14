@@ -1,11 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Scout\ScoutBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class BuilderDirective extends BaseDirective implements ArgBuilderDirective, ScoutBuilderDirective, FieldBuilderDirective
 {
@@ -37,32 +42,36 @@ scalar BuilderValue
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         $resolver = $this->resolver();
 
         return $resolver($builder, $value, $this->definitionNode);
     }
 
-    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
+    public function handleScoutBuilder(ScoutBuilder $builder, mixed $value): ScoutBuilder
     {
         $resolver = $this->resolver();
 
         return $resolver($builder, $value, $this->definitionNode);
     }
 
-    public function handleFieldBuilder(object $builder): object
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         $resolver = $this->resolver();
 
         if ($this->directiveHasArgument('value')) {
             return $resolver(
                 $builder,
-                $this->directiveArgValue('value')
+                $this->directiveArgValue('value'),
+                $root,
+                $args,
+                $context,
+                $resolveInfo,
             );
         }
 
-        return $resolver($builder);
+        return $resolver($builder, null, $root, $args, $context, $resolveInfo);
     }
 
     protected function resolver(): \Closure

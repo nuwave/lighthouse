@@ -1,9 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Pagination\PaginationManipulator;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Utils;
@@ -22,35 +20,30 @@ directive @complexity(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String
+  resolver: String!
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
 
     public function complexityResolver(FieldValue $fieldValue): callable
     {
-        if ($this->directiveHasArgument('resolver')) {
-            [$className, $methodName] = $this->getMethodArgumentParts('resolver');
+        $resolver = $this->directiveArgValue('resolver');
+        assert(is_string($resolver));
 
-            $namespacedClassName = $this->namespaceClassName(
-                $className,
-                RootType::defaultNamespaces($fieldValue->getParentName())
-            );
+        [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
-            return Utils::constructResolver($namespacedClassName, $methodName);
-        }
+        $namespacedClassName = $this->namespaceClassName(
+            $className,
+            $fieldValue->parentNamespaces(),
+        );
 
-        return [static::class, 'defaultComplexityResolver'];
+        return Utils::constructResolver($namespacedClassName, $methodName);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
+    /** @param  array<string, mixed>  $args */
     public static function defaultComplexityResolver(int $childrenComplexity, array $args): int
     {
-        /**
-         * Assuming pagination, @see PaginationManipulator::countArgument().
-         */
+        /** Assuming pagination, @see PaginationManipulator::countArgument(). */
         $first = $args['first'] ?? null;
 
         $expectedNumberOfChildren = is_int($first)
@@ -59,9 +52,8 @@ GRAPHQL;
 
         return
             // Default complexity for this field itself
-            // TODO add this in v6
-            // 1 +
+            1
             // Scale children complexity by the expected number of results
-            $childrenComplexity * $expectedNumberOfChildren;
+            + $childrenComplexity * $expectedNumberOfChildren;
     }
 }

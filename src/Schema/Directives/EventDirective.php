@@ -1,23 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class EventDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
-
-    public function __construct(EventsDispatcher $eventsDispatcher)
-    {
-        $this->eventsDispatcher = $eventsDispatcher;
-    }
+    public function __construct(
+        protected EventsDispatcher $eventsDispatcher,
+    ) {}
 
     public static function definition(): string
     {
@@ -37,20 +30,18 @@ directive @event(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $eventClassName = $this->namespaceClassName(
-            $this->directiveArgValue('dispatch')
+            $this->directiveArgValue('dispatch'),
         );
 
         $fieldValue->resultHandler(function ($result) use ($eventClassName) {
             $this->eventsDispatcher->dispatch(
-                new $eventClassName($result)
+                new $eventClassName($result),
             );
 
             return $result;
         });
-
-        return $next($fieldValue);
     }
 }

@@ -1,26 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Benchmarks;
 
-class HugeResponseBench extends QueryBench
+final class HugeResponseBench extends QueryBench
 {
-    protected $schema = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  parent: Parent
-    @field(resolver: "Benchmarks\\HugeResponseBench@resolve")
-}
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
+    type Query {
+      parent: Parent
+        @field(resolver: "Benchmarks\\HugeResponseBench@resolve")
+    }
 
-type Parent {
-  name: String!
-  children: [Child!]!
-}
+    type Parent {
+      name: String!
+      children: [Child!]!
+    }
 
-type Child {
-  name: String!
-  parent: Parent!
-}
-
-GRAPHQL;
+    type Child {
+      name: String!
+      parent: Parent!
+    }
+    GRAPHQL;
 
     /**
      * Resolves parent.
@@ -50,8 +49,15 @@ GRAPHQL;
     }
 
     /**
+     * @Warmup(1)
+     *
+     * @Revs(10)
+     *
      * @Iterations(10)
-     * @OutputTimeUnit("seconds", precision=3)
+     *
+     * @ParamProviders({"providePerformanceTuning"})
+     *
+     * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark1(): void
     {
@@ -65,8 +71,15 @@ GRAPHQL;
     }
 
     /**
+     * @Warmup(1)
+     *
+     * @Revs(10)
+     *
      * @Iterations(10)
-     * @OutputTimeUnit("seconds", precision=3)
+     *
+     * @ParamProviders({"providePerformanceTuning"})
+     *
+     * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark100(): void
     {
@@ -82,8 +95,15 @@ GRAPHQL;
     }
 
     /**
+     * @Warmup(1)
+     *
+     * @Revs(10)
+     *
      * @Iterations(10)
-     * @OutputTimeUnit("seconds", precision=3)
+     *
+     * @ParamProviders({"providePerformanceTuning"})
+     *
+     * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark10k(): void
     {

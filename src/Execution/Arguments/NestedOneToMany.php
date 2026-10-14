@@ -1,45 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Closure;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToMany implements ArgResolver
 {
-    /**
-     * @var string
-     */
-    protected $relationName;
-
-    public function __construct(string $relationName)
-    {
-        $this->relationName = $relationName;
-    }
+    public function __construct(
+        protected string $relationName,
+    ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  ArgumentSet  $args
      */
-    public function __invoke($parent, $args): void
+    public function __invoke($model, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
-        $relation = $parent->{$this->relationName}();
+        $relation = $model->{$this->relationName}();
+        assert($relation instanceof HasMany || $relation instanceof MorphMany);
 
-        static::createUpdateUpsert($args, $relation);
-        static::connectDisconnect($args, $relation);
-
-        if ($args->has('delete')) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain()
-            );
-        }
-    }
-
-    public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
-    {
         if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 
@@ -66,57 +47,36 @@ class NestedOneToMany implements ArgResolver
                 $upsertModel($relation->make(), $childArgs);
             }
         }
-    }
 
-    public static function connectDisconnect(ArgumentSet $args, HasOneOrMany $relation): void
-    {
         if ($args->has('connect')) {
-            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $children = $relation
                 ->make()
                 ->whereIn(
-                    self::getLocalKeyName($relation),
-                    $args->arguments['connect']->value
+                    $relation->make()->getKeyName(),
+                    $args->arguments['connect']->value,
                 )
                 ->get();
-
-            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $relation->saveMany($children);
         }
 
         if ($args->has('disconnect')) {
-            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $children = $relation
                 ->make()
                 ->whereIn(
-                    self::getLocalKeyName($relation),
-                    $args->arguments['disconnect']->value
+                    $relation->make()->getKeyName(),
+                    $args->arguments['disconnect']->value,
                 )
                 ->get();
-
-            /** @var \Illuminate\Database\Eloquent\Model $child */
             foreach ($children as $child) {
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
             }
         }
-    }
 
-    /**
-     * TODO remove this horrible hack when we no longer support Laravel 5.6.
-     */
-    protected static function getLocalKeyName(HasOneOrMany $relation): string
-    {
-        $getLocalKeyName = Closure::bind(
-            function () {
-                /** @psalm-suppress InvalidScope */
-                // @phpstan-ignore-next-line This is a dirty hack
-                return $this->localKey;
-            },
-            $relation,
-            get_class($relation)
-        );
-
-        return $getLocalKeyName();
+        if ($args->has('delete')) {
+            $relation->getRelated()::destroy(
+                $args->arguments['delete']->toPlain(),
+            );
+        }
     }
 }

@@ -1,13 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Auth;
 
-use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -22,21 +22,15 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  */
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $auth;
-
-    public function __construct(AuthFactory $auth)
-    {
-        $this->auth = $auth;
-    }
+    public function __construct(
+        protected AuthFactory $authFactory,
+    ) {}
 
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Run authentication through one or more guards.
+Run authentication through one or more guards from `config/auth.php`.
 
 This is run per field and may allow unauthenticated
 users to still receive partial results.
@@ -53,42 +47,31 @@ directive @guard(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $previousResolver = $fieldValue->getResolver();
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $guards = $this->directiveArgValue('with', AuthServiceProvider::guards());
+            $context->setUser($this->authenticate($guards));
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                // TODO remove cast in v6
-                $with = (array) (
-                    $this->directiveArgValue('with')
-                    ?? [AuthServiceProvider::guard()]
-                );
-
-                $this->authenticate($with);
-
-                return $previousResolver($root, $args, $context, $resolveInfo);
-            }
-        );
-
-        return $next($fieldValue);
+            return $resolver($root, $args, $context, $resolveInfo);
+        });
     }
 
     /**
      * Determine if the user is logged in to any of the given guards.
      *
      * @param  array<string|null>  $guards
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
      */
-    protected function authenticate(array $guards): void
+    protected function authenticate(array $guards): Authenticatable
     {
         foreach ($guards as $guard) {
-            if ($this->auth->guard($guard)->check()) {
-                // @phpstan-ignore-next-line passing null works fine here
-                $this->auth->shouldUse($guard);
+            $user = $this->authFactory->guard($guard)->user();
 
-                return;
+            if ($user !== null) {
+                // @phpstan-ignore-next-line passing null works fine here
+                $this->authFactory->shouldUse($guard);
+
+                return $user;
             }
         }
 
@@ -99,22 +82,21 @@ GRAPHQL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
+     *
+     * @return never
      */
     protected function unauthenticated(array $guards): void
     {
-        throw new AuthenticationException(
-            AuthenticationException::MESSAGE,
-            $guards
-        );
+        throw new AuthenticationException(AuthenticationException::MESSAGE, $guards);
     }
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 }

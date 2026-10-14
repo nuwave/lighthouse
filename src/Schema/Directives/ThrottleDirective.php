@@ -1,21 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -23,21 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
-    /**
-     * @var \Illuminate\Cache\RateLimiter
-     */
-    protected $limiter;
-
-    /**
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    public function __construct(RateLimiter $limiter, Request $request)
-    {
-        $this->limiter = $limiter;
-        $this->request = $request;
-    }
+    public function __construct(
+        protected RateLimiter $limiter,
+    ) {}
 
     public static function definition(): string
     {
@@ -47,7 +32,7 @@ Sets rate limit to access the field. Does the same as ThrottleRequests Laravel M
 """
 directive @throttle(
     """
-    Named preconfigured rate limiter. Requires Laravel 8.x or later.
+    Named preconfigured rate limiter.
     """
     name: String
 
@@ -69,89 +54,68 @@ directive @throttle(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        /** @var array<int, array{key: string, maxAttempts: int, decayMinutes: float}> $limits */
-        $limits = [];
-
         $name = $this->directiveArgValue('name');
-        if (null !== $name) {
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
-            $limiter = $this->limiter->limiter($name);
+        $limiter = $name !== null ? $this->limiter->limiter($name) : null;
 
-            $limiterResponse = $limiter($this->request);
-            /**
-             * @psalm-suppress UndefinedClass
-             */
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
-            if ($limiterResponse instanceof Unlimited) {
-                return $next($fieldValue);
+        $prefix = $this->directiveArgValue('prefix', '');
+        $maxAttempts = $this->directiveArgValue('maxAttempts', 60);
+        $decayMinutes = $this->directiveArgValue('decayMinutes', 1.0);
+
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $name, $limiter, $prefix, $maxAttempts, $decayMinutes): mixed {
+            $request = $context->request();
+            if ($request === null) {
+                return $resolver($root, $args, $context, $resolveInfo);
             }
 
-            if ($limiterResponse instanceof Response) {
-                throw new DirectiveException(
-                    "Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse)
+            if ($limiter !== null) {
+                $limiterResponse = $limiter($request);
+                if ($limiterResponse instanceof Unlimited) {
+                    return $resolver($root, $args, $context, $resolveInfo);
+                }
+
+                if ($limiterResponse instanceof Response) {
+                    throw new DefinitionException("Expected named limiter {$name} to return an array, got instance of " . $limiterResponse::class);
+                }
+
+                foreach (Arr::wrap($limiterResponse) as $limit) {
+                    $this->handleLimit(
+                        sha1($name . $limit->key),
+                        $limit->maxAttempts,
+                        // Laravel 11 switched to using seconds
+                        $limit->decayMinutes ?? $limit->decaySeconds / 60,
+                        "{$resolveInfo->parentType}.{$resolveInfo->fieldName}",
+                    );
+                }
+            } else {
+                $this->handleLimit(
+                    sha1($prefix . $request->ip()),
+                    $maxAttempts,
+                    $decayMinutes,
+                    "{$resolveInfo->parentType}.{$resolveInfo->fieldName}",
                 );
             }
 
-            foreach (Arr::wrap($limiterResponse) as $limit) {
-                $limits[] = [
-                    'key' => sha1($name . $limit->key),
-                    'maxAttempts' => $limit->maxAttempts,
-                    'decayMinutes' => $limit->decayMinutes,
-                ];
-            }
-        } else {
-            $limits[] = [
-                'key' => sha1($this->directiveArgValue('prefix', '') . $this->request->ip()),
-                'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
-                'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
-            ];
-        }
-
-        $resolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
-                foreach ($limits as $limit) {
-                    $this->handleLimit(
-                        $limit['key'],
-                        $limit['maxAttempts'],
-                        $limit['decayMinutes']
-                    );
-                }
-
-                return $resolver($root, $args, $context, $resolveInfo);
-            }
-        );
-
-        return $next($fieldValue);
+            return $resolver($root, $args, $context, $resolveInfo);
+        });
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $name = $this->directiveArgValue('name');
-        if (null !== $name) {
-            if (AppVersion::below(8.0)) {
-                throw new DefinitionException('Named limiter requires Laravel 8.x or later');
-            }
-
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
-            $limiter = $this->limiter->limiter($name);
-            // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
-            if (is_null($limiter)) {
-                throw new DefinitionException("Named limiter {$name} is not found.");
-            }
+        if ($name !== null) {
+            // @phpstan-ignore-next-line limiter() can actually return null, some Laravel versions lie
+            $this->limiter->limiter($name)
+                ?? throw new DefinitionException("Named limiter {$name} is not found.");
         }
     }
 
-    /**
-     * Checks throttling limit.
-     */
-    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes): void
+    /** Checks throttling limit and records this attempt. */
+    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes, string $fieldReference): void
     {
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-            throw new RateLimitException();
+            throw new RateLimitException($fieldReference);
         }
 
         $this->limiter->hit($key, (int) ($decayMinutes * 60));

@@ -1,6 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\WhereConditions;
+
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class WhereConditionsDirective extends WhereConditionsBaseDirective
 {
@@ -12,30 +16,30 @@ Add a dynamically client-controlled WHERE condition to a fields query.
 """
 directive @whereConditions(
     """
-    Restrict the allowed column names to a well-defined enum.
+    Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
-    Use an existing enum type to restrict the allowed columns to a well-defined enum.
+    Use an existing enumeration type to restrict the allowed columns to a predefined list.
     This allows you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
 
     """
-    Restrict the allowed relation names to a well-defined enum.
+    Restrict the allowed relation names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `relationsEnum` argument.
+    Mutually exclusive with `relationsEnum`.
     """
     relations: [String!]
 
     """
-    Use an existing enum type to restrict the allowed relations to a well-defined enum.
+    Use an existing enumeration type to restrict the allowed relations to a predefined list.
     This allows you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `relations` argument.
+    Mutually exclusive with `relations`.
     """
     relationsEnum: String
 
@@ -55,12 +59,10 @@ directive @whereConditions(
 GRAPHQL;
     }
 
-    /**
-     * @param  array<string, mixed>|null  $value
-     */
-    public function handleBuilder($builder, $value): object
+    /** @param  array<string, mixed>|null  $value */
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 

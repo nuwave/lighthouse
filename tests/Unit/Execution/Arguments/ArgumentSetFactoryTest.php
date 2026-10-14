@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution\Arguments;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
@@ -13,15 +14,15 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class ArgumentSetFactoryTest extends TestCase
+final class ArgumentSetFactoryTest extends TestCase
 {
     public function testSimpleField(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: Int): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => 123,
@@ -30,17 +31,16 @@ class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame(123, $bar->value);
     }
 
     public function testNullableList(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: [Int!]): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => null,
@@ -49,13 +49,12 @@ class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
     public function testItsListsAllTheWayDown(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar:
                 # Level 1
@@ -73,26 +72,25 @@ class ArgumentSetFactoryTest extends TestCase
                 ]
             ): Int
         }
-        ';
+        GRAPHQL;
 
-        $barValue
-            // Level 1
-            = [
-                // Level 2
+        // Level 1
+        $barValue = [
+            // Level 2
+            [
+                // Level 3
                 [
-                    // Level 3
+                    // Level 4
                     [
-                        // Level 4
-                        [
-                            1, 2,
-                        ],
-                        [
-                            3, null,
-                        ],
+                        1, 2,
                     ],
-                    null,
+                    [
+                        3, null,
+                    ],
                 ],
-            ];
+                null,
+            ],
+        ];
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => $barValue,
@@ -100,32 +98,25 @@ class ArgumentSetFactoryTest extends TestCase
 
         $this->assertCount(1, $argumentSet->arguments);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $bar */
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame($barValue, $bar->value);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $firstLevel */
         $firstLevel = $bar->type;
         $this->assertInstanceOf(ListType::class, $firstLevel);
         $this->assertFalse($firstLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $secondLevel */
         $secondLevel = $firstLevel->type;
         $this->assertInstanceOf(ListType::class, $secondLevel);
         $this->assertTrue($secondLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $thirdLevel */
         $thirdLevel = $secondLevel->type;
         $this->assertInstanceOf(ListType::class, $thirdLevel);
         $this->assertFalse($thirdLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $fourthLevel */
         $fourthLevel = $thirdLevel->type;
         $this->assertInstanceOf(ListType::class, $fourthLevel);
         $this->assertTrue($fourthLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\NamedType $finalLevel */
         $finalLevel = $fourthLevel->type;
         $this->assertInstanceOf(NamedType::class, $finalLevel);
         $this->assertSame(Type::INT, $finalLevel->name);
@@ -134,7 +125,7 @@ class ArgumentSetFactoryTest extends TestCase
 
     public function testNullableInputObject(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: Bar): Int
         }
@@ -142,7 +133,7 @@ class ArgumentSetFactoryTest extends TestCase
         input Bar {
             baz: ID
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => null,
@@ -151,17 +142,16 @@ class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
     public function testWithUndefined(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: ID): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([]);
 
@@ -170,29 +160,23 @@ class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->argumentsWithUndefined());
 
         $bar = $argumentSet->argumentsWithUndefined()['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
-    protected function rootQueryArgumentSet(array $args): ArgumentSet
+    /** @param  array<string, mixed>  $args */
+    private function rootQueryArgumentSet(array $args): ArgumentSet
     {
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
         $fields = $queryType->fields;
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fooField */
         $fooField = ASTHelper::firstByName($fields, 'foo');
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fooField);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
         $factory = $this->app->make(ArgumentSetFactory::class);
 
         return $factory->wrapArgs($fooField, $args);

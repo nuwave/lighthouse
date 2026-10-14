@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation\Types;
 
@@ -10,15 +10,9 @@ use GraphQL\Type\Definition\ScalarType;
  */
 class FieldSet extends ScalarType
 {
-    public function serialize($value)
-    {
-    }
+    public function serialize(mixed $value): void {}
 
-    public function parseValue($value)
-    {
-    }
+    public function parseValue(mixed $value): void {}
 
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
-    {
-    }
+    public function parseLiteral(Node $valueNode, ?array $variables = null): void {}
 }

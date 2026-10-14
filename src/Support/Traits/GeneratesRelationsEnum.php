@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Support\Str;
@@ -19,25 +20,21 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
  */
 trait GeneratesRelationsEnum
 {
-    /**
-     * Check whether the directive constrains allowed relations.
-     */
+    /** Check whether the directive constrains allowed relations. */
     protected function hasAllowedRelations(): bool
     {
-        $hasRelations = null !== $this->directiveArgValue('relations');
-        $hasRelationsEnum = null !== $this->directiveArgValue('relationsEnum');
+        $hasRelations = ! is_null($this->directiveArgValue('relations'));
+        $hasRelationsEnum = ! is_null($this->directiveArgValue('relationsEnum'));
 
         if ($hasRelations && $hasRelationsEnum) {
-            throw new DefinitionException(
-                "The @{$this->name()} directive can only have one of the following arguments: `relations`, `relationsEnum`."
-            );
+            throw new DefinitionException("The @{$this->name()} directive can only have one of the following arguments: `relations`, `relationsEnum`.");
         }
 
         return $hasRelations || $hasRelationsEnum;
     }
 
     /**
-     * Generate the enum type for the list of allowed relations.
+     * Generate the enumeration type for the list of allowed relations.
      *
      * @return string the name of the used enum
      */
@@ -45,51 +42,52 @@ trait GeneratesRelationsEnum
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): string {
         $relationsEnum = $this->directiveArgValue('relationsEnum');
-
-        if (null !== $relationsEnum) {
+        if (! is_null($relationsEnum)) {
             return $relationsEnum;
         }
 
         $allowedRelationsEnumName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . 'Relation';
 
-        $documentAST->setTypeDefinition(
-            static::createAllowedRelationsEnum(
-                $argDefinition,
-                $parentField,
-                $parentType,
-                $this->directiveArgValue('relations'),
-                $allowedRelationsEnumName
-            )
-        );
+        $documentAST
+            ->setTypeDefinition(
+                static::createAllowedRelationsEnum(
+                    $argDefinition,
+                    $parentField,
+                    $parentType,
+                    $this->directiveArgValue('relations'),
+                    $allowedRelationsEnumName,
+                ),
+            );
 
         return $allowedRelationsEnumName;
     }
 
     /**
-     * Create the enum that holds the allowed relations.
+     * Create the Enum that holds the allowed relations.
      *
      * @param  array<mixed, string>  $allowedRelations
      */
     protected function createAllowedRelationsEnum(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         array $allowedRelations,
-        string $allowedRelationsEnumName
+        string $allowedRelationsEnumName,
     ): EnumTypeDefinitionNode {
         $enumValues = array_map(
-            function (string $relationName): string {
-                $separatedRelations = str_replace('.', '__', $relationName);
-                $key = strtoupper(
-                    Str::snake($separatedRelations)
+            static function (string $relationName): string {
+                $enumName = strtoupper(
+                    Str::snake(str_replace('.', '__', $relationName)),
                 );
 
-                return "{$key} @enum(value: \"{$relationName}\")";
+                return /** @lang GraphQL */ <<<GRAPHQL
+{$enumName} @enum(value: "{$relationName}")
+GRAPHQL;
             },
-            $allowedRelations
+            $allowedRelations,
         );
 
         $enumValuesString = implode("\n", $enumValues);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
@@ -11,13 +11,13 @@ class DateTimeTz extends DateScalar
         return $carbon->toIso8601String();
     }
 
-    protected function parse($value): Carbon
+    protected function parse(string $value): Carbon
     {
         // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
         return Carbon::createFromFormat(
             // https://www.php.net/manual/en/class.datetimeinterface.php#datetime.constants.iso8601
             Carbon::ATOM,
-            $value
+            $value,
         );
     }
 }

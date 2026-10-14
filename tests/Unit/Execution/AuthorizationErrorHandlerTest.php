@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution;
 
@@ -8,17 +8,17 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\AuthorizationErrorHandler;
 use Tests\TestCase;
 
-class AuthorizationErrorHandlerTest extends TestCase
+final class AuthorizationErrorHandlerTest extends TestCase
 {
     public function testWrapsLaravelAuthorizationException(): void
     {
         $handler = new AuthorizationErrorHandler();
 
         $authorizationException = new LaravelAuthorizationException();
-        $original = new Error('foo', null, null, [], null, $authorizationException);
+        $original = new Error(message: 'foo', previous: $authorizationException);
 
         $error = null;
-        $next = function (Error $e) use (&$error) {
+        $next = static function (Error $e) use (&$error): void {
             $error = $e;
         };
 

@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class InjectDirectiveDBTest extends DBTestCase
+final class InjectDirectiveDBTest extends DBTestCase
 {
     public function testInjectDataFromContextIntoArgs(): void
     {
@@ -15,7 +15,7 @@ class InjectDirectiveDBTest extends DBTestCase
         $this->mockResolver()
             ->with(null, ['user_id' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: Int!
         }
@@ -25,14 +25,14 @@ class InjectDirectiveDBTest extends DBTestCase
                 @inject(context: "user.id", name: "user_id")
                 @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             me {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 }

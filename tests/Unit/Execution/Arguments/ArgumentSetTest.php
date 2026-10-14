@@ -1,16 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution\Arguments;
 
-use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Tests\TestCase;
 
-class ArgumentSetTest extends TestCase
+final class ArgumentSetTest extends TestCase
 {
-    public function testHasArgument(): void
+    public function testHas(): void
     {
         $set = new ArgumentSet();
 
@@ -31,6 +29,27 @@ class ArgumentSetTest extends TestCase
         $this->assertTrue($set->has('foo'));
     }
 
+    public function testExists(): void
+    {
+        $set = new ArgumentSet();
+
+        $this->assertFalse($set->exists('foo'));
+
+        $set->arguments['foo'] = new Argument();
+        $this->assertTrue($set->exists('foo'));
+
+        $arg = new Argument();
+        $arg->value = null;
+        $set->arguments['foo'] = $arg;
+        $this->assertTrue($set->exists('foo'));
+
+        $arg->value = false;
+        $this->assertTrue($set->exists('foo'));
+
+        $arg->value = 'foobar';
+        $this->assertTrue($set->exists('foo'));
+    }
+
     public function testSingleFieldToArray(): void
     {
         $foo = new Argument();
@@ -44,7 +63,7 @@ class ArgumentSetTest extends TestCase
             [
                 'foo' => $fooValue,
             ],
-            $argumentSet->toArray()
+            $argumentSet->toArray(),
         );
     }
 
@@ -69,7 +88,7 @@ class ArgumentSetTest extends TestCase
                     'foo' => $fooValue,
                 ],
             ],
-            $argumentSet->toArray()
+            $argumentSet->toArray(),
         );
     }
 
@@ -99,7 +118,7 @@ class ArgumentSetTest extends TestCase
                     ],
                 ],
             ],
-            $argumentSet->toArray()
+            $argumentSet->toArray(),
         );
     }
 
@@ -108,7 +127,11 @@ class ArgumentSetTest extends TestCase
         $set = new ArgumentSet();
         $set->addValue('foo', 42);
 
-        $this->assertSame(42, $set->arguments['foo']->value);
+        $argument = $set->arguments['foo'];
+        $this->assertSame(42, $argument->value);
+        $this->assertNull($argument->type);
+        $this->assertEmpty($argument->directives);
+        $this->assertNull($argument->resolver);
     }
 
     public function testAddValueDeep(): void
@@ -116,72 +139,18 @@ class ArgumentSetTest extends TestCase
         $set = new ArgumentSet();
         $set->addValue('foo.bar', 42);
 
-        $foo = $set->arguments['foo']->value;
+        $foo = $set->arguments['foo'];
+        $this->assertNull($foo->type);
+        $this->assertEmpty($foo->directives);
+        $this->assertNull($foo->resolver);
 
-        $this->assertSame(42, $foo->arguments['bar']->value);
-    }
+        $fooValue = $foo->value;
+        $this->assertInstanceOf(ArgumentSet::class, $fooValue);
 
-    public function testRenameInput(): void
-    {
-        $firstName = new Argument();
-        $firstName->value = 'Michael';
-        $firstName->directives = collect([$this->makeRenameDirective('first_name')]);
-
-        $argumentSet = new ArgumentSet();
-        $argumentSet->arguments = [
-            'firstName' => $firstName,
-        ];
-
-        $renamedSet = $argumentSet->rename();
-
-        $this->assertSame(
-            [
-                'first_name' => $firstName,
-            ],
-            $renamedSet->arguments
-        );
-    }
-
-    public function testRenameNested(): void
-    {
-        $secondLevelArg = new Argument();
-        $secondLevelArg->value = 'Michael';
-        $secondLevelArg->directives = collect([$this->makeRenameDirective('second_internal')]);
-
-        $secondLevelSet = new ArgumentSet();
-        $secondLevelSet->arguments = [
-            'secondExternal' => $secondLevelArg,
-        ];
-
-        $firstLevelArg = new Argument();
-        $firstLevelArg->value = $secondLevelSet;
-        $firstLevelArg->directives = collect([$this->makeRenameDirective('first_internal')]);
-
-        $firstLevelSet = new ArgumentSet();
-        $firstLevelSet->arguments = [
-            'firstExternal' => $firstLevelArg,
-        ];
-
-        $renamedFirstLevel = $firstLevelSet->rename();
-
-        $renamedSecondLevel = $renamedFirstLevel->arguments['first_internal']->value;
-        $this->assertSame(
-            [
-                'second_internal' => $secondLevelArg,
-            ],
-            $renamedSecondLevel->arguments
-        );
-    }
-
-    protected function makeRenameDirective(string $attribute): RenameDirective
-    {
-        $renameDirective = new RenameDirective();
-        $renameDirective->hydrate(
-            Parser::constDirective(/** @lang GraphQL */ "@rename(attribute: \"$attribute\")"),
-            // We require some placeholder for the directive definition to sit on
-            Parser::fieldDefinition(/** @lang GraphQL */ 'placeholder: ID')
-        );
-
-        return $renameDirective;
+        $bar = $fooValue->arguments['bar'];
+        $this->assertSame(42, $bar->value);
+        $this->assertNull($bar->type);
+        $this->assertEmpty($bar->directives);
+        $this->assertNull($bar->resolver);
     }
 }

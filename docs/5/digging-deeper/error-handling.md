@@ -1,30 +1,25 @@
 # Error Handling
 
-Most of the error handling in Lighthouse is pretty closely based upon **webonyx/graphql-php**,
-so you can find a lot of valuable information [in their documentation](https://webonyx.github.io/graphql-php/error-handling).
+Most of the error handling in Lighthouse is pretty closely based upon **webonyx/graphql-php**.
+You can find a lot of valuable information [in their documentation](https://webonyx.github.io/graphql-php/error-handling).
 
 ## User-friendly Errors
 
-In a production setting, error messages should not be shown to the user by default
-to prevent information leaking. In some cases however, you may want to display an
-explicit error message to the user.
+In a production setting, error messages should not be shown to the user by default to prevent information leaking.
+In some cases however, you may want to display an explicit error message to the user.
 
-**webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface, that can
-be implemented by Exceptions to control how they are rendered to the client.
+**webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface.
+Can be implemented by Exceptions to control how they are rendered to the client.
 
 Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/error-handling) to learn more.
 
 ## Additional Error Information
 
-The interface [`\Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`](https://github.com/nuwave/lighthouse/blob/master/src/Exceptions/RendersErrorsExtensions.php)
-may be extended to add more information than just an error message to the rendered error output.
+The interface [`\Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`](https://github.com/nuwave/lighthouse/blob/master/src/Exceptions/RendersErrorsExtensions.php) may be extended to add more information than just an error message to the rendered error output.
 
-Let's say you want to have a custom exception type that contains information about
-the reason the exception was thrown.
+This custom exception contains information about the reason the exception was thrown:
 
 ```php
-<?php
-
 namespace App\Exceptions;
 
 use Exception;
@@ -46,9 +41,6 @@ class CustomException extends Exception implements RendersErrorsExtensions
 
     /**
      * Returns true when exception message is safe to be displayed to a client.
-     *
-     * @api
-     * @return bool
      */
     public function isClientSafe(): bool
     {
@@ -84,12 +76,9 @@ class CustomException extends Exception implements RendersErrorsExtensions
 }
 ```
 
-Now you can just throw that Exception somewhere in your code, for example your resolver,
-and it will display additional error output.
+Now you can just throw that Exception somewhere in your code, for example your resolver, and it will display additional error output.
 
 ```php
-<?php
-
 namespace App\GraphQL\Queries;
 
 use App\Exceptions\CustomException;
@@ -147,15 +136,13 @@ Add them to your `lighthouse.php` config file, for example:
 An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
 
 ```php
-<?php
-
 namespace App\GraphQL;
 
 use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
-class ExtensionErrorHandler implements ErrorHandler
+final class ExtensionErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {
@@ -175,11 +162,9 @@ class ExtensionErrorHandler implements ErrorHandler
 
 ## Partial Errors
 
-As a GraphQL query may return a partial result, you may not always want to abort
-execution immediately after an error occurred.
+As a GraphQL query may return a partial result, you may not always want to abort execution immediately after an error occurred.
 
-Use the [`ErrorPool`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorPool.php)
-when you want to collect multiple errors before returning a result.
+Use the [`ErrorPool`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorPool.php) when you want to collect multiple errors before returning a result.
 
 ```php
 try {

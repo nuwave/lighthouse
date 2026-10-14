@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\GlobalId;
 
@@ -9,10 +9,5 @@ class GlobalIdException extends \Exception implements ClientAware
     public function isClientSafe(): bool
     {
         return true;
-    }
-
-    public function getCategory(): string
-    {
-        return 'global-id';
     }
 }

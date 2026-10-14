@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -7,38 +7,39 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class LazyLoadDirectiveTest extends DBTestCase
+final class LazyLoadDirectiveTest extends DBTestCase
 {
     public function testLazyLoadRequiresRelationArgument(): void
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @lazyLoad
         }
-        ');
+        GRAPHQL);
     }
 
     public function testLazyLoadRelationArgumentMustNotBeEmptyList(): void
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @lazyLoad(relations: [])
         }
-        ');
+        GRAPHQL);
     }
 
     public function testLazyLoadRelationsOnConnections(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
+        /** @var User $user */
         $user = factory(User::class)->create();
 
-        $user->tasks()->saveMany(factory(Task::class, 3)->make());
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks: [Task!]!
                 @lazyLoad(relations: ["user"])
@@ -47,26 +48,80 @@ class LazyLoadDirectiveTest extends DBTestCase
 
         type Task {
             id: ID!
-            user: User!
+            userLoaded: Boolean! @method
         }
 
         type Query {
             user: User @first
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
-                tasks(first: 3) {
+                tasks(first: 1) {
                     edges {
                         node {
-                            id
+                            userLoaded
                         }
                     }
                 }
             }
         }
-        ');
+        GRAPHQL)->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'userLoaded' => true,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testLazyLoadRelationsOnPaginate(): void
+    {
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            tasks: [Task!]! @hasMany
+            tasksLoaded: Boolean! @method
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate @lazyLoad(relations: ["tasks"])
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(first: 1) {
+                data {
+                    tasksLoaded
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        [
+                            'tasksLoaded' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

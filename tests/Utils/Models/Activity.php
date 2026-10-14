@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $id
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Foreign keys
  * @property int $activity_id
@@ -24,13 +24,15 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content
  * @property-read \Tests\Utils\Models\User $user
  */
-class Activity extends Model
+final class Activity extends Model
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, $this> */
     public function content(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
