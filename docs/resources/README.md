@@ -23,6 +23,7 @@
 ## Example Projects
 
 - [nuwave/lighthouse-example](https://github.com/nuwave/lighthouse-example)
+  - [`sanctum` branch](https://github.com/nuwave/lighthouse-example/tree/sanctum): session authentication with Laravel Sanctum
 
 ## Recommended Packages
 

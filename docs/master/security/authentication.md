@@ -63,6 +63,8 @@ Note that Sanctum requires you to send an CSRF token as [header](https://laravel
 
 When using [mll-lab/laravel-graphiql](https://github.com/mll-lab/laravel-graphiql), follow the [instructions to add a CSRF token](https://github.com/mll-lab/laravel-graphiql#configure-session-authentication).
 
+The [`sanctum` branch of nuwave/lighthouse-example](https://github.com/nuwave/lighthouse-example/tree/sanctum) shows a complete setup with session authentication.
+
 ## Guard selected fields
 
 Use the [@guard](../api-reference/directives.md#guard) directive to require authentication for a single field.
