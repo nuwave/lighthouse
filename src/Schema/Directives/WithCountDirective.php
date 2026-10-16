@@ -5,6 +5,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
@@ -63,5 +65,11 @@ GRAPHQL;
             $this->relation(),
             $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo),
         );
+    }
+
+    protected function storeLoadedResult(Model $parent, mixed $result): void
+    {
+        // Same attribute name as CountModelsLoader::extractCount() reads
+        $parent->setAttribute(Str::snake("{$this->relation()}_count"), $result);
     }
 }

@@ -9,6 +9,7 @@ use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -416,5 +417,55 @@ final class WithDirectiveTest extends DBTestCase
             foo: Int @with(relation: "tasks")
         }
         GRAPHQL);
+    }
+
+    public function testEagerLoadsRelationOntoEveryInstanceOfTheSameModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            roles: [Role!]! @all
+        }
+
+        type Role {
+            users: [User!]! @belongsToMany
+        }
+
+        type User {
+            tasksLoaded: Boolean!
+                @with(relation: "tasks")
+                @method
+        }
+        GRAPHQL;
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        // The same user under two roles is hydrated as two separate instances
+        $user->roles()->attach(factory(Role::class, 2)->create());
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            roles {
+                users {
+                    tasksLoaded
+                }
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'roles' => [
+                    [
+                        'users' => [
+                            ['tasksLoaded' => true],
+                        ],
+                    ],
+                    [
+                        'users' => [
+                            ['tasksLoaded' => true],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

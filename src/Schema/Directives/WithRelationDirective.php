@@ -25,9 +25,21 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
         $fieldValue->wrapResolver(
             fn (callable $resolver): \Closure => fn (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): SyncPromise => $this
                 ->loadRelation($parent, $args, $context, $resolveInfo)
-                ->then(static fn (): mixed => $resolver($parent, $args, $context, $resolveInfo)),
+                ->then(function (mixed $result) use ($resolver, $parent, $args, $context, $resolveInfo): mixed {
+                    $this->storeLoadedResult($parent, $result);
+
+                    return $resolver($parent, $args, $context, $resolveInfo);
+                }),
         );
     }
+
+    /**
+     * Store the batch loaded result on the parent the resolver receives.
+     *
+     * The batch loader keeps a single instance per model key and loads onto that one only,
+     * so another instance of the same model reached elsewhere in the result would miss it.
+     */
+    protected function storeLoadedResult(Model $parent, mixed $result): void {}
 
     /** @param  array<string, mixed>  $args */
     protected function loadRelation(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred
