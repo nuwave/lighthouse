@@ -36,7 +36,7 @@ considered @shareable and the directive is not required in the corresponding sub
 
 https://www.apollographql.com/docs/federation/federated-types/federated-directives#shareable
 """
-directive @shareable on FIELD_DEFINITION | OBJECT
+directive @shareable repeatable on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 }
