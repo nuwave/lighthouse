@@ -12,7 +12,6 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Tests\Utils\Models\Role;
 
 abstract class WithRelationDirective extends BaseDirective implements FieldMiddleware
 {

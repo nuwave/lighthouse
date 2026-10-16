@@ -9,6 +9,7 @@ use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
