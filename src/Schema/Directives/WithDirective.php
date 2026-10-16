@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader;
@@ -51,5 +52,11 @@ GRAPHQL;
             $this->relation(),
             $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo),
         );
+    }
+
+    protected function hydrate(Model $parent, mixed $result): void
+    {
+        // The loader returns the first level of a dotted relation, which holds the nested ones
+        $parent->setRelation(explode('.', $this->relation())[0], $result);
     }
 }
