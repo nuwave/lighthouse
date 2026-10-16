@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Tests\Utils\Models\Role;
 
 abstract class WithRelationDirective extends BaseDirective implements FieldMiddleware
 {
@@ -26,7 +27,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
             fn (callable $resolver): \Closure => fn (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): SyncPromise => $this
                 ->loadRelation($parent, $args, $context, $resolveInfo)
                 ->then(function (mixed $result) use ($resolver, $parent, $args, $context, $resolveInfo): mixed {
-                    $this->hydrate($parent, $result);
+                    $this->storeLoadedResult($parent, $result);
 
                     return $resolver($parent, $args, $context, $resolveInfo);
                 }),
@@ -39,7 +40,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
      * The batch loader keeps a single instance per model key and loads onto that one only,
      * so another instance of the same model reached elsewhere in the result would miss it.
      */
-    protected function hydrate(Model $parent, mixed $result): void {}
+    protected function storeLoadedResult(Model $parent, mixed $result): void {}
 
     /** @param  array<string, mixed>  $args */
     protected function loadRelation(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred

@@ -54,7 +54,7 @@ GRAPHQL;
         );
     }
 
-    protected function hydrate(Model $parent, mixed $result): void
+    protected function storeLoadedResult(Model $parent, mixed $result): void
     {
         // The loader returns the first level of a dotted relation, which holds the nested ones
         $parent->setRelation(explode('.', $this->relation())[0], $result);

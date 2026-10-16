@@ -65,9 +65,9 @@ GRAPHQL;
             $this->relation(),
             $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo),
         );
-    }    
+    }
 
-    protected function hydrate(Model $parent, mixed $result): void
+    protected function storeLoadedResult(Model $parent, mixed $result): void
     {
         // Same attribute name as CountModelsLoader::extractCount() reads
         $parent->setAttribute(Str::snake("{$this->relation()}_count"), $result);
