@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Comment;
@@ -51,6 +52,38 @@ final class WithDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'tasksLoaded' => true,
+                ],
+            ],
+        ]);
+    }
+
+    public function testOuterResultHandlerReceivesValueAfterEagerLoading(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            user: User @first
+        }
+
+        type User {
+            id: ID!
+                @globalId
+                @with(relation: "tasks")
+        }
+        GRAPHQL;
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            user {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'user' => [
+                    'id' => $this->app->make(GlobalId::class)->encode('User', $user->id),
                 ],
             ],
         ]);
