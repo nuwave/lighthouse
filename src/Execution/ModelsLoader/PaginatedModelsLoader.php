@@ -54,10 +54,12 @@ class PaginatedModelsLoader implements ModelsLoader
     {
         $first = $this->paginationArgs->first;
 
-        $parentGroups = $first === null
-            ? $this->groupParentsByConstraints($parents)
-            // Each parent is limited separately
-            : $parents->toBase()->map(static fn (Model $model): array => [$model]);
+        $parentGroups = new Collection(
+            $first === null
+                ? $this->groupParentsByConstraints($parents)
+                // Each parent is limited separately
+                : array_map(static fn (Model $model): array => [$model], $parents->all()),
+        );
 
         $relations = $parentGroups
             ->map(function (array $models) use ($parents, $parentGroups, $first): Relation {
@@ -116,12 +118,12 @@ class PaginatedModelsLoader implements ModelsLoader
      *
      * @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $parents
      *
-     * @return \Illuminate\Support\Collection<int, list<\Illuminate\Database\Eloquent\Model>>
+     * @return list<list<\Illuminate\Database\Eloquent\Model>>
      */
-    protected function groupParentsByConstraints(EloquentCollection $parents): Collection
+    protected function groupParentsByConstraints(EloquentCollection $parents): array
     {
         if (! $this->decorationDependsOnParent) {
-            return new Collection([array_values($parents->all())]);
+            return [array_values($parents->all())];
         }
 
         /** @var array<string, list<\Illuminate\Database\Eloquent\Model>> $groups */
@@ -139,7 +141,7 @@ class PaginatedModelsLoader implements ModelsLoader
             $groups[serialize([$query->toSql(), $bindings])][] = $model;
         }
 
-        return new Collection(array_values($groups));
+        return array_values($groups);
     }
 
     /**
