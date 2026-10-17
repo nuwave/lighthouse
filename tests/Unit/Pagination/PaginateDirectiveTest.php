@@ -667,6 +667,161 @@ GRAPHQL,
         GRAPHQL)->assertGraphQLErrorMessage('Expected value of type "Int!", found null.');
     }
 
+    public function testAllowUnlimitedMakesFirstNullable(): void
+    {
+        $queryType = $this
+            ->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                paginated: [User!]! @paginate(allowUnlimited: true)
+                simple: [User!]! @paginate(type: SIMPLE, allowUnlimited: true)
+                connection: [User!]! @paginate(type: CONNECTION, allowUnlimited: true)
+                withDefaultCount: [User!]! @paginate(allowUnlimited: true, defaultCount: 10)
+                limited: [User!]! @paginate
+            }
+
+            type User {
+                id: ID!
+            }
+            GRAPHQL)
+            ->getQueryType();
+        $this->assertInstanceOf(ObjectType::class, $queryType);
+
+        foreach (['paginated', 'simple', 'connection', 'withDefaultCount'] as $fieldName) {
+            $firstArg = $queryType->getField($fieldName)->getArg('first');
+            $this->assertInstanceOf(Argument::class, $firstArg);
+            $this->assertSame('Int', $firstArg->getType()->toString());
+            $this->assertSame('Limits number of fetched items. Pass `null` to fetch all items.', $firstArg->description);
+        }
+
+        $withDefaultCountFirstArg = $queryType->getField('withDefaultCount')->getArg('first');
+        $this->assertInstanceOf(Argument::class, $withDefaultCountFirstArg);
+        $this->assertSame(10, $withDefaultCountFirstArg->defaultValue);
+
+        $limitedFirstArg = $queryType->getField('limited')->getArg('first');
+        $this->assertInstanceOf(Argument::class, $limitedFirstArg);
+        $this->assertSame('Int!', $limitedFirstArg->getType()->toString());
+    }
+
+    public function testAllowUnlimitedFromConfig(): void
+    {
+        config(['lighthouse.pagination.allow_unlimited' => true]);
+
+        $queryType = $this
+            ->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                unlimited: [User!]! @paginate
+                unlimitedWithExplicitNull: [User!]! @paginate(allowUnlimited: null)
+                limited: [User!]! @paginate(allowUnlimited: false)
+            }
+
+            type User {
+                id: ID!
+            }
+            GRAPHQL)
+            ->getQueryType();
+        $this->assertInstanceOf(ObjectType::class, $queryType);
+
+        foreach (['unlimited', 'unlimitedWithExplicitNull'] as $fieldName) {
+            $unlimitedFirstArg = $queryType->getField($fieldName)->getArg('first');
+            $this->assertInstanceOf(Argument::class, $unlimitedFirstArg);
+            $this->assertSame('Int', $unlimitedFirstArg->getType()->toString());
+        }
+
+        $limitedFirstArg = $queryType->getField('limited')->getArg('first');
+        $this->assertInstanceOf(Argument::class, $limitedFirstArg);
+        $this->assertSame('Int!', $limitedFirstArg->getType()->toString());
+    }
+
+    public function testThrowsWhenAllowingUnlimitedWithMaxCount(): void
+    {
+        $this->expectExceptionObject(new DefinitionException('Can not allow unlimited results on Query.users when the maximum count is 10, set either `allowUnlimited: false` or `maxCount: null`.'));
+
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true, maxCount: 10)
+        }
+
+        type User {
+            id: ID!
+        }
+        GRAPHQL);
+    }
+
+    public function testThrowsWhenAllowingUnlimitedWithMaxCountFromConfig(): void
+    {
+        config(['lighthouse.pagination.max_count' => 10]);
+
+        $this->expectExceptionObject(new DefinitionException('Can not allow unlimited results on Query.users when the maximum count is 10, set either `allowUnlimited: false` or `maxCount: null`.'));
+
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true)
+        }
+
+        type User {
+            id: ID!
+        }
+        GRAPHQL);
+    }
+
+    public function testAllowUnlimitedOverridingMaxCountFromConfig(): void
+    {
+        config(['lighthouse.pagination.max_count' => 10]);
+
+        $queryType = $this
+            ->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                users: [User!]! @paginate(allowUnlimited: true, maxCount: null)
+            }
+
+            type User {
+                id: ID!
+            }
+            GRAPHQL)
+            ->getQueryType();
+        $this->assertInstanceOf(ObjectType::class, $queryType);
+
+        $firstArg = $queryType->getField('users')->getArg('first');
+        $this->assertInstanceOf(Argument::class, $firstArg);
+        $this->assertSame('Int', $firstArg->getType()->toString());
+    }
+
+    public function testRejectsUnlimitedWhenMaxCountIsConfiguredAfterBuildingTheSchema(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true, resolver: "{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}")
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(first: 2) {
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertGraphQLErrorFree();
+
+        // Simulates a cached schema that was built before the maximum count was configured
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(first: null) {
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertGraphQLErrorMessage(PaginationArgs::requestedUnlimitedItems(1));
+    }
+
     public function testQueriesFirst0SimplePaginator(): void
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'

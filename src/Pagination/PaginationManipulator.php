@@ -58,13 +58,18 @@ class PaginationManipulator
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null,
+        bool $allowUnlimited = false,
     ): void {
+        if ($allowUnlimited && $maxCount !== null) {
+            throw new DefinitionException("Can not allow unlimited results on {$parentType->name->value}.{$fieldDefinition->name->value} when the maximum count is {$maxCount}, set either `allowUnlimited: false` or `maxCount: null`.");
+        }
+
         if ($paginationType->isConnection()) {
-            $this->registerConnection($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $edgeType);
+            $this->registerConnection($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $edgeType, $allowUnlimited);
         } elseif ($paginationType->isSimple()) {
-            $this->registerSimplePaginator($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount);
+            $this->registerSimplePaginator($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $allowUnlimited);
         } else {
-            $this->registerPaginator($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount);
+            $this->registerPaginator($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $allowUnlimited);
         }
     }
 
@@ -75,6 +80,7 @@ class PaginationManipulator
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null,
+        bool $allowUnlimited = false,
     ): void {
         $pageInfoNode = $this->pageInfo();
         if (! isset($this->documentAST->types[$pageInfoNode->getName()->value])) {
@@ -121,7 +127,7 @@ GRAPHQL
         $this->documentAST->setTypeDefinition($connectionEdge);
 
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(
-            self::countArgument($defaultCount, $maxCount),
+            self::countArgument($defaultCount, $maxCount, $allowUnlimited),
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 "A cursor after which elements are returned."
@@ -166,6 +172,7 @@ GRAPHQL
         PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
+        bool $allowUnlimited = false,
     ): void {
         $paginatorInfoNode = $this->paginatorInfo();
         if (! isset($this->documentAST->types[$paginatorInfoNode->getName()->value])) {
@@ -189,7 +196,7 @@ GRAPHQL
         $this->addPaginationWrapperType($paginatorType);
 
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(
-            self::countArgument($defaultCount, $maxCount),
+            self::countArgument($defaultCount, $maxCount, $allowUnlimited),
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
             "The offset from which items are returned."
@@ -206,6 +213,7 @@ GRAPHQL
         PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
+        bool $allowUnlimited = false,
     ): void {
         $simplePaginatorInfoNode = $this->simplePaginatorInfo();
         if (! isset($this->documentAST->types[$simplePaginatorInfoNode->getName()->value])) {
@@ -229,7 +237,7 @@ GRAPHQL
         $this->addPaginationWrapperType($paginatorType);
 
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(
-            self::countArgument($defaultCount, $maxCount),
+            self::countArgument($defaultCount, $maxCount, $allowUnlimited),
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
             "The offset from which items are returned."
@@ -241,16 +249,22 @@ GRAPHQL
     }
 
     /** Build the count argument definition string, considering default and max values. */
-    protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
+    protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null, bool $allowUnlimited = false): string
     {
         $description = '"Limits number of fetched items.';
         if ($maxCount) {
             $description .= " Maximum allowed value: {$maxCount}.";
         }
 
+        if ($allowUnlimited) {
+            $description .= ' Pass `null` to fetch all items.';
+        }
+
         $description .= "\"\n";
 
-        $definition = 'first: Int!';
+        $definition = $allowUnlimited
+            ? 'first: Int'
+            : 'first: Int!';
         if ($defaultCount) {
             $definition .= " =  {$defaultCount}";
         }
