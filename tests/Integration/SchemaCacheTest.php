@@ -5,6 +5,8 @@ namespace Tests\Integration;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Support\Utils;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
@@ -97,6 +99,99 @@ final class SchemaCacheTest extends TestCase
         ]);
 
         $this->assertIsArray(require $path);
+    }
+
+    public function testReusesLoadedCacheFileWhileUnchanged(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int
+        }
+        GRAPHQL;
+        $this->cacheSchema();
+
+        $filesystem = new class extends Filesystem {
+            public int $existsCalls = 0;
+
+            public function exists($path): bool
+            {
+                ++$this->existsCalls;
+
+                return parent::exists($path);
+            }
+        };
+        $this->app->instance(Filesystem::class, $filesystem);
+
+        // Simulates multiple requests in a long-running process such as Laravel Octane
+        $hash = $this->freshDocumentAST()->hash;
+        $this->assertSame($hash, $this->freshDocumentAST()->hash);
+        $this->assertSame($hash, $this->freshDocumentAST()->hash);
+
+        $this->assertSame(1, $filesystem->existsCalls, 'Expected the cache file to be required only once.');
+    }
+
+    public function testReloadsCacheFileWhenItChanges(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int
+        }
+        GRAPHQL;
+        $this->cacheSchema();
+        $this->assertArrayNotHasKey('Bar', $this->freshDocumentAST()->types);
+
+        // Simulates running `php artisan lighthouse:cache` in another process
+        $changed = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int
+        }
+
+        type Bar {
+            baz: Int
+        }
+        GRAPHQL);
+        $variable = var_export($changed->toArray(), true);
+        Utils::atomicPut(
+            filesystem: $this->app->make(Filesystem::class),
+            path: $this->schemaCachePath(),
+            contents: "<?php return {$variable};",
+        );
+
+        $this->assertArrayHasKey('Bar', $this->freshDocumentAST()->types);
+    }
+
+    public function testRebuildsWhenCacheFileIsDeleted(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int
+        }
+        GRAPHQL;
+        $this->cacheSchema();
+        $this->freshDocumentAST();
+
+        $filesystem = $this->app->make(Filesystem::class);
+        $filesystem->delete($this->schemaCachePath());
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int
+        }
+
+        type Bar {
+            baz: Int
+        }
+        GRAPHQL;
+
+        $this->assertArrayHasKey('Bar', $this->freshDocumentAST()->types);
+        $this->assertFileExists($this->schemaCachePath());
+    }
+
+    private function freshDocumentAST(): DocumentAST
+    {
+        $this->app->forgetInstance(ASTBuilder::class);
+
+        return $this->app->make(ASTBuilder::class)->documentAST();
     }
 
     private function cacheSchema(): void
