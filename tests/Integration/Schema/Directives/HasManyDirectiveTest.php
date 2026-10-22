@@ -2,7 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -355,6 +357,108 @@ final class HasManyDirectiveTest extends DBTestCase
                     ],
                 ],
             ]);
+    }
+
+    public function testQueryPaginatedHasManyOnEveryInstanceOfTheSameModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Role {
+            users: [User!]! @belongsToMany
+        }
+
+        type User {
+            id: ID!
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            role: Role @first
+        }
+        GRAPHQL;
+
+        $role = factory(Role::class)->create();
+        $this->assertInstanceOf(Role::class, $role);
+
+        $userWithTask = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userWithTask);
+
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $userWithTask->tasks()->save($task);
+
+        $userWithoutTasks = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userWithoutTasks);
+
+        foreach ([$userWithTask, $userWithoutTasks] as $user) {
+            $role->users()->attach($user, ['meta' => 'first']);
+            $role->users()->attach($user, ['meta' => 'second']);
+        }
+
+        $withTask = [
+            'id' => (string) $userWithTask->id,
+            'tasks' => [
+                'paginatorInfo' => [
+                    'total' => 1,
+                ],
+                'data' => [
+                    [
+                        'id' => (string) $task->id,
+                    ],
+                ],
+            ],
+        ];
+        $withoutTasks = [
+            'id' => (string) $userWithoutTasks->id,
+            'tasks' => [
+                'paginatorInfo' => [
+                    'total' => 0,
+                ],
+                'data' => [],
+            ],
+        ];
+
+        $queries = [];
+        DB::listen(static function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                role {
+                    users {
+                        id
+                        tasks(first: 10) {
+                            paginatorInfo {
+                                total
+                            }
+                            data {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertExactJson([
+                'data' => [
+                    'role' => [
+                        'users' => [
+                            $withTask,
+                            $withTask,
+                            $withoutTasks,
+                            $withoutTasks,
+                        ],
+                    ],
+                ],
+            ]);
+
+        // One subquery per distinct user, not one per instance
+        $this->assertSame(1, substr_count(implode("\n", $queries), 'union all'));
     }
 
     public function testQueryPaginatedHasManyWithNonUniqueForeignKey(): void

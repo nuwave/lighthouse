@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPerPageLengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Utils;
@@ -47,6 +48,8 @@ class PaginatedModelsLoader implements ModelsLoader
     protected function loadRelatedModels(EloquentCollection $parents): EloquentCollection
     {
         $relations = $parents->toBase()
+            // One query per row, not per instance
+            ->unique(static fn (Model $model): string => ModelKey::build($model))
             ->map(function (Model $model) use ($parents): Relation {
                 $relation = $this->relationInstance($parents);
 
@@ -58,8 +61,6 @@ class PaginatedModelsLoader implements ModelsLoader
                     $select = Utils::callProtected($relation, 'shouldSelect', ['*']);
                     $relation->addSelect($select);
                 }
-
-                $relation->initRelation([$model], $this->relation);
 
                 // @phpstan-ignore-next-line Builder mixin is not understood
                 return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
@@ -165,12 +166,13 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function associateRelationModels(EloquentCollection $parents, EloquentCollection $relatedModels): void
     {
-        $this->relationInstance($parents)
-            ->match(
-                $parents->all(),
-                $relatedModels,
-                $this->relation,
-            );
+        $relation = $this->relationInstance($parents);
+        $relation->initRelation($parents->all(), $this->relation);
+        $relation->match(
+            $parents->all(),
+            $relatedModels,
+            $this->relation,
+        );
     }
 
     /** @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $parents */

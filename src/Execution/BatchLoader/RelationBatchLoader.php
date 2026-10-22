@@ -11,9 +11,12 @@ use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 class RelationBatchLoader
 {
     /**
-     * Map from unique model keys to model instances.
+     * Map from object ids to model instances.
      *
-     * @var array<string, \Illuminate\Database\Eloquent\Model>
+     * The same row may be hydrated into multiple instances, e.g. through duplicate pivot rows.
+     * Each of them gets the relation, so they are not keyed by model key.
+     *
+     * @var array<int, \Illuminate\Database\Eloquent\Model>
      */
     protected array $parents = [];
 
@@ -40,7 +43,7 @@ class RelationBatchLoader
     public function load(Model $model): Deferred
     {
         $modelKey = ModelKey::build($model);
-        $this->parents[$modelKey] = $model;
+        $this->parents[spl_object_id($model)] = $model;
 
         return new Deferred(function () use ($modelKey) {
             if (! $this->hasResolved) {

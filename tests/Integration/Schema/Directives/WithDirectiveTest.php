@@ -9,6 +9,7 @@ use Tests\Utils\Models\Activity;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -52,6 +53,57 @@ final class WithDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'tasksLoaded' => true,
+                ],
+            ],
+        ]);
+    }
+
+    public function testEagerLoadsRelationOntoEveryInstanceOfTheSameModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            role: Role @first
+        }
+
+        type Role {
+            users: [User!]! @belongsToMany
+        }
+
+        type User {
+            tasksLoaded: Boolean!
+                @with(relation: "tasks")
+                @method
+        }
+        GRAPHQL;
+
+        $role = factory(Role::class)->create();
+        $this->assertInstanceOf(Role::class, $role);
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $role->users()->attach($user, ['meta' => 'first']);
+        $role->users()->attach($user, ['meta' => 'second']);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            role {
+                users {
+                    tasksLoaded
+                }
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'role' => [
+                    'users' => [
+                        [
+                            'tasksLoaded' => true,
+                        ],
+                        [
+                            'tasksLoaded' => true,
+                        ],
+                    ],
                 ],
             ],
         ]);
