@@ -75,7 +75,14 @@ class ArgumentSet
      */
     public function addValue(string $path, mixed $value): self
     {
-        $this->addValueAtKeys(explode('.', $path), $value);
+        $keys = explode('.', $path);
+
+        // Validated upfront so that an invalid path fails regardless of the incoming data.
+        if ($keys[0] === '*' || end($keys) === '*') {
+            throw new DefinitionException("The `*` wildcard in the `name` argument of `@inject` must be preceded by a list field and followed by a field to inject into, got: {$path}.");
+        }
+
+        $this->addValueAtKeys($keys, $value);
 
         return $this;
     }
@@ -120,8 +127,10 @@ class ArgumentSet
         }
 
         array_shift($keys);
-        if ($keys === []) {
-            throw new DefinitionException("Can not use `*` as the final path segment of the `name` argument of `@inject`, a field to inject into must follow, got: {$key}.*");
+
+        // A nullable list that was explicitly passed as null has no elements to inject into.
+        if ($argument->value === null) {
+            return;
         }
 
         if (! is_array($argument->value)) {

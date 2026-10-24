@@ -249,6 +249,42 @@ final class ArgumentSetTest extends TestCase
         $set->addValue('create.*', 123);
     }
 
+    public function testAddValueWithWildcardThrowsWhenUsedAsFinalPathSegmentAndArgumentIsOmitted(): void
+    {
+        $set = new ArgumentSet();
+
+        $this->expectException(DefinitionException::class);
+        $set->addValue('create.*', 123);
+    }
+
+    public function testAddValueWithWildcardThrowsWhenUsedAsOnlyPathSegment(): void
+    {
+        $set = new ArgumentSet();
+
+        $this->expectException(DefinitionException::class);
+        $set->addValue('*', 123);
+    }
+
+    public function testAddValueWithWildcardThrowsWhenUsedAsFirstPathSegment(): void
+    {
+        $set = new ArgumentSet();
+
+        $this->expectException(DefinitionException::class);
+        $set->addValue('*.user_id', 123);
+    }
+
+    public function testAddValueWithWildcardSkipsWhenListIsNull(): void
+    {
+        $set = new ArgumentSet();
+        $create = new Argument();
+        $create->value = null;
+        $set->arguments['create'] = $create;
+
+        $set->addValue('create.*.user_id', 123);
+
+        $this->assertNull($set->arguments['create']->value);
+    }
+
     /** Build a list element that already carries an unrelated argument, to prove injection leaves it untouched. */
     private function argumentSetWithSibling(mixed $value): ArgumentSet
     {
