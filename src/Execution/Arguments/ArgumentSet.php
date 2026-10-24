@@ -126,7 +126,8 @@ class ArgumentSet
             return;
         }
 
-        array_shift($keys);
+        // Skip the wildcard, validated upfront to be followed by a field to inject into.
+        $elementKeys = [$keys[1], ...array_slice($keys, 2)];
 
         // A nullable list that was explicitly passed as null has no elements to inject into.
         if ($argument->value === null) {
@@ -142,7 +143,7 @@ class ArgumentSet
                 throw new DefinitionException("Expected the elements of the list at `{$key}` to be inputs because of the `*` wildcard used in the `name` argument of `@inject`, got: " . get_debug_type($element) . '.');
             }
 
-            $element->addValueAtKeys($keys, $value);
+            $element->addValueAtKeys($elementKeys, $value);
         }
     }
 
