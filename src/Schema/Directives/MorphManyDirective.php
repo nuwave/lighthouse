@@ -14,8 +14,7 @@ Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloq
 """
 directive @morphMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class, if it is named different from the field in the schema.
   """
   relation: String
 
@@ -44,8 +43,7 @@ directive @morphMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Specify a custom type that implements the Edge interface to extend edge object.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String

@@ -28,18 +28,15 @@ class LimitDirective extends BaseDirective implements ArgDirective, ArgBuilderDi
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-Allow clients to specify the maximum number of results to return when used on an argument,
-or statically limit them when used on a field.
+Allow clients to specify the maximum number of results to return when used on an argument, or statically limit them when used on a field.
 
-By default, this directive does not influence the number of results the resolver queries internally,
-but limits how much of it is returned to clients. Use the `builder` argument to change this.
+By default, this directive does not influence the number of results the resolver queries internally, but limits how much of it is returned to clients.
+Use the `builder` argument to change this.
 """
 directive @limit(
     """
-    You may set this to `true` if the field uses a query builder,
-    then this directive will apply a LIMIT clause to it.
-    Typically, this option should only be used for root fields,
-    as it may cause wrong results with batched relation queries.
+    You may set this to `true` if the field uses a query builder, then this directive will apply a LIMIT clause to it.
+    Typically, this option should only be used for root fields, as it may cause wrong results with batched relation queries.
     """
     builder: Boolean! = false
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION

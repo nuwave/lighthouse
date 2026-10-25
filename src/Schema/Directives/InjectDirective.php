@@ -19,17 +19,14 @@ Inject a value from the context object into the arguments.
 directive @inject(
   """
   A path to the property of the context that will be injected.
-  If the value is nested within the context, you may use dot notation
-  to get it, e.g. "user.id".
+  If the value is nested within the context, you may use dot notation to get it, e.g. "user.id".
   """
   context: String!
 
   """
   The target name of the argument into which the value is injected.
-  You can use dot notation to set the value at arbitrary depth
-  within the incoming argument.
-  Use an asterisk `*` as a path segment to inject the value into every
-  element of a list found at that position.
+  You can use dot notation to set the value at arbitrary depth within the incoming argument.
+  Use an asterisk `*` as a path segment to inject the value into every element of a list found at that position.
   """
   name: String!
 ) repeatable on FIELD_DEFINITION

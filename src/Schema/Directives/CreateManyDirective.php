@@ -22,8 +22,7 @@ directive @createMany(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION

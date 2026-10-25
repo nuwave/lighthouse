@@ -13,8 +13,7 @@ class UploadDirective extends BaseDirective implements ArgDirective, ArgTransfor
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Uploads given file to storage, removes the argument and sets
-the returned path to the attribute key provided.
+Uploads given file to storage, removes the argument and sets the returned path to the attribute key provided.
 
 This does not change the schema from a client perspective.
 """

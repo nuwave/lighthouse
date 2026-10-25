@@ -44,8 +44,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipu
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-When `injectArgs` and `args` are used together, the client given
-arguments will be passed before the static args.
+When `injectArgs` and `args` are used together, the client given arguments will be passed before the static args.
 """
 directive @can(
   """
@@ -75,16 +74,14 @@ directive @can(
   """
   Statically defined arguments that are passed to `Gate::check`.
 
-  You may pass arbitrary GraphQL literals,
-  e.g.: [1, 2, 3] or { foo: "bar" }
+  You may pass arbitrary GraphQL literals, e.g.: [1, 2, 3] or { foo: "bar" }
 
   CanArgs pseudo-scalar is defined in BaseCanDirective.
   """
   args: CanArgs
 
   """
-  Query for specific model instances to check the policy against, using arguments
-  with directives that add constraints to the query builder, such as `@eq`.
+  Query for specific model instances to check the policy against, using arguments with directives that add constraints to the query builder, such as `@eq`.
 
   Mutually exclusive with `resolved`, `find`, and `root`.
   """
@@ -96,8 +93,7 @@ directive @can(
   scopes: [String!]
 
   """
-  If your policy checks against specific model instances, specify
-  the name of the field argument that contains its primary key(s).
+  If your policy checks against specific model instances, specify the name of the field argument that contains its primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
 

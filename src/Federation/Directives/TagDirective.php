@@ -12,8 +12,8 @@ class TagDirective extends BaseDirective
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-Applies arbitrary string metadata to a schema location. Custom tooling can use this metadata
-during any step of the schema delivery flow, including composition, static analysis, and documentation.
+Applies arbitrary string metadata to a schema location.
+Custom tooling can use this metadata during any step of the schema delivery flow, including composition, static analysis, and documentation.
 
 ```graphql
 extend schema

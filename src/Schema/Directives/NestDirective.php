@@ -26,8 +26,7 @@ class NestDirective extends BaseDirective implements ArgResolver, ArgManipulator
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-A no-op nested arg resolver that delegates all calls
-to the ArgResolver directives attached to the children.
+A no-op nested arg resolver that delegates all calls to the ArgResolver directives attached to the children.
 """
 directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;

@@ -34,8 +34,7 @@ abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
   """
   Statically defined arguments that are passed to `Gate::check`.
 
-  You may pass arbitrary GraphQL literals,
-  e.g.: [1, 2, 3] or { foo: "bar" }
+  You may pass arbitrary GraphQL literals, e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: CanArgs
 

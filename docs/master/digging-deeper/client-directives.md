@@ -18,8 +18,7 @@ Allows for conditional exclusion during execution as described by the `if` argum
 ```graphql
 directive @skip(
   """
-  If the value passed into the if field is true the field this
-  is decorating will not be included in the query response.
+  If the value passed into the if field is true the field this is decorating will not be included in the query response.
   """
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT

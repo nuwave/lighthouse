@@ -15,8 +15,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
 """
 Broadcast the results of a mutation to subscribed clients.
 
-Ensure you place this after other field middleware directives that may transform the
-result to broadcast the final value.
+Ensure you place this after other field middleware directives that may transform the result to broadcast the final value.
 """
 directive @broadcast(
   """

@@ -14,8 +14,7 @@ class MethodDirective extends BaseDirective implements FieldResolver
 """
 Resolve a field by calling a method on the parent object.
 
-Use this if the data is not accessible through simple property access or if you
-want to pass argument to the method.
+Use this if the data is not accessible through simple property access or if you want to pass argument to the method.
 """
 directive @method(
   """

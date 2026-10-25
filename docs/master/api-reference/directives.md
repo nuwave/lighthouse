@@ -156,11 +156,9 @@ type Query {
 Defer the execution of mutations to [queued jobs](https://laravel.com/docs/queues).
 
 This directive must only be used on fields of the root mutation type.
-When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched
-and the value `true` is returned - thus the fields return type must be `Boolean!`.
+When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched and the value `true` is returned - thus the fields return type must be `Boolean!`.
 
-Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job,
-it will actually execute the underlying field resolver.
+Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job, it will actually execute the underlying field resolver.
 Errors that occur during execution are reported through the Laravel exception handler.
 The handlers in the `config/lighthouse.php` option `error_handlers` are not called.
 """
@@ -221,8 +219,7 @@ Resolves a field through the Eloquent `BelongsTo` relationship.
 """
 directive @belongsTo(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class, if it is named different from the field in the schema.
   """
   relation: String
 
@@ -273,8 +270,7 @@ Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
 directive @belongsToMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class, if it is named different from the field in the schema.
   """
   relation: String
 
@@ -303,8 +299,7 @@ directive @belongsToMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Specify a custom type that implements the Edge interface to extend edge object.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -729,8 +724,7 @@ directive @cache(
 
   """
   Limit access to cached data to the currently authenticated user.
-  When the field is accessible by guest users, this will not have
-  any effect, they will access a shared cache.
+  When the field is accessible by guest users, this will not have any effect, they will access a shared cache.
   """
   private: Boolean = false
 ) on FIELD_DEFINITION
@@ -818,8 +812,7 @@ injectArgs: Boolean! = false
 """
 Statically defined arguments that are passed to `Gate::check`.
 
-You may pass arbitrary GraphQL literals,
-e.g.: [1, 2, 3] or { foo: "bar" }
+You may pass arbitrary GraphQL literals, e.g.: [1, 2, 3] or { foo: "bar" }
 """
 args: CanArgs
 
@@ -1029,8 +1022,7 @@ A custom complexity function may look like the following, refer to the [complexi
 ```php
 namespace App\GraphQL\Security;
 
-final class ComplexityAnalyzer
-{
+final class ComplexityAnalyzer {
     public function userPosts(int $childrenComplexity, array $args): int
     {
         $postComplexity = ($args['includeFullText'] ?? false)
@@ -1656,8 +1648,7 @@ type Mutation {
 The event class must accept an `Order` in the constructor:
 
 ```php
-final class PlacedOrder
-{
+final class PlacedOrder {
     public function __construct(Order $order) { ... }
 }
 ```
@@ -2146,13 +2137,9 @@ You can get the appropriate Object Type from Lighthouse's type registry.
 ```php
 namespace App\GraphQL\Interfaces;
 
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use GraphQL\Type\Definition\Type; use Nuwave\Lighthouse\Execution\ResolveInfo; use Nuwave\Lighthouse\Schema\TypeRegistry; use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-final class Commentable
-{
+final class Commentable {
     public function __construct(
         private TypeRegistry $typeRegistry
     ) {}
@@ -2778,8 +2765,7 @@ The `resolver` argument must specify a function.
 It receives the decoded `id` and resolves to a result.
 
 ```php
-public function byId($id): array
-{
+public function byId($id): array {
     return [
         'DE' => ['name' => 'Germany'],
         'MY' => ['name' => 'Malaysia'],
@@ -3016,8 +3002,7 @@ type Query {
   ): PostPaginator
 }
 
-"A paginated list of Post items."
-type PostPaginator {
+"A paginated list of Post items." type PostPaginator {
   "A list of Post items."
   data: [Post!]!
 
@@ -3025,8 +3010,7 @@ type PostPaginator {
   paginatorInfo: PaginatorInfo!
 }
 
-"Information about pagination using a fully featured paginator."
-type PaginatorInfo {
+"Information about pagination using a fully featured paginator." type PaginatorInfo {
   "Number of items in the current page."
   count: Int!
 
@@ -3097,8 +3081,7 @@ type Query {
   ): PostConnection
 }
 
-"A paginated list of Post edges."
-type PostConnection {
+"A paginated list of Post edges." type PostConnection {
   "Pagination information about the list of edges."
   pageInfo: PageInfo!
 
@@ -3106,8 +3089,7 @@ type PostConnection {
   edges: [PostEdge]
 }
 
-"An edge that contains a node of type Post and a cursor."
-type PostEdge {
+"An edge that contains a node of type Post and a cursor." type PostEdge {
   "The Post node."
   node: Post
 
@@ -3148,8 +3130,7 @@ type Query {
   ): PostSimplePaginator
 }
 
-"A paginated list of Post items."
-type PostSimplePaginator {
+"A paginated list of Post items." type PostSimplePaginator {
   "A list of Post items."
   data: [Post!]!
 
@@ -3157,8 +3138,7 @@ type PostSimplePaginator {
   paginatorInfo: SimplePaginatorInfo!
 }
 
-"Information about pagination using a simple paginator."
-type SimplePaginatorInfo {
+"Information about pagination using a simple paginator." type SimplePaginatorInfo {
   "Number of items in the current page."
   count: Int!
 
@@ -3259,13 +3239,9 @@ It must return an instance of `Illuminate\Database\Query\Builder`.
 ```php
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Query\Builder;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Support\Facades\DB; use Illuminate\Database\Query\Builder; use Nuwave\Lighthouse\Execution\ResolveInfo; use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-final class Blog
-{
+final class Blog {
     public function statistics(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         return DB::table('posts')
@@ -3295,8 +3271,7 @@ namespace App\GraphQL\Queries;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
-final class Posts
-{
+final class Posts {
     /**
      * @param  null  $root Always null, since this field has no parent.
      * @param  array{}  $args The field arguments passed by the client.
@@ -3553,11 +3528,9 @@ type Query {
 The scope will be passed the value of the client-given argument:
 
 ```php
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder; use Illuminate\Database\Eloquent\Model;
 
-final class Post extends Model
-{
+final class Post extends Model {
     public function scopeTrending(Builder $query, bool $trending): Builder { ... }
 }
 ```
@@ -3877,13 +3850,9 @@ It must resolve an Object Type from Lighthouse `TypeRegistry`.
 ```php
 namespace App\GraphQL\Unions;
 
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use GraphQL\Type\Definition\Type; use Nuwave\Lighthouse\Execution\ResolveInfo; use Nuwave\Lighthouse\Schema\TypeRegistry; use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-final class Person
-{
+final class Person {
     public function __construct(
         private TypeRegistry $typeRegistry
     ) {}

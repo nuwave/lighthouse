@@ -14,8 +14,7 @@ Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.
 """
 directive @morphToMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class, if it is named different from the field in the schema.
   """
   relation: String
 
@@ -44,8 +43,7 @@ directive @morphToMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Specify a custom type that implements the Edge interface to extend edge object.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String

@@ -13,8 +13,8 @@ class ExtendsDirective extends BaseDirective
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-Some libraries such as graphql-java don't have native support for type extensions in their printer. Apollo Federation
-supports using an @extends directive in place of extend type to annotate type references:
+Some libraries such as graphql-java don't have native support for type extensions in their printer.
+Apollo Federation supports using an @extends directive in place of extend type to annotate type references:
 
     type User @key(fields: "id") @extends {
 
