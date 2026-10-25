@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\QueryException;
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
@@ -586,5 +587,53 @@ final class UpdateDirectiveTest extends DBTestCase
 
         $decoy->refresh();
         $this->assertSame('Decoy', $decoy->name);
+    }
+
+    public function testNestedUpdateWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $otherUsersTask = factory(Task::class)->make();
+        $otherUsersTask->name = 'original';
+        $otherUsersTask->user()->associate(factory(User::class)->create());
+        $otherUsersTask->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type User {
+            id: Int
+        }
+
+        input UpdateUserInput {
+            id: Int
+            updateTask: UpdateTaskInput @update(relation: "tasks")
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!, $taskID: Int!) {
+            updateUser(input: {
+                id: $userID
+                updateTask: { id: $taskID, name: "hacked" }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+            'taskID' => $otherUsersTask->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
+
+        $otherUsersTask->refresh();
+        $this->assertSame('original', $otherUsersTask->name);
     }
 }

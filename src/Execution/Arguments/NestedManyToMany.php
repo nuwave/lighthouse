@@ -42,7 +42,7 @@ class NestedManyToMany implements ArgResolver
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation), $relation));
 
             foreach ($args->arguments['update']->value as $childArgs) {
                 $updateModel($relation->make(), $childArgs);
@@ -50,7 +50,7 @@ class NestedManyToMany implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation), parentRelation: $relation));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
                 $upsertModel($relation->make(), $childArgs);
@@ -58,10 +58,7 @@ class NestedManyToMany implements ArgResolver
         }
 
         if ($args->has('delete')) {
-            $ids = $args->arguments['delete']->toPlain();
-
-            $relation->detach($ids);
-            $relation->getRelated()::destroy($ids);
+            ParentRelationScope::delete($relation, Arr::wrap($args->arguments['delete']->toPlain()));
         }
 
         if ($args->has('connect')) {

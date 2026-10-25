@@ -48,6 +48,17 @@ Field directives such as the [@can\* family of directives](../api-reference/dire
 
 Make sure that fields with nested mutations are only available to users who are allowed to execute all reachable nested mutations.
 
+By default, the nested operations `delete`, `disconnect`, `update` and `upsert` accept IDs of models that are not related to the parent.
+For example, `updateUser(input: { id: 2, tasks: { delete: [1] } })` deletes task 1 even if it belongs to user 1.
+Set `nested_mutations_scope_to_parent` to `true` in `config/lighthouse.php` to limit them to related models:
+
+- An ID that is not related to the parent causes an error, even if no model with that ID exists.
+- `upsert` creates a new model if no model with the given ID exists.
+- `upsert` with `identifyingColumns` causes an error if the matching model is not related to the parent.
+
+`connect`, `sync`, `syncWithoutDetaching` and the `update` and `upsert` operations on [BelongsTo](#belongsto) relations are not limited, because their purpose is to establish new relationships.
+Validate or authorize the IDs passed to them yourself.
+
 ## BelongsTo
 
 We will start of by defining a mutation to create a post.

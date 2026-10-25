@@ -4,9 +4,11 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -394,6 +396,125 @@ final class DeleteDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testNestedArgResolverDeleteWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(
+                id: ID
+                deleteTasks: [ID!]! @delete(relation: "tasks")
+            ): User @update
+        }
+
+        type User {
+            id: ID!
+            tasks: [Task!]!
+        }
+
+        type Task {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!, $deleteTasks: [ID!]!) {
+            updateUser(id: $id, deleteTasks: $deleteTasks) {
+                tasks {
+                    id
+                }
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->id,
+            'deleteTasks' => [$task->id],
+        ])->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [],
+                ],
+            ],
+        ]);
+
+        $this->assertNull(Task::find($task->id));
+    }
+
+    public function testNestedArgResolverDeleteWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $otherUsersTask = factory(Task::class)->create();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(
+                id: ID
+                deleteTasks: [ID!]! @delete(relation: "tasks")
+            ): User @update
+        }
+
+        type User {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!, $deleteTasks: [ID!]!) {
+            updateUser(id: $id, deleteTasks: $deleteTasks) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->id,
+            'deleteTasks' => [$otherUsersTask->id],
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
+
+        $this->assertNotNull(Task::find($otherUsersTask->id));
+    }
+
+    public function testNestedArgResolverDeleteBelongsToManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $otherUsersRole = factory(Role::class)->create();
+        $otherUsersRole->users()->attach(factory(User::class)->create());
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(
+                id: ID
+                deleteRoles: [ID!]! @delete(relation: "roles")
+            ): User @update
+        }
+
+        type User {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!, $deleteRoles: [ID!]!) {
+            updateUser(id: $id, deleteRoles: $deleteRoles) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->id,
+            'deleteRoles' => [$otherUsersRole->id],
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersRole->id]));
+
+        $this->assertNotNull(Role::find($otherUsersRole->id));
+        $this->assertCount(1, $otherUsersRole->users()->get());
     }
 
     public function testDeleteHasOneThroughNestedArgResolver(): void
