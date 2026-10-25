@@ -29,6 +29,7 @@ services:
     image: redis:6
 
   node-docs:
+    image: lighthouse-node
     build:
       context: .
       dockerfile: node.dockerfile
@@ -43,9 +44,7 @@ services:
       - 8081:8080
 
   node-tools:
-    build:
-      context: .
-      dockerfile: node.dockerfile
+    image: lighthouse-node
     volumes:
       - ./:/workdir
     working_dir: /workdir
