@@ -59,7 +59,7 @@ jobs:
             laravel-version: "^13"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -68,7 +68,7 @@ jobs:
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
@@ -152,7 +152,7 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -162,7 +162,7 @@ jobs:
           ini-values: zend.assertions=1
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
@@ -209,7 +209,7 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -219,7 +219,7 @@ jobs:
           ini-values: zend.assertions=1
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
@@ -231,7 +231,9 @@ jobs:
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
       - name: "Upload to Codecov"
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   benchmarks:
     runs-on: ubuntu-latest
@@ -242,7 +244,7 @@ jobs:
         laravel-version: ["^13"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -251,7 +253,7 @@ jobs:
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
