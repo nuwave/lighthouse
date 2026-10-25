@@ -3342,7 +3342,7 @@ type Employee {
 }
 
 union Person @union(resolveType: "App\\GraphQL\\Unions\\Person@resolveType") =
-  | User
+    User
   | Employee
 ```
 
