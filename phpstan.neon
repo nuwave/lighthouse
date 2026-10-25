@@ -6,8 +6,6 @@ parameters:
   - benchmarks
   - src
   - tests
-  # Does not work with rector, comment in to diagnose potential issues with Octane
-  #checkOctaneCompatibility: true
   reportUnmatchedIgnoredErrors: false # As long as we support multiple Laravel versions at once, there will be some dead spots
   # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
   editorUrl: '%%relFile%%:%%line%%'
