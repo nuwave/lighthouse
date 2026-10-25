@@ -407,9 +407,8 @@ return [
     | Nested Mutations Scope To Parent
     |--------------------------------------------------------------------------
     |
-    | If set to true, the nested operations delete, disconnect, update and upsert
-    | only act on models related to the parent, otherwise they throw an error.
-    | Will be removed with v7, which always scopes them.
+    | If set to true, nested delete, disconnect, update and upsert throw an error for models not related to the parent.
+    | This option will be removed in v7, which always scopes nested mutations to the parent.
     |
     */
 

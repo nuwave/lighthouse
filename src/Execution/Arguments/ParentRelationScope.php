@@ -14,14 +14,15 @@ class ParentRelationScope
     public const UNRELATED_MODEL = 'Cannot modify a model that is not related to the given parent.';
 
     /**
-     * BelongsTo is excluded because its nested update and upsert attach unrelated models by design.
-     *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $relation
+     *
+     * @phpstan-assert-if-true !null $relation
      */
     public static function applies(?Relation $relation): bool
     {
-        // TODO remove the config check with v7 https://github.com/nuwave/lighthouse/issues/2744
+        // TODO remove the config check with v7
         return $relation !== null
+            // BelongsTo update and upsert attach unrelated models by design
             && ! $relation instanceof BelongsTo
             && config('lighthouse.nested_mutations_scope_to_parent');
     }
@@ -35,8 +36,6 @@ class ParentRelationScope
         if (! self::applies($relation)) {
             return $model->newQuery()->findOrFail($id);
         }
-
-        assert($relation !== null, 'applies() is false for null.');
 
         return self::findMany($relation, [$id])->firstOrFail();
     }
@@ -82,8 +81,6 @@ class ParentRelationScope
     }
 
     /**
-     * Returns null if no model matches anywhere, so upsert can create one.
-     *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $relation
      * @param  int|string  $id
      */
@@ -97,8 +94,6 @@ class ParentRelationScope
     }
 
     /**
-     * Returns null if no model matches anywhere, so upsert can create one.
-     *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $relation
      * @param  array<string, mixed>  $columns
      */
@@ -107,8 +102,6 @@ class ParentRelationScope
         if (! self::applies($relation)) {
             return $model->newQuery()->firstWhere($columns);
         }
-
-        assert($relation !== null, 'applies() is false for null.');
 
         $qualifiedColumns = [];
         foreach ($columns as $column => $value) {
