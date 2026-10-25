@@ -117,7 +117,7 @@ class PaginationArgs
 
             $total = $builder instanceof ScoutBuilder
                 ? 0 // Laravel\Scout\Builder exposes no method to get the total count
-                : $builder->count(); // @phpstan-ignore-line see Illuminate\Database\Query\Builder::count(), available as a mixin in the other classes
+                : $builder->count();
 
             return new ZeroPerPageLengthAwarePaginator($total, $this->page); // @phpstan-ignore return.type (generic type does not matter)
         }

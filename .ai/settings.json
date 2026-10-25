@@ -8,7 +8,6 @@
       "Bash(docker compose up:*)",
       "Bash(make setup)",
       "Bash(make it)",
-      "Bash(make up)",
       "Bash(make build)",
       "Bash(make test)",
       "Bash(make stan)",

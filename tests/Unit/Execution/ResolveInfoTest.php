@@ -96,7 +96,6 @@ final class ResolveInfoTest extends TestCase
 
         $builder = User::query();
         $resolveInfo = new class extends ResolveInfo {
-            /** @phpstan-ignore-next-line no need to call parent `__construct` */
             public function __construct()
             {
                 // empty

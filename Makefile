@@ -71,17 +71,11 @@ ai-sync: ## Generate local agent configuration from .ai
 
 .PHONY: proto/update-reports
 proto/update-reports:
-	docker compose run --rm --no-deps php curl --silent --show-error --fail --output src/Tracing/FederatedTracing/reports.proto https://usage-reporting.api.apollographql.com/proto/reports.proto
-	docker compose run --rm --no-deps php sed --in-place 's/ \[(js_use_toArray) = true]//g' src/Tracing/FederatedTracing/reports.proto
-	docker compose run --rm --no-deps php sed --in-place 's/ \[(js_preEncoded) = true]//g' src/Tracing/FederatedTracing/reports.proto
-	docker compose run --rm --no-deps php sed --in-place '3 i option php_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto";' src/Tracing/FederatedTracing/reports.proto
-	docker compose run --rm --no-deps php sed --in-place '4 i option php_metadata_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto\\\\Metadata";' src/Tracing/FederatedTracing/reports.proto
+	docker compose run --rm --no-deps php bin/update-reports-proto.sh
 
 .PHONY: proto
 proto:
 	docker run --rm --volume=.:/workdir --workdir=/workdir --pull=always bufbuild/buf generate
-	rm -rf src/Tracing/FederatedTracing/Proto
 	# Using short options of `id` to ensure compatibility with macOS, see https://github.com/nuwave/lighthouse/pull/2504
 	sudo chown --recursive "$(shell id -u):$(shell id -g)" proto-tmp
-	mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
-	rm -rf proto-tmp
+	bin/install-generated-proto.sh
