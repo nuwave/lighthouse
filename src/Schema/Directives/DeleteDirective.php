@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
@@ -93,8 +95,9 @@ GRAPHQL;
                 $relation->delete();
             }
         } else {
-            $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
-            $related::destroy($idOrIds);
+            foreach (ParentRelationScope::findMany($relation, Arr::wrap($idOrIds)) as $related) {
+                $related->delete();
+            }
         }
     }
 
