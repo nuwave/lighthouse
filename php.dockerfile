@@ -12,7 +12,6 @@ RUN apt-get update && \
         libicu-dev \
     && docker-php-ext-install \
         zip \
-        mysqli \
         pdo_mysql \
         intl \
         bcmath \
