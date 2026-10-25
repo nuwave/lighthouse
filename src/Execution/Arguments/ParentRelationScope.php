@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
+use function Safe\json_encode;
+
 class ParentRelationScope
 {
     public const UNRELATED_MODEL = 'Cannot modify a model that is not related to the given parent';
@@ -16,7 +18,10 @@ class ParentRelationScope
     /** @param  array<mixed>  $values */
     public static function unrelatedModel(array $values): string
     {
-        $valueList = implode(', ', $values);
+        $valueList = implode(', ', array_map(
+            static fn (mixed $value): mixed => is_scalar($value) ? $value : json_encode($value),
+            $values,
+        ));
 
         return self::UNRELATED_MODEL . ": {$valueList}.";
     }
