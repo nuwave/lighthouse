@@ -1,5 +1,5 @@
 parameters:
-  level: 8 # TODO level up to max
+  level: 8 # TODO raise to max with https://github.com/nuwave/lighthouse/issues/2811
   bootstrapFiles:
   - phpstan-bootstrap.php
   paths:
