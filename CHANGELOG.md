@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
+## v6.74.0
+
+### Added
+
+- Support JSON operators in `@whereConditions` https://github.com/nuwave/lighthouse/pull/2793
+
 ## v6.73.0
 
 ### Added
