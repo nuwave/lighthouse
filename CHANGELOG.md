@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
+## v6.73.0
+
+### Added
+
+- Allow injecting into every element of a list using an asterisk `*` wildcard path segment in `@inject` https://github.com/nuwave/lighthouse/pull/2280
+
 ## v6.72.5
 
 ### Changed
