@@ -7,6 +7,40 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
+## v6.74.0
+
+### Added
+
+- Support JSON operators in `@whereConditions` https://github.com/nuwave/lighthouse/pull/2793
+
+## v6.73.0
+
+### Added
+
+- Allow injecting into every element of a list using an asterisk `*` wildcard path segment in `@inject` https://github.com/nuwave/lighthouse/pull/2280
+
+## v6.72.5
+
+### Changed
+
+- `QueryCache::requireOPcacheFile()` returns `null` for invalid cache files https://github.com/nuwave/lighthouse/pull/2800
+
+### Fixed
+
+- Rebuild query and schema cache files that do not return an array or fail to parse, e.g. when empty or truncated after a failed write, instead of failing every request https://github.com/nuwave/lighthouse/pull/2800
+
+## v6.72.4
+
+### Fixed
+
+- Fix UTF-8 encoding errors when paginated relation directives such as `@belongsToMany(type: PAGINATOR)` load related models with binary column values https://github.com/nuwave/lighthouse/pull/2790
+
+## v6.72.3
+
+### Fixed
+
+- Pass the value to result handlers such as `@globalId` when the field resolves to a chained promise, such as with `@with` https://github.com/nuwave/lighthouse/pull/2794
+
 ## v6.72.2
 
 ### Fixed

@@ -216,7 +216,53 @@ class Utils
         $randomSuffix = bin2hex(random_bytes(6));
         $tempPath = "{$path}.{$randomSuffix}";
 
-        $filesystem->put(path: $tempPath, contents: $contents);
-        $filesystem->move(path: $tempPath, target: $path);
+        try {
+            if ($filesystem->put(path: $tempPath, contents: $contents) === false) {
+                throw new \RuntimeException("Failed to write file {$tempPath}.");
+            }
+
+            if ($filesystem->move(path: $tempPath, target: $path) === false) {
+                throw new \RuntimeException("Failed to move file {$tempPath} to {$path}.");
+            }
+        } catch (\Throwable $throwable) {
+            // put() or move() may also throw an ErrorException converted from a PHP warning
+            $filesystem->delete($tempPath);
+
+            throw $throwable;
+        }
+    }
+
+    /**
+     * Require a PHP file that returns an array, or return null and delete it from disk and OPcache if it does not.
+     *
+     * @return array<mixed>|null
+     */
+    public static function requireArrayOrForget(Filesystem $filesystem, string $path): ?array
+    {
+        if (! $filesystem->exists($path)) {
+            return null;
+        }
+
+        try {
+            $contents = require $path;
+            if (is_array($contents)) {
+                return $contents;
+            }
+        } catch (\ErrorException|\Error) {
+        }
+
+        // TODO remove when dropping PHP 8.0, it can not invalidate deleted files
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, force: true);
+        }
+
+        $filesystem->delete($path);
+
+        // After deleting, so concurrent requests cannot recompile the invalid file
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, force: true);
+        }
+
+        return null;
     }
 }

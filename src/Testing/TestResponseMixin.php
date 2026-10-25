@@ -123,7 +123,6 @@ class TestResponseMixin
             Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
 
             $testClassInstance
-                // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
                 ->postJson('graphql/subscriptions/auth', [
                     'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
                 ])
@@ -142,7 +141,6 @@ class TestResponseMixin
             Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
 
             $testClassInstance
-                // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
                 ->postJson('graphql/subscriptions/auth', [
                     'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
                 ])

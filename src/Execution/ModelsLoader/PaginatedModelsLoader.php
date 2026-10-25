@@ -13,8 +13,6 @@ use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPerPageLengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Utils;
 
-use function Safe\json_encode;
-
 class PaginatedModelsLoader implements ModelsLoader
 {
     public function __construct(
@@ -63,14 +61,12 @@ class PaginatedModelsLoader implements ModelsLoader
 
                 $relation->initRelation([$model], $this->relation);
 
-                // @phpstan-ignore-next-line Builder mixin is not understood
                 return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
             });
 
         // Merge all the relation queries into a single query with UNION ALL.
 
         $firstRelation = $relations->shift();
-        // @phpstan-ignore function.impossibleType,instanceof.alwaysFalse
         assert($firstRelation instanceof Relation, 'Non-null because only non-empty lists of parents are passed into this loader.');
 
         // Use ->getQuery() to respect model scopes, such as soft deletes
@@ -86,7 +82,7 @@ class PaginatedModelsLoader implements ModelsLoader
         return $relatedModels->unique(
             // Compare all attributes because there might not be a unique primary key
             // or there could be differing pivot attributes.
-            static fn (Model $relatedModel): string => json_encode($relatedModel->getRawOriginal()),
+            static fn (Model $relatedModel): string => serialize($relatedModel->getRawOriginal()),
         );
     }
 

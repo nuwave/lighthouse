@@ -26,7 +26,6 @@ class NestedOneToMany implements ArgResolver
             $saveModel = new ResolveNested(new SaveModel($relation));
 
             foreach ($args->arguments['create']->value as $childArgs) {
-                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $saveModel($relation->make(), $childArgs);
             }
         }
@@ -35,7 +34,6 @@ class NestedOneToMany implements ArgResolver
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation), $relation));
 
             foreach ($args->arguments['update']->value as $childArgs) {
-                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $updateModel($relation->make(), $childArgs);
             }
         }
@@ -44,7 +42,6 @@ class NestedOneToMany implements ArgResolver
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation), parentRelation: $relation));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
-                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $upsertModel($relation->make(), $childArgs);
             }
         }
