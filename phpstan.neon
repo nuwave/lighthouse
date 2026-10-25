@@ -6,7 +6,7 @@ parameters:
   - benchmarks
   - src
   - tests
-  reportUnmatchedIgnoredErrors: true
+  reportUnmatchedIgnoredErrors: false # As long as we support multiple Laravel versions at once, there will be some dead spots
   # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
   editorUrl: '%%relFile%%:%%line%%'
   editorUrlTitle: '%%relFile%%:%%line%%'
@@ -56,18 +56,15 @@ parameters:
   - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
   - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'
   - '#Generic type Illuminate\\.+ specifies \d template types, but (class|interface) Illuminate\\.+ supports only \d: .+#'
-  - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsToMany|MorphToMany)<(.+)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, Illuminate\\Database\\Eloquent\\Relations\\Pivot>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsTo|MorphTo)<(.+), \$this\((.+)\)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, \3>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
-  - '#Return type of call to method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<.+>::save\(\) contains unresolvable type\.#'
 
   # covariance/generic issue
   - '#expects Illuminate\\Database\\Eloquent\\Collection<(.+), Illuminate\\Database\\Eloquent\\Model>, Illuminate\\Database\\Eloquent\\Collection<\1, TModel of Illuminate\\Database\\Eloquent\\Model> given.#'
 
   # PHPUnit version compatibility - InvocationMocker (PHPUnit 9-11) vs InvocationStubber (PHPUnit 12+)
   # The MocksResolvers trait uses conditional definition based on PHPUnit version
-  - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<.+> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
   - path: src/Testing/MocksResolvers.php
     message: '#(class|has invalid return type) PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker#'
   - '#Call to method (with|willReturn|willReturnCallback|willReturnMap|willReturnArgument|willReturnSelf|willReturnOnConsecutiveCalls|willThrowException|method|id|after|withAnyParameters|will)\(\) on an unknown class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker\.#'
@@ -82,20 +79,11 @@ parameters:
   # Possible footgun, but people who extend Lighthouse classes should know what they are doing
   - '#Cannot unset property .+ because it might have hooks in a subclass\.#'
 
-  # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
-  - '#Property .* in isset\(\) is not nullable\.#'
-
   # Unavailable in thecodingmachine/safe:1
   - '#Function (hrtime) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
 
   # Unavailable in thecodingmachine/safe:2
   - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
-
-  # Lumen type hints are just wrong
-  - '#Parameter \#1 \$content of function response expects string, .* given\.#'
-
-  # Older versions of bensampo/laravel-enum are not generic yet
-  - '#contains generic type BenSampo\\Enum\\Enum<.+> but class BenSampo\\Enum\\Enum is not generic\.#'
 
   # Ignore errors caused by the absence of Lumen in the dev dependencies
   - path: src/Support/AppVersion.php
@@ -111,17 +99,11 @@ parameters:
       - '#PHPDoc tag @var for variable \$router contains unknown class Laravel\\Lumen\\Routing\\Router\.#'
       - '#Call to method addRoute\(\) on an unknown class Laravel\\Lumen\\Routing\\Router\.#'
 
-  # Recent Mockery versions do not account for the last arg possibly being a closure
-  - path: tests/Unit/Subscriptions/Iterators/AuthenticatingSyncIteratorTest.php
-    message: '#Parameter \#2 \.\.\.\$args of static method Mockery::mock\(\) expects array\|class-string<Nuwave\\Lighthouse\\Subscriptions\\SubscriptionGuard>\|Nuwave\\Lighthouse\\Subscriptions\\SubscriptionGuard, Closure given\.#'
-
   - path: tests/Integration/Schema/Directives/BuilderDirectiveTest.php
     message: '#Return type of call to static method Mockery::mock\(\) contains unresolvable type\.#'
 
   # Laravel added generics to Arr::first in 11.x, not sure how to handle them for now.
   - path: src/OrderBy/OrderByDirective.php
-    message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
-  - path: src/Testing/TestResponseMixin.php
     message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
 
   # Lots of work to specify the generics, little gain

@@ -396,13 +396,13 @@ class GraphQL
         }
 
         if ($queryHash === null) {
-            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+            return DocumentValidator::validate($schema, $query, $validationRules);
         }
 
         $validationCacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
         if (! $validationCacheConfig['enable']) {
-            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+            return DocumentValidator::validate($schema, $query, $validationRules);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
@@ -421,7 +421,7 @@ class GraphQL
         // As of webonyx/graphql-php 15.14.0, GraphQL\Error\Error is not serializable.
         // We would have to figure out how to serialize them properly to cache them.
         if ($result !== []) {
-            return $result; // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+            return $result;
         }
 
         $store->put($cacheKey, $result, $validationCacheConfig['ttl']);
