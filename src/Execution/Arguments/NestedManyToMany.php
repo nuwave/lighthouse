@@ -61,9 +61,7 @@ class NestedManyToMany implements ArgResolver
         }
 
         if ($args->has('delete')) {
-            $ids = $args->arguments['delete']->toPlain();
-
-            ParentRelationScope::delete($relation, $ids);
+            ParentRelationScope::delete($relation, Arr::wrap($args->arguments['delete']->toPlain()));
         }
 
         if ($args->has('connect')) {

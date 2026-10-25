@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToMany implements ArgResolver
@@ -77,7 +78,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('delete')) {
-            ParentRelationScope::delete($relation, $args->arguments['delete']->toPlain());
+            ParentRelationScope::delete($relation, Arr::wrap($args->arguments['delete']->toPlain()));
         }
     }
 }

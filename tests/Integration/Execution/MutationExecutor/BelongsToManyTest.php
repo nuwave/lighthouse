@@ -1165,6 +1165,74 @@ final class BelongsToManyTest extends DBTestCase
         $this->assertNull(User::find($user->id));
     }
 
+    /** @return iterable<array{bool}> */
+    public static function scopeToParent(): iterable
+    {
+        yield 'unscoped' => [false];
+        yield 'scoped to parent' => [true];
+    }
+
+    /** @dataProvider scopeToParent */
+    #[DataProvider('scopeToParent')]
+    public function testDeleteBelongsToManyWithSingleID(bool $scopeToParent): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => $scopeToParent]);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Role {
+            id: ID!
+            users: [User!] @belongsToMany
+        }
+
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            updateRole(input: UpdateRoleInput! @spread): Role @update
+        }
+
+        input UpdateRoleInput {
+            id: ID!
+            users: DeleteUserRelation
+        }
+
+        input DeleteUserRelation {
+            delete: ID
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $role = factory(Role::class)->create();
+        $user = factory(User::class)->create();
+        $role->users()->attach($user);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userID: ID!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    delete: $userID
+                }
+            }) {
+                users {
+                    id
+                }
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userID' => $user->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateRole' => [
+                    'users' => [],
+                ],
+            ],
+        ]);
+
+        $this->assertNull(User::find($user->id));
+    }
+
     public function testUpdateBelongsToManyWithoutRelationFailsWhenScopedToParent(): void
     {
         config(['lighthouse.nested_mutations_scope_to_parent' => true]);
