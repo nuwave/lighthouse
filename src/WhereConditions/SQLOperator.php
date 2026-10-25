@@ -120,7 +120,7 @@ GRAPHQL;
         if ($arity === 3) {
             // Usually, the operator is passed as the second argument to the condition
             // method, e.g. ->where('some_col', '=', $value)
-            $args[] = match($operator) {
+            $args[] = match ($operator) {
                 'JsonLengthEq' => '=',
                 'JsonLengthNeq' => '!=',
                 'JsonLengthLt' => '<',
