@@ -46,6 +46,7 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/_ide_helper.php',
         __DIR__ . '/rector.php',
     ]);
+    $rectorConfig->cacheDirectory(__DIR__ . '/rector-tmp-dir');
     $rectorConfig->bootstrapFiles([
         // Rector uses PHPStan internally, which in turn requires Larastan to be set up correctly
         __DIR__ . '/vendor/larastan/larastan/bootstrap.php',
