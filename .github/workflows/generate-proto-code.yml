@@ -17,11 +17,9 @@ jobs:
         with:
           setup_only: true
 
-      - run: |
-          buf generate
-          rm -rf src/Tracing/FederatedTracing/Proto
-          mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
-          rm -rf proto-tmp
+      - run: buf generate
+
+      - run: bin/install-generated-proto.sh
 
       - run: git pull
 
