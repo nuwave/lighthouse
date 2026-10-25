@@ -61,16 +61,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('disconnect')) {
-            $ids = $args->arguments['disconnect']->value;
-            $children = ParentRelationScope::applies($relation)
-                ? ParentRelationScope::findManyOrFail($relation, $ids)
-                : $relation
-                    ->make()
-                    ->whereIn(
-                        $relation->make()->getKeyName(),
-                        $ids,
-                    )
-                    ->get();
+            $children = ParentRelationScope::findMany($relation, $args->arguments['disconnect']->value);
             foreach ($children as $child) {
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();

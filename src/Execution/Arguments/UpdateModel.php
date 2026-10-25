@@ -37,9 +37,7 @@ class UpdateModel implements ArgResolver, PreSaveArgumentsAware
             ?? throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
         assert($id instanceof Argument);
 
-        $model = $this->parentRelation !== null && ParentRelationScope::applies($this->parentRelation)
-            ? ParentRelationScope::findManyOrFail($this->parentRelation, [$id->value])->firstOrFail()
-            : $model->newQuery()->findOrFail($id->value);
+        $model = ParentRelationScope::findOrFail($this->parentRelation, $model, $id->value);
 
         return ($this->previous)($model, $args);
     }

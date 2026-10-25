@@ -43,7 +43,7 @@ class UpsertModel implements ArgResolver, PreSaveArgumentsAware
             $identifyingColumns = $this->identifyingColumnValues($args, $this->identifyingColumns)
                 ?? throw new Error(self::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
 
-            $existingModel = $this->findExisting($model, $identifyingColumns);
+            $existingModel = ParentRelationScope::firstForUpsert($this->parentRelation, $model, $identifyingColumns);
 
             if ($existingModel !== null) {
                 $model = $existingModel;
@@ -53,7 +53,7 @@ class UpsertModel implements ArgResolver, PreSaveArgumentsAware
         if ($existingModel === null) {
             $id = $this->retrieveID($model, $args);
             if ($id) {
-                $existingModel = $this->findExisting($model, [$model->getKeyName() => $id]);
+                $existingModel = ParentRelationScope::findForUpsert($this->parentRelation, $model, $id);
                 if ($existingModel !== null) {
                     $model = $existingModel;
                 }
@@ -86,16 +86,6 @@ class UpsertModel implements ArgResolver, PreSaveArgumentsAware
         }
 
         return $identifyingValues;
-    }
-
-    /** @param  array<string, mixed>  $columns */
-    protected function findExisting(Model $model, array $columns): ?Model
-    {
-        if ($this->parentRelation !== null && ParentRelationScope::applies($this->parentRelation)) {
-            return ParentRelationScope::firstForUpsert($this->parentRelation, $columns);
-        }
-
-        return $model->newQuery()->firstWhere($columns);
     }
 
     /** @return mixed The value of the ID or null */
