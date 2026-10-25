@@ -4,12 +4,12 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Directives\ManyModelMutationDirective;
 use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
-use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Schema\Directives\ManyModelMutationDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
 final class UpdateManyDirectiveTest extends DBTestCase
 {

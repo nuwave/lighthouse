@@ -3,8 +3,8 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\QueryException;
-use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
+use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
 use Tests\Utils\Models\Company;
