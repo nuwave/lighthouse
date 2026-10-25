@@ -52,7 +52,7 @@ abstract class ModelMutationDirective extends BaseDirective implements FieldReso
         $relation = $model->{$this->relationName()}();
         assert($relation instanceof Relation);
 
-        $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
+        $related = $relation->make();
 
         return $this->executeMutation($related, $args, $relation);
     }

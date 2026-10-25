@@ -81,14 +81,12 @@ class PaginatedModelsLoader implements ModelsLoader
                 }
 
                 // Unlimited queries combined with UNION ALL below still need a limit, otherwise MySQL ignores their ORDER BY
-                // @phpstan-ignore-next-line Builder mixin is not understood
                 return $relation->forPage($this->paginationArgs->page, $first ?? PHP_INT_MAX);
             });
 
         // Merge all the relation queries into a single query with UNION ALL.
 
         $firstRelation = $relations->shift();
-        // @phpstan-ignore function.impossibleType,instanceof.alwaysFalse
         assert($firstRelation instanceof Relation, 'Non-null because only non-empty lists of parents are passed into this loader.');
 
         // Use ->getQuery() to respect model scopes, such as soft deletes

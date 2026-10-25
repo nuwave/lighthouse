@@ -217,7 +217,6 @@ final class DeferDBTest extends DBTestCase
 
             $this->assertSame(
                 $company->users
-                    // @phpstan-ignore-next-line type of model is known
                     ->map(static fn (User $user): array => [
                         'email' => $user->email,
                         'company' => null,

@@ -149,7 +149,7 @@ class FederatedTracing implements Tracing
     protected function findOrNewNode(array $path): Node
     {
         assert($this->trace !== null); // @phpstan-ignore notIdentical.alwaysTrue (control flow not understood)
-        assert($this->trace->getRoot() !== null); // @phpstan-ignore notIdentical.alwaysTrue (control flow not understood)
+        assert($this->trace->getRoot() !== null);
 
         if ($path === []) {
             return $this->trace->getRoot();

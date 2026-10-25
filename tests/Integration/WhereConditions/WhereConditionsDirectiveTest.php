@@ -22,6 +22,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         id: ID!
         name: String
         email: String
+        preferences: UserPreferences
+    }
+
+    type UserPreferences {
+        theme: String
+        languages: [String!]
     }
 
     type Post {
@@ -360,6 +366,354 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                     ],
                     [
                         'id' => '5',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonContainsKey(): void
+    {
+        $userWithoutTheme = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithoutTheme);
+        $userWithoutTheme->preferences = [];
+        $userWithoutTheme->save();
+
+        $userWithTheme = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithTheme);
+        $userWithTheme->preferences = ['theme' => 'dark'];
+        $userWithTheme->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->theme",
+                    operator: JSON_CONTAINS_KEY,
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonDoesntContainsKey(): void
+    {
+        $userWithoutTheme = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithoutTheme);
+        $userWithoutTheme->preferences = [];
+        $userWithoutTheme->save();
+
+        $userWithTheme = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithTheme);
+        $userWithTheme->preferences = ['theme' => 'dark'];
+        $userWithTheme->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->theme",
+                    operator: JSON_DOESNT_CONTAIN_KEY,
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonContains(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_CONTAINS,
+                    value: ["en", "fr"]
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonDoesntContains(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_DOESNT_CONTAIN,
+                    value: ["en", "fr"]
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonLengthEquals(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_LENGTH_EQ,
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonLengthNotEquals(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_LENGTH_NEQ,
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonLengthLessThan(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_LENGTH_LT,
+                    value: 2
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonLengthGreaterThan(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_LENGTH_GT,
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonLengthLessThanOrEquals(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_LENGTH_LTE,
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testOperatorJsonLengthGreaterThanOrEquals(): void
+    {
+        $userWithOnlyEnglish = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithOnlyEnglish);
+        $userWithOnlyEnglish->preferences = ['languages' => ['en']];
+        $userWithOnlyEnglish->save();
+
+        $userWithEnglishAndFrench = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithEnglishAndFrench);
+        $userWithEnglishAndFrench->preferences = ['languages' => ['en', 'fr']];
+        $userWithEnglishAndFrench->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "preferences->languages",
+                    operator: JSON_LENGTH_GTE,
+                    value: 2
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
                     ],
                 ],
             ],

@@ -6,8 +6,7 @@ on:
       - master
 
 env:
-  REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
-  LIGHTHOUSE_TEST_DB_USER: root
+  REQUIRED_PHP_EXTENSIONS: mbstring, pdo_mysql, redis
   LIGHTHOUSE_TEST_DB_PASSWORD: root
   LIGHTHOUSE_TEST_DB_HOST: 127.0.0.1
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
@@ -21,7 +20,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
+      matrix: &matrix
         php-version:
           - "8.0"
           - "8.1"
@@ -39,7 +38,7 @@ jobs:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
           - name: highest
-            arg: "" # No args added as highest is default
+            arg: ""
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
@@ -59,7 +58,7 @@ jobs:
             laravel-version: "^13"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -68,10 +67,10 @@ jobs:
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update phpbench/phpbench rector/rector
@@ -93,48 +92,11 @@ jobs:
 
   tests:
     name: PHPUnit on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
-      matrix:
-        php-version:
-          - "8.0"
-          - "8.1"
-          - "8.2"
-          - "8.3"
-          - "8.4"
-          - "8.5"
-        laravel-version:
-          - "^9"
-          - "^10"
-          - "^11"
-          - "^12"
-          - "^13"
-        os:
-          - ubuntu-latest
-        composer:
-          - name: lowest
-            arg: "--prefer-lowest --prefer-stable"
-          - name: highest
-            arg: "" # No args added as highest is default
-        exclude:
-          - php-version: "8.0"
-            laravel-version: "^10"
-          - php-version: "8.0"
-            laravel-version: "^11"
-          - php-version: "8.1"
-            laravel-version: "^11"
-          - php-version: "8.0"
-            laravel-version: "^12"
-          - php-version: "8.1"
-            laravel-version: "^12"
-          - php-version: "8.0"
-            laravel-version: "^13"
-          - php-version: "8.1"
-            laravel-version: "^13"
-          - php-version: "8.2"
-            laravel-version: "^13"
+      matrix: *matrix
 
     services:
       mysql:
@@ -152,7 +114,7 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -162,10 +124,10 @@ jobs:
           ini-values: zend.assertions=1
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update phpstan/phpstan-mockery phpbench/phpbench
@@ -188,11 +150,6 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php-version: ["8.5"]
-        laravel-version: ["^13"]
-
     services:
       mysql:
         image: mysql:5.7
@@ -209,53 +166,50 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: "8.5"
           coverage: pcov
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
           ini-values: zend.assertions=1
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          key: php-8.5-composer-^13
 
       - run: composer remove --dev phpbench/phpbench --no-update
 
-      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:^13 --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
       - name: "Upload to Codecov"
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   benchmarks:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php-version: ["8.5"]
-        laravel-version: ["^13"]
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: "8.5"
           coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          key: php-8.5-composer-^13
 
-      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:^13 --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpbench run --progress=none --report=aggregate

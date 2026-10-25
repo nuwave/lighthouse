@@ -23,7 +23,6 @@ final class WithEnum extends Model
 {
     public $timestamps = false;
 
-    // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
     protected $casts = [
         'type' => AOrB::class,
     ];

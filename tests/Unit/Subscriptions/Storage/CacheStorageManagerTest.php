@@ -25,7 +25,7 @@ final class CacheStorageManagerTest extends TestCase
     /** Construct a dummy subscriber for testing. */
     private function subscriber(string $queryString): Subscriber
     {
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = Subscriber::uniqueChannelName();
         $subscriber->query = Parser::parse($queryString, ['noLocation' => true]);
 
