@@ -185,11 +185,6 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php-version: ["8.5"]
-        laravel-version: ["^13"]
-
     services:
       mysql:
         image: mysql:5.7
@@ -210,7 +205,7 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: "8.5"
           coverage: pcov
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
           ini-values: zend.assertions=1
@@ -219,11 +214,11 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          key: php-8.5-composer-^13
 
       - run: composer remove --dev phpbench/phpbench --no-update
 
-      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:^13 --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
@@ -235,17 +230,12 @@ jobs:
   benchmarks:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php-version: ["8.5"]
-        laravel-version: ["^13"]
-
     steps:
       - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: "8.5"
           coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
@@ -253,8 +243,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
+          key: php-8.5-composer-^13
 
-      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:^13 --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpbench run --progress=none --report=aggregate
