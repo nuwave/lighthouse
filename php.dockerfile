@@ -23,7 +23,7 @@ RUN apt-get update && \
     && docker-php-ext-enable \
         xdebug \
         redis \
-    && echo 'memory_limit=-1' > /usr/local/etc/php/conf.d/lighthouse.ini
+    && printf 'memory_limit=-1\nxdebug.mode=off\n' > /usr/local/etc/php/conf.d/lighthouse.ini
 
 ARG USER
 ARG USER_ID

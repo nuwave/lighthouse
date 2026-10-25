@@ -30,8 +30,7 @@ final class SubscriptionTest extends TestCase
 
         $this->setUpTestsSubscriptions();
 
-        $this->mockResolverExpects($this->any())
-            ->willReturnCallback(static fn (mixed $root, array $args): array => $args);
+        $this->registerMockResolver(static fn (mixed $root, array $args): array => $args, 'default');
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
