@@ -27,7 +27,6 @@ parameters:
   - tests/Unit/Testing/TestingTraitDummyLumen.php
   # Native enums
   - tests/Utils/Enums/ImageableType.php
-  - tests/Utils/Enums/ImageableType.php
   ignoreErrors:
   # PHPUnit 10+ attributes don't exist in PHPUnit 9.x
   - path: tests
