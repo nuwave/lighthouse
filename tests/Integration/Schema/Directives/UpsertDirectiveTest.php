@@ -709,7 +709,7 @@ GRAPHQL;
         }
         GRAPHQL, [
             'userID' => $user->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel(['existing-task']));
 
         $otherUsersTask->refresh();
         $this->assertSame(1, $otherUsersTask->difficulty);

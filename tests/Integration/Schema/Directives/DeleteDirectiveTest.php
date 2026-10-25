@@ -476,7 +476,7 @@ final class DeleteDirectiveTest extends DBTestCase
         GRAPHQL, [
             'id' => $user->id,
             'deleteTasks' => [$otherUsersTask->id],
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
 
         $this->assertNotNull(Task::find($otherUsersTask->id));
     }
@@ -511,7 +511,7 @@ final class DeleteDirectiveTest extends DBTestCase
         GRAPHQL, [
             'id' => $user->id,
             'deleteRoles' => [$otherUsersRole->id],
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersRole->id]));
 
         $this->assertNotNull(Role::find($otherUsersRole->id));
         $this->assertCount(1, $otherUsersRole->users()->get());

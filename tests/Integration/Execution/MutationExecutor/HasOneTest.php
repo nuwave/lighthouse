@@ -569,7 +569,7 @@ final class HasOneTest extends DBTestCase
         GRAPHQL, [
             'taskID' => $task->id,
             'postID' => $otherTasksPost->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherTasksPost->id]));
 
         $this->assertNotNull(Post::find($otherTasksPost->id));
     }
@@ -599,7 +599,7 @@ final class HasOneTest extends DBTestCase
         GRAPHQL, [
             'taskID' => $task->id,
             'postID' => $otherTasksPost->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherTasksPost->id]));
 
         $otherTasksPost->refresh();
         $this->assertSame('original', $otherTasksPost->title);
@@ -631,7 +631,7 @@ final class HasOneTest extends DBTestCase
         GRAPHQL, [
             'taskID' => $task->id,
             'postID' => $otherTasksPost->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherTasksPost->id]));
 
         $otherTasksPost->refresh();
         $this->assertSame('original', $otherTasksPost->title);

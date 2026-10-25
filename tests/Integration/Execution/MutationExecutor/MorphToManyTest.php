@@ -391,7 +391,7 @@ final class MorphToManyTest extends DBTestCase
         GRAPHQL, [
             'taskID' => $task->id,
             'tagID' => $otherTasksTag->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherTasksTag->id]));
 
         $otherTasksTag->refresh();
 

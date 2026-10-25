@@ -11,7 +11,15 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class ParentRelationScope
 {
-    public const UNRELATED_MODEL = 'Cannot modify a model that is not related to the given parent.';
+    public const UNRELATED_MODEL = 'Cannot modify a model that is not related to the given parent';
+
+    /** @param  array<mixed>  $values */
+    public static function unrelatedModel(array $values): string
+    {
+        $valueList = implode(', ', $values);
+
+        return self::UNRELATED_MODEL . ": {$valueList}.";
+    }
 
     /**
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $relation
@@ -56,8 +64,9 @@ class ParentRelationScope
 
         $models = (clone $relation)->whereKey($ids)->get();
 
-        if (array_diff($ids, $models->modelKeys()) !== []) {
-            throw new Error(self::UNRELATED_MODEL);
+        $unrelatedIDs = array_diff($ids, $models->modelKeys());
+        if ($unrelatedIDs !== []) {
+            throw new Error(self::unrelatedModel($unrelatedIDs));
         }
 
         return $models;
@@ -111,7 +120,7 @@ class ParentRelationScope
         $scopedModel = (clone $relation)->where($qualifiedColumns)->first();
 
         if ($scopedModel === null && $model->newQuery()->where($columns)->exists()) {
-            throw new Error(self::UNRELATED_MODEL);
+            throw new Error(self::unrelatedModel($columns));
         }
 
         return $scopedModel;

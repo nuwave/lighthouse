@@ -911,7 +911,7 @@ final class HasManyTest extends DBTestCase
         GRAPHQL, [
             'userID' => $user->id,
             'taskID' => $otherUsersTask->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
 
         $this->assertNotNull(Task::find($otherUsersTask->id));
     }
@@ -939,7 +939,7 @@ final class HasManyTest extends DBTestCase
         GRAPHQL, [
             'userID' => $user->id,
             'taskID' => $task->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage('Cannot modify a model that is not related to the given parent: 999.');
 
         $this->assertNotNull(Task::find($task->id));
     }
@@ -1073,7 +1073,7 @@ final class HasManyTest extends DBTestCase
         GRAPHQL, [
             'userID' => $user->id,
             'taskID' => $otherUsersTask->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
 
         $otherUsersTask->refresh();
 
@@ -1134,7 +1134,7 @@ final class HasManyTest extends DBTestCase
         GRAPHQL, [
             'userID' => $user->id,
             'taskID' => $otherUsersTask->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
 
         $otherUsersTask->refresh();
         $this->assertSame('original', $otherUsersTask->name);
@@ -1166,7 +1166,7 @@ final class HasManyTest extends DBTestCase
         GRAPHQL, [
             'userID' => $user->id,
             'taskID' => $otherUsersTask->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
 
         $otherUsersTask->refresh();
         $this->assertSame('original', $otherUsersTask->name);
@@ -1348,7 +1348,7 @@ final class HasManyTest extends DBTestCase
         GRAPHQL, [
             'userID' => $user->id,
             'taskIDs' => [$task->id, $otherUsersTask->id],
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
 
         $task->refresh();
         $this->assertSame($user->id, $task->user_id);

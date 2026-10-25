@@ -373,7 +373,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
         GRAPHQL, [
             'userID' => $user->id,
             'taskID' => $otherUsersTask->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
 
         $otherUsersTask->refresh();
         $this->assertSame('original', $otherUsersTask->name);

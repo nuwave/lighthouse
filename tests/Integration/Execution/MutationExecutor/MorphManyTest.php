@@ -610,7 +610,7 @@ final class MorphManyTest extends DBTestCase
         GRAPHQL, [
             'taskID' => $task->id,
             'imageID' => $otherTasksImage->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherTasksImage->id]));
 
         $this->assertNotNull(Image::find($otherTasksImage->id));
     }
@@ -640,7 +640,7 @@ final class MorphManyTest extends DBTestCase
         GRAPHQL, [
             'taskID' => $task->id,
             'imageID' => $otherTasksImage->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherTasksImage->id]));
 
         $otherTasksImage->refresh();
         $this->assertSame('original', $otherTasksImage->url);

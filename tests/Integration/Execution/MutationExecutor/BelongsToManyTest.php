@@ -1124,7 +1124,7 @@ final class BelongsToManyTest extends DBTestCase
         GRAPHQL, [
             'roleID' => $role->id,
             'userID' => $otherRolesUser->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherRolesUser->id]));
 
         $this->assertNotNull(User::find($otherRolesUser->id));
         $this->assertCount(1, $otherRole->users()->get());
@@ -1258,7 +1258,7 @@ final class BelongsToManyTest extends DBTestCase
         GRAPHQL, [
             'roleID' => $role->id,
             'userID' => $otherRolesUser->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherRolesUser->id]));
 
         $otherRolesUser->refresh();
 
@@ -1291,7 +1291,7 @@ final class BelongsToManyTest extends DBTestCase
         GRAPHQL, [
             'roleID' => $role->id,
             'userID' => $otherRolesUser->id,
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherRolesUser->id]));
 
         $otherRolesUser->refresh();
 
@@ -1361,7 +1361,7 @@ final class BelongsToManyTest extends DBTestCase
         GRAPHQL, [
             'roleID' => $role->id,
             'userIDs' => [$user->id, $otherUser->id],
-        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUser->id]));
 
         $this->assertNotNull(User::find($user->id));
         $this->assertNotNull(User::find($otherUser->id));
