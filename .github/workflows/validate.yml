@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
+      matrix: &matrix
         php-version:
           - "8.0"
           - "8.1"
@@ -96,42 +96,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        php-version:
-          - "8.0"
-          - "8.1"
-          - "8.2"
-          - "8.3"
-          - "8.4"
-          - "8.5"
-        laravel-version:
-          - "^9"
-          - "^10"
-          - "^11"
-          - "^12"
-          - "^13"
-        composer:
-          - name: lowest
-            arg: "--prefer-lowest --prefer-stable"
-          - name: highest
-            arg: ""
-        exclude:
-          - php-version: "8.0"
-            laravel-version: "^10"
-          - php-version: "8.0"
-            laravel-version: "^11"
-          - php-version: "8.1"
-            laravel-version: "^11"
-          - php-version: "8.0"
-            laravel-version: "^12"
-          - php-version: "8.1"
-            laravel-version: "^12"
-          - php-version: "8.0"
-            laravel-version: "^13"
-          - php-version: "8.1"
-            laravel-version: "^13"
-          - php-version: "8.2"
-            laravel-version: "^13"
+      matrix: *matrix
 
     services:
       mysql:
