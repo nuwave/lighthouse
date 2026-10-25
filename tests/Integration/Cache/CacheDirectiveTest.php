@@ -523,4 +523,66 @@ final class CacheDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testDistinguishesFalseAndNullArgs(): void
+    {
+        $this->mockResolver(static fn (mixed $root, array $args): string => var_export($args['flag'], true));
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo(flag: Boolean): String @mock @cache
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo(flag: false)
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => 'false',
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo(flag: null)
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => 'NULL',
+            ],
+        ]);
+    }
+
+    public function testDistinguishesNullAndStringNullArgs(): void
+    {
+        $this->mockResolver(static fn (mixed $root, array $args): string => var_export($args['arg'], true));
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo(arg: String): String @mock @cache
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo(arg: "null")
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => "'null'",
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo(arg: null)
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => 'NULL',
+            ],
+        ]);
+    }
 }
