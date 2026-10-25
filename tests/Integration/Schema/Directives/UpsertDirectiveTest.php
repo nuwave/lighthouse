@@ -715,4 +715,133 @@ GRAPHQL;
         $this->assertSame(1, $otherUsersTask->difficulty);
         $this->assertSame($otherUser->id, $otherUsersTask->user_id);
     }
+
+    public function testNestedUpsertByIdentifyingColumnUpdatesRelatedModelWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->name = 'existing-task';
+        $task->difficulty = 1;
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            name: String
+            difficulty: Int
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks", identifyingColumns: ["name"])
+        }
+
+        input UpdateTaskInput {
+            name: String!
+            difficulty: Int
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!) {
+            updateUser(input: {
+                id: $userID
+                tasks: [{ name: "existing-task", difficulty: 2 }]
+            }) {
+                tasks {
+                    name
+                    difficulty
+                }
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
+                            'name' => 'existing-task',
+                            'difficulty' => 2,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(1, Task::count());
+    }
+
+    public function testNestedUpsertByIdentifyingColumnCreatesWhenNothingMatchesWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            name: String
+            difficulty: Int
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks", identifyingColumns: ["name"])
+        }
+
+        input UpdateTaskInput {
+            name: String!
+            difficulty: Int
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!) {
+            updateUser(input: {
+                id: $userID
+                tasks: [{ name: "existing-task", difficulty: 2 }]
+            }) {
+                tasks {
+                    name
+                    difficulty
+                }
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
+                            'name' => 'existing-task',
+                            'difficulty' => 2,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(1, Task::count());
+    }
 }

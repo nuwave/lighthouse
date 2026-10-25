@@ -1337,4 +1337,73 @@ final class BelongsToManyTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testDeleteBelongsToManyWithOwnAndForeignIDsFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $role = factory(Role::class)->create();
+        $user = factory(User::class)->create();
+        $role->users()->attach($user);
+        $otherUser = factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userIDs: [ID!]!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    delete: $userIDs
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userIDs' => [$user->id, $otherUser->id],
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $this->assertNotNull(User::find($user->id));
+        $this->assertNotNull(User::find($otherUser->id));
+        $this->assertCount(1, $role->users()->get());
+    }
+
+    public function testUpsertBelongsToManyWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $role = factory(Role::class)->create();
+        $user = factory(User::class)->create();
+        $role->users()->attach($user);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($roleID: ID!, $userID: ID!) {
+            updateRole(input: {
+                id: $roleID
+                users: {
+                    upsert: [{ id: $userID, name: "upserted" }]
+                }
+            }) {
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'roleID' => $role->id,
+            'userID' => $user->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateRole' => [
+                    'users' => [
+                        [
+                            'id' => (string) $user->id,
+                            'name' => 'upserted',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

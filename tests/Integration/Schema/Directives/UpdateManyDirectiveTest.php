@@ -5,6 +5,9 @@ namespace Tests\Integration\Schema\Directives;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\ManyModelMutationDirective;
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 
@@ -326,5 +329,53 @@ final class UpdateManyDirectiveTest extends DBTestCase
             }
         }
         GRAPHQL);
+    }
+
+    public function testNestedUpdateManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $otherUsersTask = factory(Task::class)->make();
+        $otherUsersTask->name = 'original';
+        $otherUsersTask->user()->associate(factory(User::class)->create());
+        $otherUsersTask->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type User {
+            id: Int
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @updateMany(relation: "tasks")
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!, $taskID: Int!) {
+            updateUser(input: {
+                id: $userID
+                tasks: [{ id: $taskID, name: "hacked" }]
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+            'taskID' => $otherUsersTask->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $otherUsersTask->refresh();
+        $this->assertSame('original', $otherUsersTask->name);
     }
 }

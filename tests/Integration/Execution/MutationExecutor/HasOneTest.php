@@ -637,4 +637,40 @@ final class HasOneTest extends DBTestCase
         $this->assertSame('original', $otherTasksPost->title);
         $this->assertSame($otherTask->id, $otherTasksPost->task_id);
     }
+
+    public function testUpdateHasOneWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $task = factory(Task::class)->create();
+        $post = factory(Post::class)->make();
+        $post->task()->associate($task);
+        $post->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $postID: ID!) {
+            updateTask(input: {
+                id: $taskID
+                post: {
+                    update: { id: $postID, title: "updated" }
+                }
+            }) {
+                post {
+                    title
+                }
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $task->id,
+            'postID' => $post->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateTask' => [
+                    'post' => [
+                        'title' => 'updated',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

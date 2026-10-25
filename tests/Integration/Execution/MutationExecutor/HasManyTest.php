@@ -1208,4 +1208,149 @@ final class HasManyTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testUpdateHasManyWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: ID!, $taskID: ID!) {
+            updateUser(input: {
+                id: $userID
+                tasks: {
+                    update: [{ id: $taskID, name: "updated" }]
+                }
+            }) {
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+            'taskID' => $task->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
+                            'name' => 'updated',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertHasManyWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: ID!, $taskID: ID!) {
+            updateUser(input: {
+                id: $userID
+                tasks: {
+                    upsert: [{ id: $taskID, name: "upserted" }]
+                }
+            }) {
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+            'taskID' => $task->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
+                            'name' => 'upserted',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(1, Task::count());
+    }
+
+    public function testDisconnectHasManyWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: ID!, $taskID: ID!) {
+            updateUser(input: {
+                id: $userID
+                tasks: {
+                    disconnect: [$taskID]
+                }
+            }) {
+                tasks {
+                    id
+                }
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+            'taskID' => $task->id,
+        ])->assertExactJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [],
+                ],
+            ],
+        ]);
+
+        $task->refresh();
+        $this->assertNull($task->user_id);
+    }
+
+    public function testDisconnectHasManyWithOwnAndForeignIDsFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+        $otherUsersTask = factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: ID!, $taskIDs: [ID!]!) {
+            updateUser(input: {
+                id: $userID
+                tasks: {
+                    disconnect: $taskIDs
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+            'taskIDs' => [$task->id, $otherUsersTask->id],
+        ])->assertGraphQLErrorMessage(ParentRelationScope::UNRELATED_MODEL);
+
+        $task->refresh();
+        $this->assertSame($user->id, $task->user_id);
+    }
 }
