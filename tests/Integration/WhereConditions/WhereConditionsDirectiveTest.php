@@ -1069,6 +1069,38 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $this->assertSame('CAMEL_CASE', $camelCaseValue['name']);
     }
 
+    public function testWellDefinedRelations(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users(
+                where: _ @whereConditions(relations: ["posts", "posts.comments", "alternateConnections.user", "alternate.connectionsUser"])
+            ): [User!]! @all
+        }
+        GRAPHQL;
+
+        $expectedEnumName = 'QueryUsersWhereRelation';
+        $enum = $this->introspectType($expectedEnumName);
+
+        $this->assertIsArray($enum);
+        $this->assertSame(TypeKind::ENUM, $enum['kind']);
+        $this->assertSame($expectedEnumName, $enum['name']);
+        $this->assertSame('Allowed relation names for Query.users.where.', $enum['description']);
+
+        $enumValues = $enum['enumValues'];
+        $this->assertCount(4, $enumValues);
+
+        [$postsValue, $postsCommentsValue, $alternateConnectionsUserValue, $alternateConnectionsUserNestedValue] = $enumValues;
+        $this->assertSame('POSTS', $postsValue['name']);
+        $this->assertSame('POSTS__COMMENTS', $postsCommentsValue['name']);
+        $this->assertSame('ALTERNATE_CONNECTIONS__USER', $alternateConnectionsUserValue['name']);
+        $this->assertSame('ALTERNATE__CONNECTIONS_USER', $alternateConnectionsUserNestedValue['name']);
+    }
+
     public function testUseColumnEnumsArg(): void
     {
         $user = factory(User::class)->create();
