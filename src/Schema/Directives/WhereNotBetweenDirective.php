@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective
@@ -28,7 +26,7 @@ directive @whereNotBetween(
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(Builder $builder, $value): Builder
     {
         if ($value === null) {
             return $builder;

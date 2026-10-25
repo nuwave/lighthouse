@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 final class WithoutGlobalScopesDirective extends BaseDirective implements ArgBuilderDirective
@@ -27,13 +27,15 @@ directive @withoutGlobalScopes(
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(Builder $builder, mixed $value): Builder
     {
         if (! $value) {
             return $builder;
         }
 
         $scopes = $this->directiveArgValue('names', $this->nodeName());
+
+        assert($builder instanceof EloquentBuilder || $builder instanceof Relation);
 
         return $builder->withoutGlobalScopes($scopes);
     }
