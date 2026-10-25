@@ -841,7 +841,7 @@ type Employee {
 }
 
 union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
-    User
+  | User
   | Employee
 ```
 
