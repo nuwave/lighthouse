@@ -37,9 +37,9 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
         ksort($args);
         foreach ($args as $key => $value) {
             $parts[] = $key;
-            $parts[] = is_array($value)
-                ? \Safe\json_encode($value)
-                : $value;
+            $parts[] = is_object($value)
+                ? $value
+                : \Safe\json_encode($value);
         }
 
         return implode(self::SEPARATOR, $parts);
