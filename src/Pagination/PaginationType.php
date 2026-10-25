@@ -43,6 +43,18 @@ class PaginationType
         return $this->type === self::CONNECTION;
     }
 
+    /**
+     * The field names leading from the paginated type to the paginated items.
+     *
+     * @return array<int, string>
+     */
+    public function itemsPath(): array
+    {
+        return $this->isConnection()
+            ? ['edges', 'node']
+            : ['data'];
+    }
+
     public function infoFieldName(): string
     {
         return match ($this->type) {

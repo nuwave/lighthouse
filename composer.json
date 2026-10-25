@@ -117,6 +117,7 @@
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
+                "Nuwave\\Lighthouse\\Select\\SelectServiceProvider",
                 "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
                 "Nuwave\\Lighthouse\\Testing\\TestingServiceProvider",
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
