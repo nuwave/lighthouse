@@ -61,14 +61,12 @@ class PaginatedModelsLoader implements ModelsLoader
 
                 $relation->initRelation([$model], $this->relation);
 
-                // @phpstan-ignore-next-line Builder mixin is not understood
                 return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
             });
 
         // Merge all the relation queries into a single query with UNION ALL.
 
         $firstRelation = $relations->shift();
-        // @phpstan-ignore function.impossibleType,instanceof.alwaysFalse
         assert($firstRelation instanceof Relation, 'Non-null because only non-empty lists of parents are passed into this loader.');
 
         // Use ->getQuery() to respect model scopes, such as soft deletes
