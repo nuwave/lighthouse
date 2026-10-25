@@ -54,6 +54,7 @@ Set `nested_mutations_scope_to_parent` to `true` in `config/lighthouse.php` to l
 
 - An ID that is not related to the parent causes an error, even if no model with that ID exists.
 - `upsert` creates a new model if no model with the given ID exists.
+- `upsert` with `identifyingColumns` causes an error if the matching model is not related to the parent.
 
 `connect`, `sync`, `syncWithoutDetaching` and the `update` and `upsert` operations on [BelongsTo](#belongsto) relations are not limited, because they relate models that are not yet related.
 Validate or authorize the IDs passed to them yourself.
