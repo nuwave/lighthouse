@@ -6,7 +6,7 @@ parameters:
   - benchmarks
   - src
   - tests
-  reportUnmatchedIgnoredErrors: false # As long as we support multiple Laravel versions at once, there will be some dead spots
+  reportUnmatchedIgnoredErrors: true
   # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
   editorUrl: '%%relFile%%:%%line%%'
   editorUrlTitle: '%%relFile%%:%%line%%'
