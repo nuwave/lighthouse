@@ -7,7 +7,6 @@ on:
 
 env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
-  LIGHTHOUSE_TEST_DB_USER: root
   LIGHTHOUSE_TEST_DB_PASSWORD: root
   LIGHTHOUSE_TEST_DB_HOST: 127.0.0.1
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
@@ -71,7 +70,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update phpbench/phpbench rector/rector
@@ -93,7 +92,7 @@ jobs:
 
   tests:
     name: PHPUnit on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
@@ -111,8 +110,6 @@ jobs:
           - "^11"
           - "^12"
           - "^13"
-        os:
-          - ubuntu-latest
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
@@ -165,7 +162,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update phpstan/phpstan-mockery phpbench/phpbench
