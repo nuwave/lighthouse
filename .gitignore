@@ -14,6 +14,7 @@ docs/superpowers
 .php-cs-fixer.cache
 build
 phpstan-tmp-dir
+rector-tmp-dir
 proto-tmp
 
 # composer
