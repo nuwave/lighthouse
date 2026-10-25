@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.head_ref }}
 
       - run: curl -sSfo src/Tracing/FederatedTracing/reports.proto https://usage-reporting.api.apollographql.com/proto/reports.proto
 
