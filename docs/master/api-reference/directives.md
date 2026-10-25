@@ -3002,7 +3002,8 @@ type Query {
   ): PostPaginator
 }
 
-"A paginated list of Post items." type PostPaginator {
+"A paginated list of Post items."
+type PostPaginator {
   "A list of Post items."
   data: [Post!]!
 
@@ -3010,7 +3011,8 @@ type Query {
   paginatorInfo: PaginatorInfo!
 }
 
-"Information about pagination using a fully featured paginator." type PaginatorInfo {
+"Information about pagination using a fully featured paginator."
+type PaginatorInfo {
   "Number of items in the current page."
   count: Int!
 
@@ -3081,7 +3083,8 @@ type Query {
   ): PostConnection
 }
 
-"A paginated list of Post edges." type PostConnection {
+"A paginated list of Post edges."
+type PostConnection {
   "Pagination information about the list of edges."
   pageInfo: PageInfo!
 
@@ -3089,7 +3092,8 @@ type Query {
   edges: [PostEdge]
 }
 
-"An edge that contains a node of type Post and a cursor." type PostEdge {
+"An edge that contains a node of type Post and a cursor."
+type PostEdge {
   "The Post node."
   node: Post
 
@@ -3130,7 +3134,8 @@ type Query {
   ): PostSimplePaginator
 }
 
-"A paginated list of Post items." type PostSimplePaginator {
+"A paginated list of Post items."
+type PostSimplePaginator {
   "A list of Post items."
   data: [Post!]!
 
@@ -3138,7 +3143,8 @@ type Query {
   paginatorInfo: SimplePaginatorInfo!
 }
 
-"Information about pagination using a simple paginator." type SimplePaginatorInfo {
+"Information about pagination using a simple paginator."
+type SimplePaginatorInfo {
   "Number of items in the current page."
   count: Int!
 
