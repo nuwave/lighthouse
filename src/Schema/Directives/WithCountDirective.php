@@ -22,8 +22,9 @@ class WithCountDirective extends WithRelationDirective implements FieldManipulat
 """
 Eager-load the count of an Eloquent relation if the field is queried.
 
-Note that this does not return a value for the field, the count is simply prefetched, assuming it is used to compute the field value.
-Use `@count` if the field should simply return the relation count.
+This does not return a value for the field.
+It only prefetches the count, assuming the field value is computed from it.
+Use `@count` to return the relation count as the field value.
 """
 directive @withCount(
   """

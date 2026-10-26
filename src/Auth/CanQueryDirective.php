@@ -15,7 +15,8 @@ class CanQueryDirective extends BaseCanDirective
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-Query for specific model instances to check the policy against, using arguments with directives that add constraints to the query builder, such as `@eq`.
+Query for specific model instances to check the policy against.
+Use arguments with directives that add constraints to the query builder, such as `@eq`.
 """
 directive @canQuery(
 {$commonArguments}

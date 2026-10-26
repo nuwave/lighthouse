@@ -17,7 +17,7 @@ class SoftDeletesDirective extends BaseDirective implements FieldManipulator
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Allows to filter if trashed elements should be fetched.
-This manipulates the schema by adding the argument `trashed: Trashed @trashed` to the field.
+This adds the argument `trashed: Trashed @trashed` to the field.
 """
 directive @softDeletes on FIELD_DEFINITION
 GRAPHQL;

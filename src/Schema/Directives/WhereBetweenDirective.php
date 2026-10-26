@@ -15,7 +15,7 @@ class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
 """
 Verify that a column's value is between two values.
 
-The type of the input value this is defined upon should be an `input` object with two fields.
+The type of the argument or input field should be an `input` object with two fields.
 """
 directive @whereBetween(
   """

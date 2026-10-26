@@ -29,7 +29,7 @@ This directive must only be used on fields of the root mutation type.
 When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched and the value `true` is returned.
 Thus, the field's return type must be `Boolean!`.
 
-Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job, it will actually execute the underlying field resolver.
+Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job, it executes the underlying field resolver.
 Errors that occur during execution are reported through the Laravel exception handler.
 The handlers in the `config/lighthouse.php` option `error_handlers` are not called.
 """

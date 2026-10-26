@@ -237,7 +237,8 @@ Qualify such columns with the table name, e.g. `@whereConditions(columns: ["role
 
 ```graphql
 """
-Allows clients to filter a query based on the existence of a related model, using a dynamically controlled `WHERE` condition that applies to the relationship.
+Allow clients to filter a query by the existence of a related model.
+A dynamically controlled `WHERE` condition applies to the relationship.
 """
 directive @whereHasConditions(
   """

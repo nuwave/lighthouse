@@ -13,7 +13,8 @@ class WhereHasConditionsDirective extends WhereConditionsBaseDirective
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Allows clients to filter a query based on the existence of a related model, using a dynamically controlled `WHERE` condition that applies to the relationship.
+Allow clients to filter a query by the existence of a related model.
+A dynamically controlled `WHERE` condition applies to the relationship.
 """
 directive @whereHasConditions(
     """

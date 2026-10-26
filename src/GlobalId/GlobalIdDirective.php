@@ -23,7 +23,8 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
 """
 Converts between IDs/types and global IDs.
 
-When used upon a field, it encodes; when used upon an argument, it decodes.
+On a field, it encodes the value.
+On an argument, it decodes the value.
 """
 directive @globalId(
   """

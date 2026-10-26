@@ -28,8 +28,8 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Sets rate limit to access the field.
-Does the same as ThrottleRequests Laravel Middleware.
+Limit the rate of access to the field.
+Works like the Laravel middleware `ThrottleRequests`.
 """
 directive @throttle(
     """

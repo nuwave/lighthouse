@@ -34,7 +34,7 @@ directive @delete(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 

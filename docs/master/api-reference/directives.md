@@ -159,7 +159,7 @@ This directive must only be used on fields of the root mutation type.
 When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched and the value `true` is returned.
 Thus, the field's return type must be `Boolean!`.
 
-Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job, it will actually execute the underlying field resolver.
+Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job, it executes the underlying field resolver.
 Errors that occur during execution are reported through the Laravel exception handler.
 The handlers in the `config/lighthouse.php` option `error_handlers` are not called.
 """
@@ -817,7 +817,7 @@ injectArgs: Boolean! = false
 """
 Statically defined arguments that are passed to `Gate::check`.
 
-You may pass arbitrary GraphQL literals, e.g.: [1, 2, 3] or { foo: "bar" }
+You may pass any GraphQL literal, e.g. `[1, 2, 3]` or `{ foo: "bar" }`.
 """
 args: CanArgs
 
@@ -867,11 +867,11 @@ You can find usage examples of these directives in [the authorization docs](../s
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-Query for specific model instances to check the policy against, using primary key(s) from specified argument.
+Query for specific model instances to check the policy against, using the primary key(s) from the specified argument.
 """
 directive @canFind(
   """
-  Specify the name of the field argument that contains its primary key(s).
+  Specify the name of the field argument that contains the primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
   """
@@ -917,7 +917,8 @@ directive @canModel(
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-Query for specific model instances to check the policy against, using arguments with directives that add constraints to the query builder, such as `@eq`.
+Query for specific model instances to check the policy against.
+Use arguments with directives that add constraints to the query builder, such as `@eq`.
 """
 directive @canQuery(
   """
@@ -1156,7 +1157,7 @@ directive @create(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -1208,7 +1209,7 @@ directive @createMany(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -1241,7 +1242,7 @@ directive @delete(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 
@@ -1542,7 +1543,7 @@ Works very similar to the [@delete](#delete) directive.
 ```graphql
 """
 Assign an internal value to an enum key.
-When dealing with the Enum type in your code, you will receive the defined value instead of the string key.
+Your code receives the internal value instead of the string key.
 """
 directive @enum(
   """
@@ -1661,7 +1662,8 @@ final class PlacedOrder
 """
 Converts between IDs/types and global IDs.
 
-When used upon a field, it encodes; when used upon an argument, it decodes.
+On a field, it encodes the value.
+On an argument, it decodes the value.
 """
 directive @globalId(
   """
@@ -1717,7 +1719,7 @@ You may rebind the `Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to a
 """
 Run authentication through one or more guards from `config/auth.php`.
 
-This is run per field and may allow unauthenticated users to still receive partial results.
+This runs per field, so unauthenticated users may still receive partial results.
 
 Used upon an object, it applies to all fields within.
 """
@@ -2042,13 +2044,13 @@ Inject a value from the context object into the arguments.
 directive @inject(
   """
   A path to the property of the context that will be injected.
-  If the value is nested within the context, you may use dot notation to get it, e.g. "user.id".
+  Use dot notation to get a nested value from the context, e.g. `user.id`.
   """
   context: String!
 
   """
   The target name of the argument into which the value is injected.
-  You can use dot notation to set the value at arbitrary depth within the incoming argument.
+  Use dot notation to set the value at any depth within the incoming arguments.
   Use an asterisk `*` as a path segment to inject the value into every element of a list found at that position.
   """
   name: String!
@@ -2212,7 +2214,7 @@ directive @like(
   key: String
 
   """
-  Fixate the positions of wildcards (`%`, `_`) in the LIKE comparison around the placeholder `{}`, e.g. `%{}`, `__{}` or `%{}%`.
+  Fix the positions of wildcards (`%`, `_`) around the placeholder `{}` in the LIKE comparison, e.g. `%{}`, `__{}` or `%{}%`.
   If specified, wildcard characters in the client-given input are escaped.
   If not specified, the client can pass wildcards unescaped.
   """
@@ -2234,15 +2236,17 @@ directive @like(
 
 ```graphql
 """
-Allow clients to specify the maximum number of results to return when used on an argument, or statically limit them when used on a field.
+On an argument, allow clients to specify the maximum number of results to return.
+On a field, limit the number of results statically.
 
-By default, this directive does not influence the number of results the resolver queries internally, but limits how much of it is returned to clients.
+By default, this directive does not change how many results the resolver queries internally.
+It only limits how many of them are returned to clients.
 Use the `builder` argument to change this.
 """
 directive @limit(
   """
-  You may set this to `true` if the field uses a query builder, then this directive will apply a LIMIT clause to it.
-  Typically, this option should only be used for root fields, as it may cause wrong results with batched relation queries.
+  Set this to `true` to apply a LIMIT clause to the query builder of the field.
+  Only use this on root fields, as it may cause wrong results with batched relation queries.
   """
   builder: Boolean! = false
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
@@ -2293,7 +2297,7 @@ type Query {
 """
 Resolve a field by calling a method on the parent object.
 
-Use this if the data is not accessible through simple property access or if you want to pass argument to the method.
+Use this if the data is not accessible through simple property access, or to pass arguments to the method.
 """
 directive @method(
   """
@@ -2666,7 +2670,7 @@ type User {
 
 ```graphql
 """
-A no-op nested arg resolver that delegates all calls to the ArgResolver directives attached to the children.
+A no-op nested arg resolver that delegates all calls to the ArgResolver directives of its children.
 """
 directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
@@ -2703,7 +2707,7 @@ type User {
 """
 Register a type for Relay's global object identification.
 
-When used without any arguments, Lighthouse will attempt to resolve the type through a model with the same name.
+Without arguments, Lighthouse tries to resolve the type through the model with the same name.
 """
 directive @node(
   """
@@ -3367,7 +3371,7 @@ Validate an argument using [Laravel validation](https://laravel.com/docs/validat
 directive @rules(
   """
   Specify the validation rules to apply to the field.
-  This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules), or the fully qualified class name of a custom validation rule.
+  Reference either one of [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules) or the fully qualified class name of a custom validation rule.
 
   Validation rules that mutate the given input values are _not_ supported:
   - `exclude_if`
@@ -3422,7 +3426,7 @@ Run validation on an array itself, using [Laravel built-in validation](https://l
 directive @rulesForArray(
   """
   Specify the validation rules to apply to the field.
-  This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules, or the fully qualified class name of a custom validation rule.
+  Reference either one of [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules) or the fully qualified class name of a custom validation rule.
 
   Validation rules that mutate the given input values are _not_ supported:
   - `exclude_if`
@@ -3615,7 +3619,7 @@ See [feature toggles](../digging-deeper/feature-toggles.md).
 ```graphql
 """
 Allows to filter if trashed elements should be fetched.
-This manipulates the schema by adding the argument `trashed: Trashed @trashed` to the field.
+This adds the argument `trashed: Trashed @trashed` to the field.
 """
 directive @softDeletes on FIELD_DEFINITION
 ```
@@ -3721,8 +3725,8 @@ type Subscription {
 
 ```graphql
 """
-Sets rate limit to access the field.
-Does the same as ThrottleRequests Laravel Middleware.
+Limit the rate of access to the field.
+Works like the Laravel middleware `ThrottleRequests`.
 """
 directive @throttle(
   """
@@ -3892,7 +3896,7 @@ directive @update(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -3942,7 +3946,7 @@ directive @updateMany(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -3965,7 +3969,8 @@ input UpdatePostInput {
 
 ```graphql
 """
-Uploads given file to storage, removes the argument and sets the returned path to the attribute key provided.
+Upload the given file to storage and remove the argument.
+The returned path is set to the given attribute key.
 
 This does not change the schema from a client perspective.
 """
@@ -4023,7 +4028,7 @@ directive @upsert(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -4072,7 +4077,7 @@ directive @upsertMany(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -4259,7 +4264,7 @@ type Query {
 """
 Verify that a column's value is between two values.
 
-The type of the input value this is defined upon should be an `input` object with two fields.
+The type of the argument or input field should be an `input` object with two fields.
 """
 directive @whereBetween(
   """
@@ -4370,7 +4375,7 @@ type Mutation {
 """
 Verify that a column's value lies outside two values.
 
-The type of the input value this is defined upon should be an `input` object with two fields.
+The type of the argument or input field should be an `input` object with two fields.
 """
 directive @whereNotBetween(
   """
@@ -4497,8 +4502,9 @@ If you just want to return the relation as-is, see [handling Eloquent relationsh
 """
 Eager-load the count of an Eloquent relation if the field is queried.
 
-Note that this does not return a value for the field, the count is simply prefetched, assuming it is used to compute the field value.
-Use `@count` if the field should simply return the relation count.
+This does not return a value for the field.
+It only prefetches the count, assuming the field value is computed from it.
+Use `@count` to return the relation count as the field value.
 """
 directive @withCount(
   """
