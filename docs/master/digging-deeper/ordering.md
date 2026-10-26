@@ -10,7 +10,8 @@ type Query {
 }
 ```
 
-The type of the argument can be left blank as `_` , as Lighthouse will automatically generate an input that takes enumerated column names, together with the `SortOrder` enum.
+You can leave the type of the argument blank as `_`.
+Lighthouse then generates an input that takes enumerated column names, together with the `SortOrder` enum.
 Add that to your schema:
 
 ```graphql

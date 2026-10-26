@@ -37,7 +37,8 @@ Because the GraphQL Specification does not support polymorphic Input types (yet)
 
 It is not possible to have an argument that can contain different types.
 Would be necessary to pass the attributes the different related models might have.
-For now, we can only support cases where the input type does not change across related models, e.g. connecting through an ID, disconnecting or deleting the relation.
+For now, we only support cases where the input type does not change across related models.
+Examples are connecting through an ID, disconnecting or deleting the relation.
 
 See [this issue](https://github.com/nuwave/lighthouse/issues/900) for further discussion.
 
@@ -182,7 +183,8 @@ input UpdateUserBelongsTo {
 ```
 
 You must pass a truthy value to `disconnect` and `delete` for them to run.
-This structure was chosen as it is consistent with updating `BelongsToMany` relationships and allows the query string to be mostly static, taking a variable value to control its behavior.
+This structure is consistent with updating `BelongsToMany` relationships.
+It allows the query string to be mostly static, with a variable value to control its behavior.
 
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean) {
@@ -251,7 +253,8 @@ mutation UpdatePost($disconnectAuthor: Boolean) {
 
 ## MorphTo
 
-The basic structure of this nested mutation type is similar to [BelongsTo](#belongsto), the main difference being that the `connect` operation requires an input type with both the `id` and `type` of the related model.
+The basic structure of this nested mutation type is similar to [BelongsTo](#belongsto).
+The main difference is that the `connect` operation requires an input type with both the `id` and `type` of the related model.
 
 ```graphql
 type Task {
@@ -685,7 +688,7 @@ type UserMoviePivot {
 }
 ```
 
-Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass an array where the keys are IDs of related models and the values are pivot data.
+Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods accept an array with IDs of related models as keys and pivot data as values.
 
 Lighthouse exposes this capability through the nested operations on many-to-many relations.
 Instead of passing only a list of IDs, you can define an `input` type that also contains pivot data.

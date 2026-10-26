@@ -306,7 +306,8 @@ Use `executeQueryString()` for executing a string query or `executeParsedQuery()
 See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category.
 
 You can [leverage `GraphQL\Error\ProvidesExtensions`](https://lighthouse-php.com/master/digging-deeper/error-handling.html#additional-error-information) to restore `category` in your custom exceptions.
-Additionally, you may [implement a custom error handler](https://lighthouse-php.com/master/digging-deeper/error-handling.html#registering-error-handlers) that wraps well-known third-party exceptions with your own exception that adds an appropriate `category`.
+Additionally, you may [implement a custom error handler](https://lighthouse-php.com/master/digging-deeper/error-handling.html#registering-error-handlers) that wraps well-known third-party exceptions with your own exception.
+Your exception adds an appropriate `category`.
 
 ### Use native interface for errors with extensions
 
@@ -359,7 +360,8 @@ If you had previously depended on the presence of the schema in your cache, then
 
 ### Register `ScoutServiceProvider` if you use `@search`
 
-If you use the `@search` directive in your schema, you will now need to register the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`, it is no longer registered by default.
+If you use the `@search` directive in your schema, register the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`.
+It is no longer registered by default.
 See [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ### Update `lighthouse.guard` configuration
@@ -432,7 +434,8 @@ type Query {
 ```
 
 [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
-To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config, see the [default config](src/lighthouse.php) for an example.
+To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config.
+See the [default config](src/lighthouse.php) for an example.
 
 If you used `@middleware` for authorization, replace it with [@can](docs/master/api-reference/directives.md#can).
 
@@ -571,7 +574,8 @@ This affects custom directives that implemented one of the following interfaces:
 - `Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`
 - `Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`
 
-Whereas those interfaces previously extended `Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now have to choose if you want them to apply to entire lists of arguments, elements within that list.
+Those interfaces previously extended `Nuwave\Lighthouse\Support\Contracts\ArgDirective`.
+Now you have to choose if you want them to apply to entire lists of arguments, or to elements within that list.
 Or both.
 Change them as follows to make them behave like in v4:
 
@@ -642,13 +646,16 @@ type Mutation {
 The event is no longer fired, and the event class was removed.
 Lighthouse now uses a queued job instead.
 
-If you manually fired the event, replace it by queuing a `Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob` or a call to `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions::queueBroadcast()`.
+If you manually fired the event, queue a `Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob` instead.
+Alternatively, call `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions::queueBroadcast()`.
 
-In case you depend on an event being fired whenever a subscription is queued, you can bind your own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions`.
+You may depend on an event being fired whenever a subscription is queued.
+Then bind your own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions`.
 
 ### `TypeRegistry` does not register duplicates by default
 
-Calling `register()` on the `Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing a type that was already registered, as this most likely is an error.
+Calling `register()` on the `Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing a type that was already registered.
+This is most likely an error.
 
 If you want to previous behavior of overwriting existing types, use `overwrite()` instead.
 

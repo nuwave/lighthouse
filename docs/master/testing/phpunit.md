@@ -251,9 +251,11 @@ $this
 
 ## Testing Errors
 
-Depending on your debug and error handling configuration, Lighthouse catches most if not all errors produced within queries and includes them within the result.
+Depending on your debug and error handling configuration, Lighthouse catches most if not all errors produced within queries.
+It includes them in the result.
 
-One way to test for errors is to examine the `TestResponse`, either by looking at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins) such as `assertGraphQLErrorMessage()`:
+One way to test for errors is to examine the `TestResponse`.
+Look at the JSON response manually or use the provided [assertion mixins](#testresponse-assertion-mixins) such as `assertGraphQLErrorMessage()`:
 
 ```php
 $this

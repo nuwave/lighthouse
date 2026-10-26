@@ -96,7 +96,8 @@ class SaveModel implements ArgResolver, PreSaveArgumentsAware
         if ($this->parentRelation instanceof BelongsTo) {
             $childModel = $this->parentRelation->associate($model);
 
-            // If the child Model does not exist (still to be saved), a save could break any pending belongsTo relations that still need to be created and associated with it.
+            // If the child Model does not exist yet, saving it could break pending belongsTo relations.
+            // Those still need to be created and associated with it.
             if ($childModel->exists) {
                 $childModel->save();
             }

@@ -81,7 +81,8 @@ class PaginationArgs
         }
 
         // If the result may be used in a cache, we always want to retrieve and store the full pagination data.
-        // Even though the query that initially creates the cache may not need additional information such as the total counts, following queries may need them - and use the same cached value.
+        // The query that creates the cache may not need additional information such as the total counts.
+        // Following queries may need them and use the same cached value.
         $hasCacheDirective = $resolveInfo->argumentSet
             ->directives
             ->contains(static fn (Directive $directive): bool => $directive instanceof CacheDirective);

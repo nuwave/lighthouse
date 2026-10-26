@@ -27,7 +27,7 @@ type Query {
 
 ## @feature
 
-The [@feature](../api-reference/directives.md#feature) directive allows to include fields, types, arguments, or input fields in the schema depending on whether a [Laravel Pennant](https://laravel.com/docs/pennant) feature is active.
+The [@feature](../api-reference/directives.md#feature) directive allows to include fields, types, arguments, or input fields in the schema if a [Laravel Pennant](https://laravel.com/docs/pennant) feature is active.
 
 For example, you might want a new experimental field only to be available when the according feature is active:
 
@@ -73,9 +73,11 @@ type Query {
 ## Interaction With Schema Cache
 
 [@show](../api-reference/directives.md#show) and [@hide](../api-reference/directives.md#hide) work by manipulating the schema.
-This means that when using their `env` option, the inclusion or exclusion of elements depends on the value of `app()->environment()` at the time the schema is built and not update on later environment changes.
+With their `env` option, the inclusion or exclusion of elements depends on the value of `app()->environment()` at the time the schema is built.
+It does not update on later environment changes.
 If you are pre-generating your schema cache, make sure to match the environment to your deployment target.
 
 The same goes for [@feature](../api-reference/directives.md#feature).
 Whether a field is included in the schema will be based on the state of a feature at the time the schema is built.
-In addition, if you are pre-generating your schema cache, you will only be able to use features that support [nullable scopes](https://laravel.com/docs/pennant#nullable-scope), as there won't be an authenticated user to check the feature against.
+In addition, if you pre-generate your schema cache, you can only use features that support [nullable scopes](https://laravel.com/docs/pennant#nullable-scope).
+There is no authenticated user to check the feature against.

@@ -4,7 +4,8 @@ You can use [standard Laravel mechanisms](https://laravel.com/docs/authenticatio
 
 ## AttemptAuthentication middleware
 
-As all GraphQL requests are served at a single HTTP endpoint, middleware added through the `lighthouse.php` config will run for all queries against your server.
+All GraphQL requests are served at a single HTTP endpoint.
+Thus, middleware added through the `lighthouse.php` config runs for all queries against your server.
 
 In most cases, your schema will have some publicly accessible fields and others that require authentication.
 As multiple checks for authentication or permissions may be required in a single request, it is convenient to attempt authentication once per request.
@@ -45,7 +46,8 @@ Stateless guards are recommended for most use cases, such as the default `api` g
 
 ### Laravel Sanctum
 
-If you are using [Laravel Sanctum](https://laravel.com/docs/sanctum) for your API, set the guard to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as the first middleware for Lighthouse's route.
+If you are using [Laravel Sanctum](https://laravel.com/docs/sanctum) for your API, set the guard to `sanctum`.
+Then register Sanctum's `EnsureFrontendRequestsAreStateful` as the first middleware for Lighthouse's route.
 
 ```php
     'route' => [

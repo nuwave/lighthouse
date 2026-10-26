@@ -26,7 +26,8 @@ type Query {
 }
 ```
 
-The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
+The [@all](../api-reference/directives.md#all) directive assumes that your model has the same name as the return type of the field.
+It uses Eloquent to resolve the field.
 
 The following query:
 
@@ -262,7 +263,8 @@ type Mutation {
 }
 ```
 
-When using `identifyingColumns`, all configured identifying columns must be provided with non-null values, otherwise the upsert fails with a GraphQL error.
+When using `identifyingColumns`, all configured identifying columns must have non-null values.
+Otherwise, the upsert fails with a GraphQL error.
 
 Since upsert can create or update your data, your input should mark the minimum required fields as non-nullable.
 

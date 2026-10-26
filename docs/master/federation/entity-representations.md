@@ -28,7 +28,7 @@ type Comment @extends @key(fields: "id") {
 
 ## Non-Eloquent representation
 
-If entities don't have an Eloquent relationship within the subgraph, it's necessary to specify a separate resolver that will return the required information.
+If entities don't have an Eloquent relationship within the subgraph, specify a separate resolver that returns the required information.
 The resolver should return data containing information about the `__typename` field.
 This corresponds to the entity's name and the primary key that can identify the entity.
 The `__typename` can either be provided as an explicit field or implicitly by returning an object with a matching class name.

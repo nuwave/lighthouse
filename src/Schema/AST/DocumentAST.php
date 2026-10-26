@@ -135,7 +135,8 @@ class DocumentAST implements Arrayable
                         throw new DefinitionException("Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}.");
                     }
 
-                    // It might be valid to have multiple types that correspond to a single model in order to hide some fields in some scenarios, so we cannot decide on a single object type for a given class name unambiguously right here.
+                    // Multiple types may correspond to a single model, e.g. to hide some fields in some scenarios.
+                    // So we cannot pick a single object type for a given class name here.
                     $instance->classNameToObjectTypeNames[$modelClass][] = $name;
                 }
             } elseif ($definition instanceof TypeExtensionNode) {

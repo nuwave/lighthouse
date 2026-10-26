@@ -3,7 +3,8 @@
 Not every user in your application may be allowed to see all data or do any action.
 You can control what they can do by enforcing authorization rules.
 
-Before you can apply authorization, make sure you cover [authentication](authentication.md) first - it's a prerequisite to have your users logged in before checking what they can do.
+Before you apply authorization, cover [authentication](authentication.md) first.
+Your users must be logged in before you check what they can do.
 
 ## Use the Viewer pattern
 
@@ -203,7 +204,7 @@ final class PostPolicy
 }
 ```
 
-When you combine both ways of passing arguments, the policy will be passed the `injectArgs` as the second parameter and the static `args` as the third parameter:
+When you combine both ways, the policy receives `injectArgs` as the second parameter and the static `args` as the third:
 
 ```php
 final class PostPolicy

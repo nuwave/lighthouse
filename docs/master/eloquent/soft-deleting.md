@@ -4,7 +4,8 @@ Lighthouse offers convenient helpers to work with models that use [soft deletes]
 
 ## Filter Soft Deleted Models
 
-If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait, you can add the [@softDeletes](../api-reference/directives.md#softdeletes) directive to a field to be able to query `onlyTrashed`, `withTrashed` or `withoutTrashed` elements.
+If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait, add the [@softDeletes](../api-reference/directives.md#softdeletes) directive to a field.
+Then you can query `onlyTrashed`, `withTrashed` or `withoutTrashed` elements.
 
 ```graphql
 type Query {

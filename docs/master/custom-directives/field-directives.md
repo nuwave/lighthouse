@@ -4,7 +4,8 @@ Field directives can be applied to any [FieldDefinition](https://graphql.github.
 
 ## FieldResolver
 
-Perhaps the most important directive interface, a [`Nuwave\Lighthouse\Support\Contracts\FieldResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldResolver.php) lets you add a resolver for a field through a directive.
+A [`Nuwave\Lighthouse\Support\Contracts\FieldResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldResolver.php) lets you add a resolver for a field through a directive.
+It is perhaps the most important directive interface.
 
 It can be a great way to reuse resolver logic within a schema.
 
@@ -76,7 +77,8 @@ A [`Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nu
 
 ## ValidationDirective
 
-This directive type is implemented as an abstract class rather than a pure interface and allows you to define complex validation rules for a field with ease.
+This directive type is an abstract class rather than a pure interface.
+It lets you define complex validation rules for a field.
 
 [Read more about it in the Validation section](../security/validation.md#validator-for-fields).
 

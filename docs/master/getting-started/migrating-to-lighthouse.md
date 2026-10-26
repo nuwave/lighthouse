@@ -20,7 +20,8 @@ Sometimes, additional annotations or a PHP implementation is required.
 
 ## Resolver logic
 
-If you are coming from libraries such as [Folkloreatelier/laravel-graphql](https://github.com/Folkloreatelier/laravel-graphql), [rebing/laravel-graphql](https://github.com/rebing/graphql-laravel) or any other library that is originally based upon [webonyx/graphql-php](https://github.com/webonyx/graphql-php), you should be able to reuse much of your existing code.
+Many libraries are based upon [webonyx/graphql-php](https://github.com/webonyx/graphql-php), such as [Folkloreatelier/laravel-graphql](https://github.com/Folkloreatelier/laravel-graphql) and [rebing/laravel-graphql](https://github.com/rebing/graphql-laravel).
+If you are coming from one of them, you should be able to reuse much of your existing code.
 
 You can also register your existing types within Lighthouse's type registry, so you won't have to rewrite them in SDL.
 [Use native PHP types](../digging-deeper/adding-types-programmatically.md#native-php-types).

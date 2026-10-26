@@ -24,7 +24,8 @@ The return value of this must fit the return type defined for the corresponding 
 
 ## Root resolvers
 
-Root resolvers are classes with an `__invoke` method that sit directly in the configured `lighthouse.namespaces.queries` or `lighthouse.namespaces.mutations` namespaces.
+Root resolvers are classes with an `__invoke` method.
+They sit directly in the configured `lighthouse.namespaces.queries` or `lighthouse.namespaces.mutations` namespaces.
 Lighthouse calls them with positional arguments `($root, $args, $context, $resolveInfo)` where `$root` is always `null` for root types.
 
 Omitting `$root` causes Lighthouse's positional `null` to bind to `$args`, producing TypeErrors at runtime.

@@ -93,7 +93,8 @@ The following example illustrates how a field `foo` can be referenced three time
 }
 ```
 
-You can get all arguments for every node that is referencing the field you are currently resolving, passing the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature):
+You can get all arguments for every node that references the field you are resolving.
+Pass the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature):
 
 ```php
 $arguments = $clientDirective->forField($resolveInfo);

@@ -44,7 +44,8 @@ This means the relationship data is not loaded until you first access the proper
 This leads to a common performance pitfall that comes with the nested nature of GraphQL queries: the so-called N+1 query problem.
 [Learn more](../performance/n-plus-one.md).
 
-When you decorate your relationship fields with Lighthouse's built-in relationship directives, queries are automatically combined through a technique called _batch loading_.
+When you decorate your relationship fields with Lighthouse's built-in relationship directives, Lighthouse combines their queries.
+This technique is called _batch loading_.
 That means you get fewer database requests and better performance without doing much work.
 
 > Batch loading might not provide ideal performance for all use cases.

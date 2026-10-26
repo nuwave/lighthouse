@@ -219,7 +219,8 @@ class TypeRegistry
      */
     public function possibleTypes(): array
     {
-        // Make sure all the types from the AST are eagerly converted to find orphaned types, such as an object type that is only ever used through its association to an interface.
+        // Eagerly convert all types from the AST to find orphaned types.
+        // An example is an object type that is only ever used through its interface.
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->getName()->value;
 

@@ -371,7 +371,8 @@ You may want to allow accessing data that describes the relation between the mod
 See [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
 
 Like in Laravel, you can access the `pivot` attribute on the models (or its alias).
-Even though this attribute is always present when querying the model through the relation, it may not be present when reaching the node through another path in the schema.
+This attribute is always present when querying the model through the relation.
+It may be missing when reaching the node through another path in the schema.
 It is recommended to define the field as nullable (no `!`).
 
 The following example assumes the intermediate table between `User` and `Role` defines a column `meta`.
@@ -417,7 +418,8 @@ type RoleUserPivot {
 }
 ```
 
-When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) that either contains the attributes of the intermediate table or contains a `pivot` field with the corresponding type.
+When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types).
+It contains either the attributes of the intermediate table or a `pivot` field with the corresponding type.
 
 The custom edge type must contain at least the following two fields:
 
@@ -1295,7 +1297,8 @@ type Mutation {
 }
 ```
 
-If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or `MorphTo` relationship, you can pass a Boolean instead of an ID, as there is only one possible model that can be deleted.
+For a `HasOne`, `MorphOne`, `BelongsTo` or `MorphTo` relationship to a single other model, you can pass a Boolean instead of an ID.
+There is only one possible model to delete.
 
 ```graphql
 type Mutation {
@@ -1390,7 +1393,8 @@ enum FeatureState {
 }
 ```
 
-Requires the installation of [Laravel Pennant](https://laravel.com/docs/pennant) and manual registration of the service provider `Nuwave\Lighthouse\Pennant\PennantServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
+Requires the installation of [Laravel Pennant](https://laravel.com/docs/pennant).
+Register the service provider `Nuwave\Lighthouse\Pennant\PennantServiceProvider` manually, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ## @field
 
@@ -1420,7 +1424,8 @@ type Mutation {
 }
 ```
 
-You can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md), The following will look for a class in `App\GraphQL\Queries` by default.
+You can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md).
+The following will look for a class in `App\GraphQL\Queries` by default.
 
 ```graphql
 type Query {
@@ -1698,7 +1703,8 @@ enum GlobalIdDecode {
 }
 ```
 
-Instead of the original ID, the `id` field will now return a base64-encoded String that globally identifies the User and can be used for querying the `node` endpoint.
+Instead of the original ID, the `id` field now returns a base64-encoded String that globally identifies the User.
+Clients can use it to query the `node` endpoint.
 
 ```graphql
 type User {
@@ -2081,7 +2087,8 @@ type Mutation {
 }
 ```
 
-If you need to inject a value into every element of a list, such as a nested `create` mutation for a `HasMany` relation, use an asterisk `*` as a wildcard path segment.
+To inject a value into every element of a list, use an asterisk `*` as a wildcard path segment.
+An example is a nested `create` mutation for a `HasMany` relation.
 
 ```graphql
 type Mutation {
@@ -3560,7 +3567,8 @@ directive @search(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Requires the installation of [Laravel Scout](https://laravel.com/docs/scout) and manual registration of the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
+Requires the installation of [Laravel Scout](https://laravel.com/docs/scout).
+Register the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider` manually, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 The model `search()` method is called with the argument value.
 It uses the Scout driver you configured.
@@ -3579,7 +3587,8 @@ The [@search](#search) directive only works in combination with filter directive
 Scout is only activated if an argument annotated with [@search](#search) is present with a string value.
 Passing `null` behaves the same as leaving the argument out and falls back to a database query.
 
-When using [@convertEmptyStringsToNull](#convertemptystringstonull), nullable `String` arguments with an empty string value may be converted to `null` and therefore not activate Scout.
+With [@convertEmptyStringsToNull](#convertemptystringstonull), nullable `String` arguments with an empty string value may become `null`.
+Those do not activate Scout.
 If you need empty-string search behavior, prefer an explicit schema contract such as a dedicated search field or a non-null search argument.
 
 Normally the search will be performed using the index specified by the model's `searchableAs` method.
@@ -4098,7 +4107,8 @@ input UpsertUserInput {
 }
 ```
 
-For `@upsertMany`, all configured identifying columns must be present with non-null values for every input item, otherwise the upsert fails with a GraphQL error.
+For `@upsertMany`, every input item must have non-null values for all configured identifying columns.
+Otherwise, the upsert fails with a GraphQL error.
 
 ## @validator
 

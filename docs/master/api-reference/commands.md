@@ -61,7 +61,8 @@ A great way to keep up to date with your current version of Lighthouse is to add
     ],
 ```
 
-If the generated definitions conflict with those provided by your IDE, try `--omit-built-in` to avoid redefining built-in directives such as `@deprecated`.
+If the generated definitions conflict with those of your IDE, try `--omit-built-in`.
+It avoids redefining built-in directives such as `@deprecated`.
 
 ## interface
 

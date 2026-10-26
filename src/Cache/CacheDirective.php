@@ -101,7 +101,8 @@ GRAPHQL;
             //        return $value['rawValue'];
             //    }
             //
-            // Such a change would introduce some potential BC, if for instance cached value was already containing an object with a `rawValue` key prior the implementation change.
+            // Such a change could break backwards compatibility.
+            // For instance, a value cached before the change might already contain an object with a `rawValue` key.
             // A possible workaround is to choose a less collision-probable key instead of `rawValue` (e.g. "lighthouse:rawValue").
 
             $resolved = $resolver($root, $args, $context, $resolveInfo);

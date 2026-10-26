@@ -5,9 +5,11 @@ To understand the concept behind arg resolvers, you should familiarize yourself 
 ## Motivation
 
 Arg resolvers are an extension of the ideas behind GraphQL field execution, applied to input arguments.
-Since GraphQL queries can be used to fetch complex and deeply nested data from the client, it is natural to assume that such complex data can also be passed as the input arguments to a query.
+Clients can use GraphQL queries to fetch complex and deeply nested data.
+So it is natural to assume that clients can also pass such complex data as input arguments to a query.
 
-GraphQL's execution engine allows you to write small and focused field resolver functions that only care about returning the data that it is immediately responsible for.
+GraphQL's execution engine lets you write small and focused field resolver functions.
+Each one only returns the data it is immediately responsible for.
 That makes the code much simpler and avoids duplication.
 
 However, a single field resolver still has to take care of all the input arguments that are passed to it.
@@ -73,7 +75,8 @@ function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
 In this contrived example, the function is still small.
 However, separation of concerns is already violated: A single function is responsible for creating both tasks and notes.
 
-We might want to extend our schema to support more operations in the future, such as updating a task and creating, updating or deleting notes or other, more deeply nested relations.
+We might want to extend our schema to support more operations in the future.
+For example, updating a task and creating, updating or deleting notes or other, more deeply nested relations.
 Such changes would force us to duplicate code and increase the complexity of our single function.
 
 ## Solution

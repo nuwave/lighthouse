@@ -3,7 +3,8 @@
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
 Adding query conditions ad-hoc can be cumbersome and limiting when you require manifold ways to filter query results.
-Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients and allow them to apply complex, dynamic WHERE conditions to queries.
+Lighthouse's `WhereConditions` extension gives clients advanced query capabilities.
+They can apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
@@ -16,7 +17,8 @@ return [
 ]
 ```
 
-For other versions, register the service provider `Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
+For other versions, register the service provider `Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider`.
+See [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 

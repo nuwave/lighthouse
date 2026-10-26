@@ -42,7 +42,7 @@ You may override this by calling `GraphQL\Executor\Executor::setDefaultFieldReso
 
 The context is the third argument of any resolver function.
 
-You may replace the default `Nuwave\Lighthouse\Schema\Context` with your own implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+You may replace the default `Nuwave\Lighthouse\Schema\Context` with your own implementation of `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
 The following example is only a starting point of what you can do:
 
 ```php

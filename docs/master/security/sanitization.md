@@ -1,7 +1,8 @@
 # Sanitization
 
 When dealing with user input, you need to make sure the given data is valid.
-While [validation](validation) is a great first line of defense, there are cases where it is most practical to modify the given input to ensure it is valid or safe to use.
+[Validation](validation) is a great first line of defense.
+In some cases, it is most practical to modify the given input to ensure it is valid or safe to use.
 
 ## Single arguments
 
@@ -18,4 +19,5 @@ type Mutation {
 
 ## Complex arguments
 
-When you need to look at multiple input fields in order to run sanitization, you can use a [`FieldMiddlewareDirective`](../custom-directives/field-directives.md#fieldmiddleware) to transform the given inputs before passing them along to the final resolver.
+When sanitization needs to look at multiple input fields, use a [`FieldMiddlewareDirective`](../custom-directives/field-directives.md#fieldmiddleware).
+It can transform the given inputs before passing them along to the final resolver.
