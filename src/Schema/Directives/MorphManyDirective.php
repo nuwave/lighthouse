@@ -61,7 +61,8 @@ enum MorphManyType {
     PAGINATOR
 
     """
-    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+    Offset-based pagination like Laravel "Simple Pagination".
+    It does not count the total number of records.
     """
     SIMPLE
 

@@ -612,6 +612,8 @@ final class AddUsersToCompany
 ```graphql
 """
 Broadcast the results of a mutation to subscribed clients.
+
+Place this after other field middleware directives that may transform the result, so it broadcasts the final value.
 """
 directive @broadcast(
   """
@@ -718,6 +720,8 @@ final class MyClass
 ```graphql
 """
 Cache the result of a resolver.
+
+Place this after other field middleware to ensure it caches the correct transformed value.
 """
 directive @cache(
   """
@@ -829,17 +833,23 @@ action: CanAction! = EXCEPTION_PASS
 """
 Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
 """
-returnValue: CanArgs
-"""
+returnValue: CanReturnValue
 ```
 
 Types are specified as:
 
 ```graphql
 """
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
 """
 scalar CanArgs
+
+"""
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
+"""
+scalar CanReturnValue
 
 enum CanAction {
   """
@@ -853,7 +863,7 @@ enum CanAction {
   EXCEPTION_NOT_AUTHORIZED
 
   """
-  Return the value specified in `returnValue` argument to conceal the real error.
+  Return the value specified in the `returnValue` directive argument to conceal the real error.
   """
   RETURN_VALUE
 }
@@ -1368,7 +1378,7 @@ directive @feature(
   Specify what the state of the feature should be for the field to be included.
   """
   when: FeatureState! = ACTIVE
-) on FIELD_DEFINITION | OBJECT
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 
 """
 Options for the `when` argument of `@feature`.
@@ -2171,7 +2181,7 @@ directive @hide(
   Compared against the value returned from `app()->environment()`.
   """
   env: [String!]!
-) repeatable on FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 ```
 
 See [feature toggles](../digging-deeper/feature-toggles.md).
@@ -3373,7 +3383,7 @@ directive @rules(
   Specify the validation rules to apply to the field.
   Reference either one of [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules) or the fully qualified class name of a custom validation rule.
 
-  Validation rules that mutate the given input values are _not_ supported:
+  Validation rules that mutate the given input value are _not_ supported:
   - `exclude_if`
   - `exclude_unless`
   Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
@@ -3605,11 +3615,11 @@ Includes the annotated element from the schema conditionally.
 """
 directive @show(
   """
-  Specify which environments include this element, e.g. ["testing"].
+  Specify which environments include this element, e.g. `["testing"]`.
   Compared against the value returned from `app()->environment()`.
   """
   env: [String!]!
-) repeatable on FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 ```
 
 See [feature toggles](../digging-deeper/feature-toggles.md).
