@@ -36,7 +36,7 @@ final class Hello
 }
 ```
 
-The easiest way to create such a class is to use the built-in `artisan` commands `lighthouse:query` and `lighthouse:mutation`.
+Create such a class with the built-in `artisan` commands `lighthouse:query` and `lighthouse:mutation`.
 They both take a single argument: the name of the field you want to generate.
 
 For example, this is how you generate a class for the field `hello`:
@@ -169,7 +169,7 @@ Let's suppose it returns an instance of `App\Model\User`.
 Next, the field sub-selection will be resolved - the two requested fields are `id` and `name`.
 Since we already resolved the User in the parent field, we do not want to fetch it again to get its attributes.
 
-Conveniently, the first argument of each resolver is the return value of the parent field, in this case a User model.
+The first argument of each resolver is the return value of the parent field, in this case a User model.
 
 A naive implementation of a resolver for `id` might look like this:
 

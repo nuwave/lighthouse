@@ -106,7 +106,7 @@ public function testPostsSubscription(): void
 
 Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work well with the JSON data returned by GraphQL.
+The returned `TestResponse` offers assertions that work well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
@@ -228,7 +228,7 @@ $spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broa
 
 ### TestResponse Assertion Mixins
 
-Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
+Lighthouse provides additional assertions as mixins to the `TestResponse` class.
 Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#ide-helper) to get proper autocompletion:
 
 ```shell

@@ -4,7 +4,7 @@ Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/val
 
 ## Single Arguments
 
-The simplest way to leverage the built-in validation rules is to use the [@rules](../api-reference/directives.md#rules) directive.
+Apply the built-in validation rules with the [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {

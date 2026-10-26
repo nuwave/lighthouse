@@ -76,7 +76,7 @@ Reverses a string, e.g. 'foo' => 'oof'.
 directive @reverse on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-The simplest way to mock a resolver is to have it return static data:
+A mock resolver can return static data:
 
 ```php
 public function testReverseField(): void

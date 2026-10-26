@@ -165,7 +165,7 @@ SELECT * FROM `users` WHERE `email_verified_at` IS NOT NULL
 
 ## Create
 
-The easiest way to create data on your server is to use the [@create](../api-reference/directives.md#create) directive.
+Create data on your server with the [@create](../api-reference/directives.md#create) directive.
 
 ```graphql
 type Mutation {
