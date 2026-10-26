@@ -156,7 +156,8 @@ type Query {
 Defer the execution of mutations to [queued jobs](https://laravel.com/docs/queues).
 
 This directive must only be used on fields of the root mutation type.
-When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched and the value `true` is returned - thus the fields return type must be `Boolean!`.
+When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched and the value `true` is returned.
+Thus, the field's return type must be `Boolean!`.
 
 Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job, it will actually execute the underlying field resolver.
 Errors that occur during execution are reported through the Laravel exception handler.
