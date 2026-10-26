@@ -7,7 +7,8 @@ Lighthouse allows you to conditionally show or hide elements (fields, types, arg
 The directives [@show](../api-reference/directives.md#show) and [@hide](../api-reference/directives.md#hide) work in a similar way.
 Are logical opposites of each other.
 
-For example, you might want to limit an experimental new field to test environments. [@show](../api-reference/directives.md#show) is most suitable for this:
+For example, you might want to limit an experimental new field to test environments.
+[@show](../api-reference/directives.md#show) is most suitable for this:
 
 ```graphql
 type Query {

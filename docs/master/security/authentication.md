@@ -121,7 +121,9 @@ It returns `null` if the request is not authenticated.
 
 ## Stateful Authentication Example
 
-You can create or destroy a session with mutations instead of separate API endpoints (`/login`, `/logout`). **This only works when Lighthouse's guard uses a session driver.** Laravel's token based authentication does not allow logging in or out on the server side.
+You can create or destroy a session with mutations instead of separate API endpoints (`/login`, `/logout`).
+**This only works when Lighthouse's guard uses a session driver.**
+Laravel's token based authentication does not allow logging in or out on the server side.
 
 The implementation in the docs is only an example and may have to be adapted to your specific use case.
 

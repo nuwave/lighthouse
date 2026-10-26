@@ -124,7 +124,8 @@ Field-level settings override type-level settings.
 
 The final header settings are calculated based on these rules:
 
-- `max-age` equals the lowest `maxAge` among all fields. If that value is 0, `no-cache` is used instead
+- `max-age` equals the lowest `maxAge` among all fields.
+  If that value is 0, `no-cache` is used instead
 - visibility is `public` unless the scope of a queried field is `PRIVATE`
 
 The following defaults apply:

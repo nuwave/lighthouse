@@ -4,10 +4,8 @@ Some directives can be applied to field arguments or input fields (any [InputVal
 
 As arguments may be contained within a list in the schema definition, you must specify what your directive should apply to in addition to its function.
 
-- If it applies to the individual items within the list,
-  implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
-- Else, if it should apply to the whole list,
-  implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirectiveForArray.php) interface.
+- If it applies to the individual items within the list, implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
+- Else, if it should apply to the whole list, implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirectiveForArray.php) interface.
 
 You must implement exactly one of those two interfaces in order for an argument directive to work.
 

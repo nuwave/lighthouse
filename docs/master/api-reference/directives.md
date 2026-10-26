@@ -679,8 +679,7 @@ scalar BuilderValue
 You must point to a `method` that receives the builder instance.
 That method can apply additional constraints to the query.
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 When used on an argument, the method is only called when the argument is specified (may be `null`).
@@ -2030,8 +2029,7 @@ directive @in(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2083,8 +2081,7 @@ type Mutation {
 }
 ```
 
-If you need to inject a value into every element of a list, such as a nested `create` mutation
-for a `HasMany` relation, use an asterisk `*` as a wildcard path segment.
+If you need to inject a value into every element of a list, such as a nested `create` mutation for a `HasMany` relation, use an asterisk `*` as a wildcard path segment.
 
 ```graphql
 type Mutation {
@@ -2233,8 +2230,7 @@ directive @like(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ## @limit
@@ -2661,8 +2657,7 @@ directive @neq(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2796,8 +2791,7 @@ directive @notIn(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2888,8 +2882,7 @@ input OrderByRelation {
 }
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 See [ordering](../digging-deeper/ordering.md).
@@ -2989,8 +2982,7 @@ type Query {
 }
 ```
 
-> When you want to paginate a relationship, use the to-many relationship
-> directives such as [@hasMany](directives.md#hasmany) instead.
+> When you want to paginate a relationship, use the to-many relationship directives such as [@hasMany](directives.md#hasmany) instead.
 
 The schema definition is automatically transformed to this:
 
@@ -3113,8 +3105,7 @@ But means that the response does not hold information about the total number of 
 
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
-> The `SIMPLE` paginator does not have the attributes
-> `lastPage` and `total`.
+> The `SIMPLE` paginator does not have the attributes `lastPage` and `total`.
 >
 > If you need those fields, you should use the default `PAGINATOR`.
 
@@ -3242,8 +3233,7 @@ type Query {
 Your method receives the typical resolver arguments.
 It must return an instance of `Illuminate\Database\Query\Builder`.
 
-> If you want to query a model and possibly its relations through nested fields,
-> make sure to return an Eloquent builder, e.g. `Post::query()`.
+> If you want to query a model and possibly its relations through nested fields, make sure to return an Eloquent builder, e.g. `Post::query()`.
 
 ```php
 namespace App\Models;
@@ -3527,8 +3517,7 @@ directive @scope(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -3772,8 +3761,7 @@ Allows to filter if trashed elements should be fetched.
 directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 The most convenient way to use this directive is through [@softDeletes](#softdeletes).
@@ -4173,8 +4161,7 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar WhereValue
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 You can specify simple operators:
@@ -4245,8 +4232,7 @@ directive @whereAuth(
 ) on FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 The following query returns all posts that belong to the currently authenticated user.
@@ -4275,8 +4261,7 @@ directive @whereBetween(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 This example defines an `input` to filter that a value is between two dates.
@@ -4318,8 +4303,7 @@ directive @whereJsonContains(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4386,8 +4370,7 @@ directive @whereNotBetween(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4424,8 +4407,7 @@ directive @whereNotNull(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4455,8 +4437,7 @@ directive @whereNull(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4546,8 +4527,7 @@ directive @withoutGlobalScopes(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```php

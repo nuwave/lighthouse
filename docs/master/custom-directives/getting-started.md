@@ -97,8 +97,7 @@ Now that we defined and implemented the directive, how can Lighthouse find it?
 When Lighthouse encounters a directive within the schema, it starts looking for a matching class in the following order:
 
 1. User-defined namespaces as configured in `config/lighthouse.php`, defaults to `App\GraphQL\Directives`
-1. The [RegisterDirectiveNamespaces](../api-reference/events.md#registerdirectivenamespaces) event is dispatched
-   to gather namespaces defined by plugins, extensions or other listeners
+1. The [RegisterDirectiveNamespaces](../api-reference/events.md#registerdirectivenamespaces) event is dispatched to gather namespaces defined by plugins, extensions or other listeners
 1. Lighthouse's built-in directive namespace
 
 This means that our directive is already registered, because it is defined in the default namespace.

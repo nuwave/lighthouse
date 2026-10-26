@@ -14,9 +14,9 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 Methods you need to explicitly call to set up test traits were removed in favor of automatic setup.
 
 - Remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
-This only works when your test class uses the trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequests`.
+  This only works when your test class uses the trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequests`.
 - Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
-This only works when your test class extends `Illuminate\Foundation\Testing\TestCase`.
+  This only works when your test class extends `Illuminate\Foundation\Testing\TestCase`.
 
 ### `EnsureXHR` is enabled in the default configuration
 
@@ -402,8 +402,7 @@ The recommended process for finding breaking changes is:
 
 1. Print your schema before upgrading: `php artisan lighthouse:print-schema > old.graphql`
 1. Upgrade, then re-print your schema: `php artisan lighthouse:print-schema > new.graphql`
-1. Use [graphql-inspector](https://github.com/kamilkisiela/graphql-inspector) to compare your
-changes: `graphql-inspector diff old.graphql new.graphql`
+1. Use [graphql-inspector](https://github.com/kamilkisiela/graphql-inspector) to compare your changes: `graphql-inspector diff old.graphql new.graphql`
 
 ### Rename `resolve` to `__invoke`
 
@@ -590,10 +589,10 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 The application of directives that implement the `ArgDirective` interface is split into three distinct phases:
 
 - Sanitize: Clean the input, e.g. trim whitespace.
-Directives can hook into this phase by implementing `ArgSanitizerDirective`.
+  Directives can hook into this phase by implementing `ArgSanitizerDirective`.
 - Validate: Ensure the input conforms to the expectations, e.g. check a valid email is given
 - Transform: Change the input before processing it further, e.g. hashing passwords.
-Directives can hook into this phase by implementing `ArgTransformerDirective`
+  Directives can hook into this phase by implementing `ArgTransformerDirective`
 
 ### Replace custom validation directives with validator classes
 
