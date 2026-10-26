@@ -15,23 +15,18 @@ use Illuminate\Support\Carbon;
 /**
  * Fires right after a request reaches the GraphQLController.
  *
- * Can be used for logging or for measuring and monitoring
- * the time a request takes to resolve.
+ * Can be used for logging or for measuring and monitoring the time a request takes to resolve.
  *
  * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
 class StartRequest
 {
-    /**
-     * The point in time when the request started.
-     */
+    /** The point in time when the request started. */
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The request sent from the client.
-         */
-        public Request $request
+        /** The request sent from the client. */
+        public Request $request,
     ) {
         $this->moment = Carbon::now();
     }
@@ -54,7 +49,7 @@ class StartOperationOrOperations
          *
          * @var \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
          */
-        public OperationParams|array $operationOrOperations
+        public OperationParams|array $operationOrOperations,
     ) {}
 }
 ```
@@ -72,10 +67,8 @@ class StartOperationOrOperations
 class BuildSchemaString
 {
     public function __construct(
-        /**
-         * The root schema that was defined by the user.
-         */
-        public string $userSchema
+        /** The root schema that was defined by the user. */
+        public string $userSchema,
     ) {}
 }
 ```
@@ -114,7 +107,7 @@ class ManipulateAST
         /**
          * The AST that can be manipulated.
          */
-        public DocumentAST &$documentAST
+        public DocumentAST &$documentAST,
     ) {}
 }
 ```
@@ -134,37 +127,23 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class StartExecution
 {
-    /**
-     * The point in time when the query execution started.
-     */
+    /** The point in time when the query execution started. */
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The parsed schema.
-         */
+        /** The parsed schema. */
         public Schema $schema,
-
-        /**
-         * The client given parsed query string.
-         */
+        /** The client given parsed query string. */
         public DocumentNode $query,
-
         /**
          * The client given variables, neither validated nor transformed.
          *
          * @var array<string, mixed>|null
          */
         public ?array $variables,
-
-        /**
-         * The client given operation name.
-         */
+        /** The client given operation name. */
         public ?string $operationName,
-
-        /**
-         * The context for the operation.
-         */
+        /** The context for the operation. */
         public GraphQLContext $context,
     ) {
         $this->moment = Carbon::now();
@@ -180,8 +159,7 @@ use GraphQL\Executor\ExecutionResult;
 /**
  * Fires after a query was resolved.
  *
- * Listeners may return a @see \Nuwave\Lighthouse\Execution\ExtensionsResponse
- * to include in the response.
+ * Listeners may return a @see \Nuwave\Lighthouse\Execution\ExtensionsResponse to include in the response.
  */
 class BuildExtensionsResponse
 {
@@ -217,8 +195,8 @@ use GraphQL\Executor\ExecutionResult;
 /**
  * Fires after resolving each individual query.
  *
- * This lets listeners manipulate the query result
- * without worrying about batched execution.
+ * This lets listeners manipulate the query result.
+ * It avoids worrying about batched execution.
  */
 class ManipulateResult
 {
@@ -226,7 +204,7 @@ class ManipulateResult
         /**
          * The result of resolving an individual query.
          */
-        public ExecutionResult &$result
+        public ExecutionResult &$result,
     ) {}
 }
 ```
@@ -242,16 +220,12 @@ use Illuminate\Support\Carbon;
  */
 class EndExecution
 {
-    /**
-     * The point in time when the result was ready.
-     */
+    /** The point in time when the result was ready. */
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The result of resolving a single operation.
-         */
-        public ExecutionResult $result
+        /** The result of resolving a single operation. */
+        public ExecutionResult $result,
     ) {
         $this->moment = Carbon::now();
     }
@@ -272,7 +246,7 @@ class EndOperationOrOperations
          *
          * @var array<string, mixed>|array<int, array<string, mixed>> $resultOrResults
          */
-        public array $resultOrResults
+        public array $resultOrResults,
     ) {}
 }
 ```
@@ -286,23 +260,18 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Fires right after building the HTTP response in the GraphQLController.
  *
- * Can be used for logging or for measuring and monitoring
- * the time a request takes to resolve.
+ * Can be used for logging or for measuring and monitoring the time a request takes to resolve.
  *
  * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
 class EndRequest
 {
-    /**
-     * The point in time when the response was ready.
-     */
+    /** The point in time when the response was ready. */
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The response that is about to be sent to the client.
-         */
-        public Response $response
+        /** The response that is about to be sent to the client. */
+        public Response $response,
     ) {
         $this->moment = Carbon::now();
     }
@@ -326,9 +295,7 @@ use GraphQL\Type\Schema;
 class ValidateSchema
 {
     public function __construct(
-        /**
-         * The final schema to validate.
-         */
+        /** The final schema to validate. */
         public Schema $schema,
     ) {}
 }
