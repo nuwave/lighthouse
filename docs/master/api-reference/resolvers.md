@@ -17,7 +17,8 @@ function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolv
    For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
 3. `GraphQLContext $context`: Arbitrary data that is shared between all fields of a single query.
    Lighthouse passes in an instance of `Nuwave\Lighthouse\Schema\Context` by default.
-4. `ResolveInfo $resolveInfo`: Information about the query itself, such as the execution state, the field name, path to the field from the root, and more.
+4. `ResolveInfo $resolveInfo`: Information about the query itself.
+   Includes execution state, field name, path to the field from the root, and more.
 
 The return value of this must fit the return type defined for the corresponding field from the schema.
 
