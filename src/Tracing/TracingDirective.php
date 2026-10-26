@@ -19,8 +19,8 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Do not use this directive directly, it is automatically added to the schema
-when using the tracing extension.
+Do not use this directive directly.
+Lighthouse adds it to the schema when you use the tracing extension.
 """
 directive @tracing on FIELD_DEFINITION
 GRAPHQL;

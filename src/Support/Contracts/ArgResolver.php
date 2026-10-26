@@ -5,8 +5,7 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 /**
  * Resolve a slice of input arguments during mutation execution.
  *
- * Arg resolvers compose like field resolvers: each handles only its own
- * nested input, and Lighthouse orchestrates traversal of the argument tree.
+ * Arg resolvers compose like field resolvers: each handles only its own nested input, and Lighthouse orchestrates traversal of the argument tree.
  *
  * @see \Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver
  *

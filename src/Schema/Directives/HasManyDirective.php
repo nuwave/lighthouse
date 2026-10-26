@@ -14,8 +14,8 @@ Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloq
 """
 directive @hasMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -44,8 +44,8 @@ directive @hasMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -61,7 +61,8 @@ enum HasManyType {
     PAGINATOR
 
     """
-    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+    Offset-based pagination like Laravel "Simple Pagination".
+    It does not count the total number of records.
     """
     SIMPLE
 

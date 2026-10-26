@@ -39,9 +39,22 @@ final class MyCustomDirectiveTest extends TestCase
 ## Mock resolvers
 
 When testing custom functionality through a dummy schema, you still need to have a way to resolve fields.
-Lighthouse provides a simple way to mock resolvers in a dummy schema.
+Lighthouse can mock resolvers in a dummy schema.
+Mark the fields to mock with the `@mock` directive:
 
-Add the `MocksResolvers` trait to your test class:
+```graphql
+"""
+Resolve the field with a mock resolver registered in the test, see `MocksResolvers`.
+"""
+directive @mock(
+  """
+  Specify a unique key for the mock resolver.
+  """
+  key: String = "default"
+) on FIELD_DEFINITION
+```
+
+Then add the `MocksResolvers` trait to your test class:
 
 ```php
 namespace Tests;
@@ -63,7 +76,7 @@ Reverses a string, e.g. 'foo' => 'oof'.
 directive @reverse on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-The simplest way to mock a resolver is to have it return static data:
+A mock resolver can return static data:
 
 ```php
 public function testReverseField(): void
@@ -89,8 +102,8 @@ public function testReverseField(): void
 ```
 
 Since we get back an instance of PHPUnit's `InvocationMocker`, we can also assert that our resolver is called with certain values.
-Note that we are not passing an explicit resolver function here.
-The default resolver will simply return `null`.
+We are not passing an explicit resolver function here.
+The default resolver returns `null`.
 
 ```php
 public function testReverseInput(): void

@@ -6,4 +6,5 @@ For a given `__typename` in the given `$representations`, Lighthouse will look f
 ## Extends
 
 You have to use `@extends` in place of `extend type` to annotate type references.
-This is because Lighthouse merges type extensions before the final schema is produced, thus they would not be preserved to appear in the federation schema SDL.
+This is because Lighthouse merges type extensions before it produces the final schema.
+Thus, they would not appear in the federation schema SDL.

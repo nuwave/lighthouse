@@ -15,6 +15,7 @@ class RenameArgsDirective extends BaseDirective implements FieldMiddleware
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Apply the @rename directives on the incoming arguments.
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @renameArgs on FIELD_DEFINITION
 GRAPHQL;
@@ -29,8 +30,7 @@ GRAPHQL;
     {
         foreach ($argumentSet->arguments as $name => $argument) {
             // Recursively apply the renaming to nested inputs.
-            // We look for further ArgumentSet instances, they
-            // might be contained within an array.
+            // We look for further ArgumentSet instances, they might be contained within an array.
             Utils::applyEach(
                 function ($value): void {
                     if ($value instanceof ArgumentSet) {

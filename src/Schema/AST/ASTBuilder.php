@@ -62,8 +62,7 @@ class ASTBuilder
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
         // Allow registering listeners that inject additional schema definitions.
-        // This can be used by plugins to hook into the schema building process
-        // while still allowing the user to define their schema as usual.
+        // This can be used by plugins to hook into the schema building process while still allowing the user to define their schema as usual.
         $additionalSchemas = (array) $this->eventsDispatcher->dispatch(
             new BuildSchemaString($schemaString),
         );
@@ -82,9 +81,8 @@ class ASTBuilder
         $this->applyArgManipulators();
         $this->applyInputFieldManipulators();
 
-        // Listeners may manipulate the DocumentAST that is passed by reference
-        // into the ManipulateAST event. This can be useful for extensions
-        // that want to programmatically change the schema.
+        // Listeners may manipulate the DocumentAST that is passed by reference into the ManipulateAST event.
+        // This can be useful for extensions that want to programmatically change the schema.
         $this->eventsDispatcher->dispatch(
             new ManipulateAST($this->documentAST),
         );
@@ -109,16 +107,14 @@ class ASTBuilder
     {
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
             foreach ($typeExtensionsList as $typeExtension) {
-                // Before we actually extend the types, we apply the manipulator directives
-                // that are defined on type extensions themselves
+                // Before we extend the types, we apply the manipulator directives that are defined on type extensions themselves
                 foreach (
                     $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class) as $typeExtensionManipulator
                 ) {
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
                 }
 
-                // After manipulation on the type extension has been done,
-                // we can merge them with the original type
+                // After manipulation on the type extension has been done, we can merge them with the original type
                 if (
                     $typeExtension instanceof ObjectTypeExtensionNode
                     || $typeExtension instanceof InputObjectTypeExtensionNode

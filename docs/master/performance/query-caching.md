@@ -42,7 +42,8 @@ In some scenarios, you may need to clear the query cache completely.
 
 The Artisan command works based on your current configuration for `query_cache` in `config/lighthouse.php`.
 
-- When using the modes [`store`](#mode-store) or [`hybrid`](#mode-hybrid), all entries in the configured cache store will be removed regardless of their age or whether they even belong to Lighthouse.
+- When using the modes [`store`](#mode-store) or [`hybrid`](#mode-hybrid), the command removes all entries in the configured cache store.
+  That includes entries of any age and entries that do not belong to Lighthouse.
 - When using the modes [`opcache`](#mode-opcache) or [`hybrid`](#mode-hybrid), all cached query files will be removed.
 
 When you plan to change `query_cache.mode`, clear your cache while your current configuration is still in place.
@@ -74,7 +75,8 @@ You can enable it by setting `validation_cache.enable` to `true` in `config/ligh
 
 ## Testing caveats
 
-If you are mocking Laravel cache classes like `Illuminate\Support\Facades\Cache` or `Illuminate\Cache\Repository` and asserting expectations in your unit tests, it might be best to disable the query cache in your `phpunit.xml`:
+Your unit tests might mock Laravel cache classes like `Illuminate\Support\Facades\Cache` or `Illuminate\Cache\Repository` and assert expectations.
+In that case, it might be best to disable the query cache in your `phpunit.xml`:
 
 ```diff
   <?xml version="1.0" encoding="UTF-8"?>

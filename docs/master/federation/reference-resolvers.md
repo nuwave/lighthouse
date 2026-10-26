@@ -4,7 +4,7 @@ To enable the current subgraph to provide entities for other subgraphs, you need
 These reference resolvers act as helpers to enable cross-subgraph communication and provide data from one subgraph to another when needed.
 Read more about reference resolvers in the [Apollo Federation docs](https://www.apollographql.com/docs/federation/v1/entities#reference-resolvers).
 
-Lighthouse will look for a class which name is equivalent to `__typename` in the namespace configured in `lighthouse.federation.entities_resolver_namespace`.
+Lighthouse looks for a class named like `__typename` in the namespace configured in `lighthouse.federation.entities_resolver_namespace`.
 
 When you need to retrieve information from subgraphs, the gateway automatically generates a request to the corresponding endpoint of the subgraph.
 More details about this can be found in section [Query.\_entities of the Apollo Federation docs](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-overview#query_entities).
@@ -23,7 +23,8 @@ An example of such a request is shown below:
 
 ## Single Entity Resolvers
 
-After validating that type `Foo` exists, Lighthouse will look for a resolver class in the namespace configured in `lighthouse.federation.entities_resolver_namespace`.
+After validating that type `Foo` exists, Lighthouse looks for a resolver class.
+It searches the namespace configured in `lighthouse.federation.entities_resolver_namespace`.
 The resolver class is expected to contain a method `__invoke()` which takes a single argument: the array form of the representation.
 
 ```php
@@ -62,7 +63,8 @@ final class Foo
 ## Batched Entity Resolvers
 
 When the client requests a large number of entities with the same type, it can be more efficient to resolve them all at once.
-When your entity resolver class implements `Nuwave\Lighthouse\Federation\BatchedEntityResolver`, Lighthouse will call it a single time with an array of all representations of its type.
+When your entity resolver class implements `Nuwave\Lighthouse\Federation\BatchedEntityResolver`, Lighthouse calls it once.
+It passes an array of all representations of its type.
 The resolver can then do some kind of batch query to resolve them and return them all at once.
 
 ```php
@@ -112,7 +114,8 @@ final class Product implements BatchedEntityResolver
 
 ## Eloquent Model Resolvers
 
-When no resolver class can be found, Lighthouse will attempt to find the model that matches the type `__typename`, using the namespaces configured in `lighthouse.namespaces.models`.
+When no resolver class can be found, Lighthouse tries to find the model that matches the type `__typename`.
+It uses the namespaces configured in `lighthouse.namespaces.models`.
 
 ```graphql
 {

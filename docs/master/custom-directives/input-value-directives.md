@@ -2,12 +2,11 @@
 
 Some directives can be applied to field arguments or input fields (any [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition)).
 
-As arguments may be contained within a list in the schema definition, you must specify what your directive should apply to in addition to its function.
+Arguments may be contained within a list in the schema definition.
+Thus, in addition to its function, you must specify what your directive applies to.
 
-- If it applies to the individual items within the list,
-  implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
-- Else, if it should apply to the whole list,
-  implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirectiveForArray.php) interface.
+- If it applies to the individual items within the list, implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
+- Else, if it should apply to the whole list, implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirectiveForArray.php) interface.
 
 You must implement exactly one of those two interfaces in order for an argument directive to work.
 
@@ -71,7 +70,8 @@ final class TrimDirective extends BaseDirective implements ArgSanitizerDirective
 }
 ```
 
-The `sanitize` method takes an argument which represents the actual incoming value that is given to an argument in a query and is expected to modify the value, if needed.
+The `sanitize` method takes the incoming value that is given to an argument in a query.
+It is expected to modify the value, if needed.
 Return it.
 
 For example, if we have the following schema.
@@ -111,7 +111,8 @@ Notable differences are:
 
 ## ArgBuilderDirective
 
-An [`Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php) directive allows using arguments passed by the client to dynamically modify the database query that Lighthouse creates for a field.
+An [`Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php) directive modifies the database query that Lighthouse creates for a field.
+It uses the arguments passed by the client.
 
 Currently, the following directives use arguments to modify the query:
 
@@ -198,16 +199,19 @@ input DateRange {
 
 ## ArgResolver
 
-An [`Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php) directive allows you to compose resolvers for complex nested inputs, similar to the way that field resolvers are composed together.
+An [`Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php) directive lets you compose resolvers for complex nested inputs.
+This is similar to the way that field resolvers are composed.
 
 For an in-depth explanation of the concept of composing arg resolvers, read the [explanation of arg resolvers](../concepts/arg-resolvers.md).
 
 ## SaveAwareArgResolver
 
-A [`Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/SaveAwareArgResolver.php) extends `ArgResolver` and allows control over whether the resolver runs before or after the parent model is saved.
+A [`Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/SaveAwareArgResolver.php) extends `ArgResolver`.
+It controls whether the resolver runs before or after the parent model is saved.
 
 This is useful when your directive needs to set attributes or foreign keys on the model before it is persisted.
-For example, a directive that resolves a BelongsTo relationship must associate the related model before the parent is saved, since the foreign key column may have a NOT NULL constraint.
+For example, a directive that resolves a BelongsTo relationship must associate the related model before the parent is saved.
+The foreign key column may have a NOT NULL constraint.
 
 ```php
 use Illuminate\Database\Eloquent\Model;
@@ -246,5 +250,5 @@ final class GeocodeDirective extends BaseDirective implements SaveAwareArgResolv
 When `runBeforeSave()` returns `true`, the resolver is invoked before `$model->save()`, allowing it to set attributes on the model.
 When it returns `false`, the resolver runs after the model is saved — the same timing as any `ArgResolver` that does not implement this interface.
 
-Note that `__invoke()` receives `null` as `$args` if the client sends `null` for a nullable input field.
+`__invoke()` receives `null` as `$args` if the client sends `null` for a nullable input field.
 Guard accordingly.

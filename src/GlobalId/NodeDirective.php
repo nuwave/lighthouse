@@ -32,8 +32,7 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
 """
 Register a type for Relay's global object identification.
 
-When used without any arguments, Lighthouse will attempt
-to resolve the type through a model with the same name.
+Without arguments, Lighthouse tries to resolve the type through the model with the same name.
 """
 directive @node(
   """

@@ -120,11 +120,12 @@ Register the service provider `Nuwave\Lighthouse\CacheControl\CacheControlServic
 
 You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response regardless of [@cache](../api-reference/directives.md#cache) by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field.
 The directive can be defined on the field-level or type-level.
-Note that field-level settings override type-level settings.
+Field-level settings override type-level settings.
 
 The final header settings are calculated based on these rules:
 
-- `max-age` equals the lowest `maxAge` among all fields. If that value is 0, `no-cache` is used instead
+- `max-age` equals the lowest `maxAge` among all fields.
+  If that value is 0, `no-cache` is used instead
 - visibility is `public` unless the scope of a queried field is `PRIVATE`
 
 The following defaults apply:

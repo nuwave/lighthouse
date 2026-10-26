@@ -55,8 +55,7 @@ abstract class TestCase extends TestbenchTestCase
     {
         parent::setUp();
 
-        // This default is only valid for testing Lighthouse itself and thus
-        // is not defined in the reusable test trait.
+        // This default is only valid for testing Lighthouse itself and thus is not defined in the reusable test trait.
         $this->schema ??= self::PLACEHOLDER_QUERY;
         $this->setUpTestSchema();
 

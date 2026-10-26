@@ -4,13 +4,14 @@ Field directives can be applied to any [FieldDefinition](https://graphql.github.
 
 ## FieldResolver
 
-Perhaps the most important directive interface, a [`Nuwave\Lighthouse\Support\Contracts\FieldResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldResolver.php) lets you add a resolver for a field through a directive.
+A [`Nuwave\Lighthouse\Support\Contracts\FieldResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldResolver.php) lets you add a resolver for a field through a directive.
+It is perhaps the most important directive interface.
 
 It can be a great way to reuse resolver logic within a schema.
 
 ## FieldMiddleware
 
-A [`Nuwave\Lighthouse\Support\Contracts\FieldMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldMiddleware.php) directive allows you to wrap around the field resolver, just like [Laravel Middleware](https://laravel.com/docs/middleware).
+A [`Nuwave\Lighthouse\Support\Contracts\FieldMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldMiddleware.php) directive allows you to wrap around the field resolver, like [Laravel Middleware](https://laravel.com/docs/middleware).
 
 You may use it to handle incoming values before reaching the final resolver as well as the outgoing result of resolving the field.
 
@@ -76,7 +77,8 @@ A [`Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nu
 
 ## ValidationDirective
 
-This directive type is implemented as an abstract class rather than a pure interface and allows you to define complex validation rules for a field with ease.
+This directive type is an abstract class rather than a pure interface.
+It lets you define complex validation rules for a field.
 
 [Read more about it in the Validation section](../security/validation.md#validator-for-fields).
 

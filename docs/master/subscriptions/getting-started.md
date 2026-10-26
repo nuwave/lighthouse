@@ -26,17 +26,17 @@ When using subscriptions with [Laravel Octane](https://laravel.com/docs/octane),
 ### Empty Response Optimization
 
 Lighthouse returns the subscription channel as part of the response under `extensions`.
-If `subscriptions.exclude_empty` in `lighthouse.php` is set to `true`, API responses without a subscription channel will not contain `lighthouse_subscriptions` in `extensions`.
-This optimizes performance by sending less data,
-but clients must anticipate this appropriately.
+Set `subscriptions.exclude_empty` in `lighthouse.php` to `true` to change this.
+Then responses without a subscription channel omit `lighthouse_subscriptions` from `extensions`.
+This optimizes performance by sending less data, but clients must anticipate this appropriately.
 
 ## Expiring Subscriptions
 
 Subscriptions do not expire by themselves.
 Unless you delete a subscription, it will continue to broadcast events after the client has disconnected.
 
-The easiest way to expire subscriptions automatically is to use the env `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL` to set an expiration time in seconds (e.g.
-`LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` to expire in one hour).
+Automate expiry by setting `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL` to an expiration time in seconds.
+For example, `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` expires subscriptions after one hour.
 
 ## Encrypted Subscriptions
 
@@ -60,8 +60,8 @@ More details on how to enable encryption are defined in the [Pusher documentatio
 ### Pusher Expiration Webhook
 
 If you are using the Pusher driver, you can use a [`channel existence`](https://pusher.com/docs/channels/server_api/webhooks/#channel-existence-events) webhook to mitigate this problem.
-When a Pusher channel is vacated (i.e. there are no subscribers), it will trigger the webhook,
-which will instruct Lighthouse to delete the subscription.
+When a Pusher channel is vacated (i.e. there are no subscribers), it triggers the webhook.
+The webhook instructs Lighthouse to delete the subscription.
 
 The webhook URL will typically be:
 

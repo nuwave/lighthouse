@@ -1,13 +1,13 @@
 # Testing with PHPUnit
 
-Lighthouse makes it easy to add automated tests through [PHPUnit](https://phpunit.de).
+Lighthouse supports automated tests through [PHPUnit](https://phpunit.de).
 
 ## Setup
 
 Lighthouse offers some useful test helpers.
 Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
 
-The `MakesGraphQLRequests` trait make it easy to call your API:
+The `MakesGraphQLRequests` trait lets you call your API:
 
 ```diff
 +use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
@@ -106,7 +106,7 @@ public function testPostsSubscription(): void
 
 Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work quite well with the JSON data returned by GraphQL.
+The returned `TestResponse` offers assertions that work well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
@@ -192,7 +192,7 @@ $response->assertGraphQLSubscriptionNotAuthorized($this);
 
 Once you do your subscription query and get a `TestResponse $response`, you can run the following assertions on it.
 
-To assert the subscription actually received some broadcasts:
+To assert the subscription received some broadcasts:
 
 ```
 // any other way to broadcast would also work
@@ -228,14 +228,14 @@ $spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broa
 
 ### TestResponse Assertion Mixins
 
-Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
+Lighthouse provides additional assertions as mixins to the `TestResponse` class.
 Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#ide-helper) to get proper autocompletion:
 
 ```shell
 php artisan lighthouse:ide-helper
 ```
 
-The provided assertions are prefixed with `assertGraphQL` for easy discovery.
+The provided assertions are prefixed with `assertGraphQL`, so you can find them through autocompletion.
 They offer useful shortcuts to common testing tasks.
 For example, you might want to ensure that validation works properly:
 
@@ -251,9 +251,11 @@ $this
 
 ## Testing Errors
 
-Depending on your debug and error handling configuration, Lighthouse catches most if not all errors produced within queries and includes them within the result.
+Depending on your debug and error handling configuration, Lighthouse catches most if not all errors produced within queries.
+It includes them in the result.
 
-One way to test for errors is to examine the `TestResponse`, either by looking at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins) such as `assertGraphQLErrorMessage()`:
+One way to test for errors is to examine the `TestResponse`.
+Look at the JSON response manually or use the provided [assertion mixins](#testresponse-assertion-mixins) such as `assertGraphQLErrorMessage()`:
 
 ```php
 $this

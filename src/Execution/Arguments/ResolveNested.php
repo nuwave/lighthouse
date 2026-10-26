@@ -77,8 +77,7 @@ class ResolveNested implements ArgResolver
                 assert($value instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
 
                 // Partitioning attaches the resolvers of the children, including implicitly detected relations.
-                // Its classification is irrelevant here: there is no saver to hand regular arguments to,
-                // and children the saver did not run must still resolve.
+                // Its classification is irrelevant here: there is no saver to hand regular arguments to, and children the saver did not run must still resolve.
                 ($this->argPartitioner)($value, $root);
                 $this->resolveNestedArguments($root, $value, $alreadyRun);
                 continue;

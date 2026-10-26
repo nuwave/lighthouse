@@ -55,8 +55,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         // Save the first namespace
         $preferredNamespaceFallback = reset($namespaces);
 
-        // If the strings are sorted, any prefix common to all strings
-        // will be common to the sorted first and last strings.
+        // If the strings are sorted, any prefix common to all strings will be common to the sorted first and last strings.
         // All the strings in the middle can be ignored.
         sort($namespaces);
 
@@ -78,8 +77,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
             $matching[] = $part;
         }
 
-        // We could not determine a common part of the configured namespaces,
-        // so we assume the user will prefer the first one in the list.
+        // We could not determine a common part of the configured namespaces, so we assume the user will prefer the first one in the list.
         if ($matching === []) {
             return $preferredNamespaceFallback;
         }

@@ -36,8 +36,7 @@ directive @like(
   key: String
 
   """
-  Fixate the positions of wildcards (`%`, `_`) in the LIKE comparison around the
-  placeholder `{}`, e.g. `%{}`, `__{}` or `%{}%`.
+  Fix the positions of wildcards (`%`, `_`) around the placeholder `{}` in the LIKE comparison, e.g. `%{}`, `__{}` or `%{}%`.
   If specified, wildcard characters in the client-given input are escaped.
   If not specified, the client can pass wildcards unescaped.
   """

@@ -10,7 +10,8 @@ type Query {
 }
 ```
 
-The type of the argument can be left blank as `_` , as Lighthouse will automatically generate an input that takes enumerated column names, together with the `SortOrder` enum.
+You can leave the type of the argument blank as `_`.
+Lighthouse then generates an input that takes enumerated column names, together with the `SortOrder` enum.
 Add that to your schema:
 
 ```graphql
@@ -84,7 +85,7 @@ enum PostColumn {
 ```
 
 Lighthouse will still automatically generate the necessary input types and the `SortOrder` enum.
-Instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
+Instead of generating enums for the allowed columns, it uses the existing `PostColumn` enum.
 
 ### Ordering By Relations
 

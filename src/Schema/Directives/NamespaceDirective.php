@@ -15,8 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  * Redefine the default namespaces used in other directives.
  *
  * The args for this directive are a map from directive names to namespaces.
- * For example `@namespace(field: "App\\GraphQL")` applies the namespace
- * `App\GraphQL` to the `@field` directive.
+ * For example `@namespace(field: "App\\GraphQL")` applies the namespace `App\GraphQL` to the `@field` directive.
  */
 class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeExtensionManipulator
 {

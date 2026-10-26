@@ -4,7 +4,8 @@ You might want to add additional types to the schema programmatically.
 
 ## Additional Schema Definitions
 
-If you want to use the SDL to define additional types dynamically, you can listen for the [`BuildSchemaString`](../api-reference/events.md#buildschemastring) event and return additional schema definitions as a string:
+To define additional types dynamically with SDL, listen for the [`BuildSchemaString`](../api-reference/events.md#buildschemastring) event.
+Return additional schema definitions as a string:
 
 ```php
 $dispatcher = app(\Illuminate\Contracts\Events\Dispatcher::class);
@@ -16,7 +17,7 @@ $dispatcher->listen(
 );
 ```
 
-When your schema is defined within files and you want to use `#import` to combine them, you can use the `Nuwave\Lighthouse\Schema\Source\SchemaStitcher` to load your file:
+When your schema is split into files that you combine with `#import`, load them with `Nuwave\Lighthouse\Schema\Source\SchemaStitcher`:
 
 ```php
 $stitcher = new \Nuwave\Lighthouse\Schema\Source\SchemaStitcher(__DIR__ . '/path/to/schema.graphql');
@@ -29,7 +30,8 @@ While Lighthouse is an SDL-first GraphQL server, you can also use native PHP typ
 
 Check out the [webonyx/graphql-php documentation](https://webonyx.github.io/graphql-php/type-definitions) on how to define types.
 
-Note that you will not have access to a large portion of Lighthouse functionality that is provided through server-side directives and the definition is much more verbose.
+You will not have access to a large portion of Lighthouse functionality that is provided through server-side directives.
+The definition is also much more verbose.
 
 Because of this, we do not recommend you use native PHP types for complex object types.
 

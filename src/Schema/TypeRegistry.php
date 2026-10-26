@@ -219,9 +219,8 @@ class TypeRegistry
      */
     public function possibleTypes(): array
     {
-        // Make sure all the types from the AST are eagerly converted
-        // to find orphaned types, such as an object type that is only
-        // ever used through its association to an interface.
+        // Eagerly convert all types from the AST to find orphaned types.
+        // An example is an object type that is only ever used through its interface.
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->getName()->value;
 
@@ -238,8 +237,7 @@ class TypeRegistry
     /**
      * Built-in scalar types that are overridden in this schema.
      *
-     * A scalar override is a type named after a built-in scalar such as `String`,
-     * defined in the schema or registered programmatically.
+     * A scalar override is a type named after a built-in scalar such as `String`, defined in the schema or registered programmatically.
      *
      * @return array<int, \GraphQL\Type\Definition\ScalarType>
      */

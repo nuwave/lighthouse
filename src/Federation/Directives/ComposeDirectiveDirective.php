@@ -12,9 +12,7 @@ class ComposeDirectiveDirective extends BaseDirective
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-Indicates to composition that all uses of a particular custom type system directive
-in the subgraph schema should be preserved in the supergraph schema
-(by default, composition omits most directives from the supergraph schema).
+Indicates to composition that all uses of a particular custom type system directive in the subgraph schema should be preserved in the supergraph schema (by default, composition omits most directives from the supergraph schema).
 
 ```graphql
 extend schema

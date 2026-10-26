@@ -20,8 +20,7 @@ class ArgPartitioner
     /**
      * Partition the arguments into nested and regular.
      *
-     * SaveAwareArgResolvers where runBeforeSave() returns true stay in the regular set
-     * so they reach SaveModel for execution before $model->save().
+     * SaveAwareArgResolvers where runBeforeSave() returns true stay in the regular set so they reach SaveModel for execution before $model->save().
      *
      * @return array{
      *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
@@ -184,14 +183,12 @@ class ArgPartitioner
     }
 
     /**
-     * Recursively collect the pre-save resolvers within @nest arguments,
-     * so they can run before $root->save() instead of after it.
+     * Recursively collect the pre-save resolvers within @nest arguments, so they can run before $root->save() instead of after it.
      *
      * The result is an ordered list rather than a name-keyed set:
      * field names are unique per input type, not across a whole input tree.
      *
-     * Leaves the given arguments untouched, as they may be shared with cached
-     * or spread ArgumentSets that the caller still owns.
+     * Leaves the given arguments untouched, as they may be shared with cached or spread ArgumentSets that the caller still owns.
      *
      * @return list<\Nuwave\Lighthouse\Execution\Arguments\Argument>
      */

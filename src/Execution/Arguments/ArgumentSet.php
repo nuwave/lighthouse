@@ -69,9 +69,8 @@ class ArgumentSet
     /**
      * Add a value at the dot-separated path.
      *
-     * Works just like @see \Illuminate\Support\Arr::add(), but a path segment
-     * of `*` injects the value into every element of the list found at that
-     * position instead of a single key.
+     * Works like @see \Illuminate\Support\Arr::add().
+     * A path segment of `*` injects the value into every element of the list at that position, instead of a single key.
      */
     public function addValue(string $path, mixed $value): self
     {
@@ -102,16 +101,15 @@ class ArgumentSet
 
         $throughWildcard = $keys[0] === '*';
 
-        // The branch leading up to a `*` might not have been given by the client
-        // at all, e.g. an optional nested input that was omitted. In that case,
-        // there is nothing to inject into, so we just do nothing.
+        // The branch leading up to a `*` might not have been given by the client at all, e.g. an optional nested input that was omitted.
+        // In that case, there is nothing to inject into, so we do nothing.
         if ($throughWildcard && ! isset($this->arguments[$key])) {
             return;
         }
 
-        // If the key doesn't exist at this depth, we will create an empty ArgumentSet
-        // to hold the next value, allowing us to create the ArgumentSet to hold a final
-        // value at the correct depth. Then we'll keep digging into the ArgumentSet.
+        // If the key doesn't exist at this depth, we create an empty ArgumentSet to hold the next value.
+        // This lets us create the ArgumentSet for the final value at the correct depth.
+        // Then we'll keep digging into the ArgumentSet.
         if (! isset($this->arguments[$key])) {
             $argument = new Argument();
             $argument->value = new self();

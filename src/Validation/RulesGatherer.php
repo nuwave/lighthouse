@@ -192,9 +192,8 @@ class RulesGatherer
     /**
      * Prepend rule arguments that refer to other arguments with the full path.
      *
-     * This may be necessary to allow certain rules to be reusable when placed
-     * upon input arguments. For example, `required_with:foo` may be defined
-     * on an input value that is nested within the arguments under `input.0`.
+     * This may be necessary to allow certain rules to be reusable when placed upon input arguments.
+     * For example, `required_with:foo` may be defined on an input value that is nested within the arguments under `input.0`.
      * It is thus changed to the full reference `required_with:input.0.foo`.
      *
      * @param  array<int, mixed>  $rules

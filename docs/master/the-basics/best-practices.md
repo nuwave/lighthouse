@@ -5,7 +5,7 @@ We recommend you use [GraphQL Rules](https://github.com/graphql-rules/graphql-ru
 
 ## In the mutation response, return a field of type Query
 
-If you decide to [return the `Query` object in every mutation payload](https://github.com/graphql-rules/graphql-rules/blob/master/docs/rules/06-mutations/mutation-payload-query.md), Lighthouse makes it very easy.
+If you decide to [return the `Query` object in every mutation payload](https://github.com/graphql-rules/graphql-rules/blob/master/docs/rules/06-mutations/mutation-payload-query.md), Lighthouse supports it.
 
 ```graphql
 type Mutation {

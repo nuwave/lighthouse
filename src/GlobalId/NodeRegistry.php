@@ -24,7 +24,7 @@ class NodeRegistry
      * The stashed current type.
      *
      * PHP resolves fields synchronously and one after another.
-     * So we can safely stash just this one value.
+     * So we can safely stash only this one value.
      * Should the need arise, this can probably be a map from the unique field path to the type.
      */
     protected string $currentType;
@@ -56,8 +56,7 @@ class NodeRegistry
     {
         [$decodedType, $decodedId] = $args['id'];
 
-        // This check forces Lighthouse to eagerly load the type, which might not have
-        // happened if the client only references it indirectly through an interface.
+        // This check forces Lighthouse to eagerly load the type, which might not have happened if the client only references it indirectly through an interface.
         // Loading the type in turn causes the TypeMiddleware to run and thus register the type in the NodeRegistry.
         $this->typeRegistry->has($decodedType)
             ?: throw new Error("[{$decodedType}] is not a type and cannot be resolved.");

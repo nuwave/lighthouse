@@ -15,8 +15,7 @@ restore_exception_handler();
 
 require_once __DIR__ . '/../../../../vendor/larastan/larastan/bootstrap.php';
 
-// Undo handlers registered by Laravel's HandleExceptions bootstrapper
-// to avoid PHPUnit risky test warnings about leaked handlers.
+// Undo handlers registered by Laravel's HandleExceptions bootstrapper to avoid PHPUnit risky test warnings about leaked handlers.
 for ($i = 0; $i < 10; ++$i) {
     if (set_error_handler(static fn (mixed ...$args): bool => false) === $errorHandler) {
         restore_error_handler();

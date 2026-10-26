@@ -63,6 +63,7 @@ scalar Upload
 ```
 
 This Scalar can only be used as an argument, not as a return type.
-For more information, please refer to the [file uploads guide](../digging-deeper/file-uploads.md).
+For more information, see the [file uploads guide](../digging-deeper/file-uploads.md).
 
-The multipart form request is handled by Lighthouse, the resolver gets passed an instance of [`Illuminate\Http\UploadedFile`](https://laravel.com/api/9.x/Illuminate/Http/UploadedFile.html) in the argument `array $variables`.
+Lighthouse handles the multipart form request.
+The resolver receives an instance of [`Illuminate\Http\UploadedFile`](https://laravel.com/api/9.x/Illuminate/Http/UploadedFile.html) in the argument `array $variables`.

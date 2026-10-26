@@ -28,13 +28,13 @@ class CanFindDirective extends BaseCanDirective
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-Query for specific model instances to check the policy against, using primary key(s) from specified argument.
+Query for specific model instances to check the policy against, using the primary key(s) from the specified argument.
 """
 directive @canFind(
 {$commonArguments}
 
   """
-  Specify the name of the field argument that contains its primary key(s).
+  Specify the name of the field argument that contains the primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
   """
