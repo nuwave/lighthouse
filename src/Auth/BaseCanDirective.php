@@ -103,8 +103,7 @@ GRAPHQL;
             try {
                 $resolved = $this->authorizeRequest($root, $args, $context, $resolveInfo, $trackedResolver, $authorizeModel);
                 if ($hasResolved) {
-                    // A batch loaded relation resolves to a promise, so authorization runs when
-                    // that promise is fulfilled, which is after this try-catch has been left.
+                    // A batch loaded relation resolves to a promise, so authorization runs when that promise is fulfilled, which is after this try-catch has been left.
                     // Handle its failure the same way to keep `action` meaningful either way.
                     return $resolved instanceof SyncPromise
                         ? $resolved->then(null, fn (\Throwable $throwable): mixed => $this->handleAuthorizationFailure($throwable))
@@ -158,8 +157,7 @@ GRAPHQL;
      */
     protected function authorizeModel(Gate $gate, string|array $ability, mixed $model, array $arguments): void
     {
-        // The signature of the second argument `$arguments` of `Gate::check`
-        // should be [modelClassName, additionalArg, additionalArg...]
+        // The signature of the second argument `$arguments` of `Gate::check` should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
         Utils::applyEach(

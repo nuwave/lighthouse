@@ -86,8 +86,7 @@ GRAPHQL;
     {
         $relationName = $this->directiveArgValue('relation');
 
-        // If the relation name is not set explicitly, we assume the argument
-        // name follows a convention and contains the relation name
+        // If the relation name is not set explicitly, we assume the argument name follows a convention and contains the relation name
         if (is_null($relationName)) {
             return lcfirst(
                 Str::after($this->nodeName(), 'has'),

@@ -69,8 +69,7 @@ class RedisStorageManager implements StoresSubscriptions
         // Store all keys as missing keys to remove the ones which are expired later.
         $missingKeys = $subscriberIds;
 
-        // Since we store the individual subscribers with a prefix,
-        // but not in the set, we have to add the prefix here.
+        // Since we store the individual subscribers with a prefix, but not in the set, we have to add the prefix here.
         $subscriberIds = array_map([$this, 'channelKey'], $subscriberIds);
 
         // Using the mget command, we can retrieve multiple values from redis.
@@ -116,8 +115,7 @@ class RedisStorageManager implements StoresSubscriptions
         $subscriber->topic = $topic;
 
         // In contrast to the CacheStorageManager, we use redis sets.
-        // Instead of reading the entire list, adding the subscriber, and storing the list;
-        // we add the name of the subscriber to the set of subscribers of this topic using the sadd command...
+        // Instead of reading the entire list, adding the subscriber, and storing the list; we add the name of the subscriber to the set of subscribers of this topic using the sadd command...
         $topicKey = $this->topicKey($topic);
         $this->connection->command('sadd', [
             $topicKey,

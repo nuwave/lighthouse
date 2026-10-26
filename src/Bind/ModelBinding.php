@@ -33,10 +33,7 @@ class ModelBinding
     /** @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $results */
     protected function modelInstance(EloquentCollection $results): ?Model
     {
-        // While "too few records" errors are handled as (client-safe) validation errors by applying
-        // the `BindingExists` rule on the BindDirective depending on whether the binding is required,
-        // "too many records" should be considered as (non-client-safe) configuration errors as it
-        // means the binding was not resolved using a unique identifier.
+        // While "too few records" errors are handled as (client-safe) validation errors by applying the `BindingExists` rule on the BindDirective depending on whether the binding is required, "too many records" should be considered as (non-client-safe) configuration errors as it means the binding was not resolved using a unique identifier.
         if ($results->count() > 1) {
             throw new MultipleRecordsFoundException($results->count());
         }

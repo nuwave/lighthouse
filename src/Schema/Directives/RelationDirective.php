@@ -51,8 +51,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             $relation = $parent->{$relationName}();
             assert($relation instanceof Relation);
 
-            // We can shortcut the resolution if the client only queries for a foreign key
-            // that we know to be present on the parent model.
+            // We can shortcut the resolution if the client only queries for a foreign key that we know to be present on the parent model.
             if (
                 $this->lighthouseConfig['shortcut_foreign_key_selection']
                 && (array_diff(array_keys($resolveInfo->getFieldSelection()), ['id', '__typename']) === [])

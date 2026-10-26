@@ -90,8 +90,7 @@ class ConnectionField
                         break;
 
                     default:
-                        // All other fields on the return type are assumed to be part
-                        // of the edge, so we try to locate them in the pivot attribute
+                        // All other fields on the return type are assumed to be part of the edge, so we try to locate them in the pivot attribute
                         if (isset($item->pivot->{$field->name})) {
                             $data[$field->name] = $item->pivot->{$field->name};
                         }

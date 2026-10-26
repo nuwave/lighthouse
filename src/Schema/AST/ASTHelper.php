@@ -291,8 +291,7 @@ class ASTHelper
         $directiveDefinition = static::extractDirectiveDefinition($directive::definition());
 
         foreach ($typeWithFields->fields as $fieldDefinition) {
-            // If the field already has the same directive defined, and it is not
-            // a repeatable directive, skip over it.
+            // If the field already has the same directive defined, and it is not a repeatable directive, skip over it.
             // Field directives are more specific than those defined on a type.
             if (
                 static::hasDirective($fieldDefinition, $name)

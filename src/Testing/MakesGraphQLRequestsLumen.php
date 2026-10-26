@@ -27,8 +27,7 @@ trait MakesGraphQLRequestsLumen // @phpstan-ignore trait.unused (hard to set up 
     /**
      * Stores the result of the introspection query.
      *
-     * On the first call to introspect() this property is set to
-     * cache the result, as introspection is expensive.
+     * On the first call to introspect() this property is set to cache the result, as introspection is expensive.
      */
     protected TestResponse $introspectionResult;
 
@@ -66,8 +65,7 @@ trait MakesGraphQLRequestsLumen // @phpstan-ignore trait.unused (hard to set up 
     /**
      * Send a POST request to the GraphQL endpoint.
      *
-     * Use this over graphQL() when you need more control or want to
-     * test how your server behaves on incorrect inputs.
+     * Use this over graphQL() when you need more control or want to test how your server behaves on incorrect inputs.
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request

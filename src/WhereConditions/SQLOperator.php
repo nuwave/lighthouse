@@ -88,12 +88,10 @@ GRAPHQL;
         $arity = $this->operatorArity($operator);
 
         if ($arity === 3) {
-            // Usually, the operator is passed as the second argument to the condition
-            // method, e.g. ->where('some_col', '=', $value)
+            // Usually, the operator is passed as the second argument to the condition method, e.g. ->where('some_col', '=', $value)
             $args[] = $operator;
         } else {
-            // We use the fact that the operators are named after Laravel's condition
-            // methods, so we can append the name, e.g. whereNull, whereNotBetween
+            // We use the fact that the operators are named after Laravel's condition methods, so we can append the name, e.g. whereNull, whereNotBetween
             $method .= $operator;
         }
 

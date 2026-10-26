@@ -93,8 +93,7 @@ class NestedManyToMany implements ArgResolver
             return [];
         }
 
-        // Since GraphQL inputs are monomorphic, we can look at the first
-        // given value for an argument and deduce the type of all values.
+        // Since GraphQL inputs are monomorphic, we can look at the first given value for an argument and deduce the type of all values.
         $exemplaryValue = $values[0];
 
         // We assume that the values contain pivot information

@@ -3,12 +3,10 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 /**
- * Implement this on ArgResolvers that can run pre-save arg resolvers
- * lifted out of a @nest before persisting the model.
+ * Implement this on ArgResolvers that can run pre-save arg resolvers lifted out of a @nest before persisting the model.
  *
  * Lifted arguments are passed as an ordered list, not as a name-keyed map:
- * field names are unique per input type, not across a whole input tree,
- * so keying them would discard colliding arguments.
+ * field names are unique per input type, not across a whole input tree, so keying them would discard colliding arguments.
  */
 interface PreSaveArgumentsAware
 {

@@ -14,15 +14,12 @@ class FieldPath
         $significantPathSegments = array_filter(
             $path,
             // Ignore numeric path entries, as those signify a list of fields.
-            // Combining the queries for lists is the purpose of the
-            // batch loader, so they must not be included.
+            // Combining the queries for lists is the purpose of the batch loader, so they must not be included.
             static fn (int|string $segment): bool => ! is_numeric($segment),
         );
 
-        // Using . as the separator would combine relations in nested fields with
-        // higher up relations using dot notation, matching the field path.
-        // We might optimize this in the future to enable batching them anyway,
-        // but employ this solution for now, as it preserves correctness.
+        // Using . as the separator would combine relations in nested fields with higher up relations using dot notation, matching the field path.
+        // We might optimize this in the future to enable batching them anyway, but employ this solution for now, as it preserves correctness.
         return implode('|', $significantPathSegments);
     }
 }

@@ -22,8 +22,7 @@ interface ProvidesCacheableValidationRules extends ProvidesValidationRules
      *
      * These rules are always executed and their result is never cached.
      *
-     * Returning `null` enables all available rules,
-     * returning `[]` skips query validation entirely.
+     * Returning `null` enables all available rules, returning `[]` skips query validation entirely.
      *
      * @return array<string, \GraphQL\Validator\Rules\ValidationRule>|null
      */

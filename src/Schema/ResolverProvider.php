@@ -23,8 +23,7 @@ class ResolverProvider implements ProvidesResolver
                 $this->throwMissingResolver($fieldValue);
             }
 
-            // Return any non-null value to continue nested field resolution
-            // when the root Query type is returned as part of the result.
+            // Return any non-null value to continue nested field resolution when the root Query type is returned as part of the result.
             if (ASTHelper::getUnderlyingTypeName($fieldValue->getField()) === RootType::QUERY) {
                 return static fn (): bool => true;
             }
@@ -53,8 +52,7 @@ class ResolverProvider implements ProvidesResolver
     /** @return never */
     protected function throwMissingResolver(FieldValue $fieldValue): void
     {
-        // Since we already know we are on the root type, this is either
-        // query, mutation or subscription
+        // Since we already know we are on the root type, this is either query, mutation or subscription
         $parent = lcfirst($fieldValue->getParentName());
         $fieldName = $fieldValue->getFieldName();
         $proposedResolverClass = ucfirst($fieldName);

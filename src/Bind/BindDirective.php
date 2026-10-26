@@ -117,9 +117,8 @@ GRAPHQL;
 
     public function transform(mixed $argumentValue): mixed
     {
-        // When validating required bindings, the \Nuwave\Lighthouse\Bind\Validation\BindingExists validation rule
-        // should call transform() before it is called by the directive resolver. To avoid resolving the bindings
-        // multiple times, we should remember the resolved binding and reuse it every time transform() is called.
+        // When validating required bindings, the \Nuwave\Lighthouse\Bind\Validation\BindingExists validation rule should call transform() before it is called by the directive resolver.
+        // To avoid resolving the bindings multiple times, we should remember the resolved binding and reuse it every time transform() is called.
         if (! $this->binding instanceof PendingBinding) {
             return $this->binding;
         }

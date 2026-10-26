@@ -86,8 +86,7 @@ GRAPHQL;
             // In Laravel cache, null is considered a non-existent value, see https://laravel.com/docs/9.x/cache#checking-for-item-existence:
             // > The `has` method [...] will also return false if the item exists but its value is null.
             //
-            // If caching `null` value becomes something worthwhile, one possible way to achieve it is to
-            // encapsulate the `$result` at writing time :
+            // If caching `null` value becomes something worthwhile, one possible way to achieve it is to encapsulate the `$result` at writing time :
             //
             //    $storeInCache = static function ($result) use ($cacheKey, $maxAge, $cache): void {
             //        $value = ['rawValue' => $result];
@@ -102,9 +101,8 @@ GRAPHQL;
             //        return $value['rawValue'];
             //    }
             //
-            // Such a change would introduce some potential BC, if for instance cached value was already containing
-            // an object with a `rawValue` key prior the implementation change. A possible workaround is to choose a
-            // less collision-probable key instead of `rawValue` (e.g. "lighthouse:rawValue").
+            // Such a change would introduce some potential BC, if for instance cached value was already containing an object with a `rawValue` key prior the implementation change.
+            // A possible workaround is to choose a less collision-probable key instead of `rawValue` (e.g. "lighthouse:rawValue").
 
             $resolved = $resolver($root, $args, $context, $resolveInfo);
 

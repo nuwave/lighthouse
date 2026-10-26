@@ -185,8 +185,7 @@ final class ArgumentSetTest extends TestCase
         $set = new ArgumentSet();
         $set->addValue('tasks.create.*.user_id', 123);
 
-        // The intermediary `tasks` input is created just like plain dot notation would,
-        // but nothing is injected because `create` was never provided by the client.
+        // The intermediary `tasks` input is created just like plain dot notation would, but nothing is injected because `create` was never provided by the client.
         $this->assertTrue($set->exists('tasks'));
 
         $tasks = $set->arguments['tasks']->value;

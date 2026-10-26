@@ -35,8 +35,7 @@ GRAPHQL;
                 unset($argumentSet->arguments[$name]);
             } else {
                 // Recursively remove nested inputs using @drop directive.
-                // We look for further ArgumentSet instances, they
-                // might be contained within an array.
+                // We look for further ArgumentSet instances, they might be contained within an array.
                 Utils::applyEach(
                     function ($value): void {
                         if ($value instanceof ArgumentSet) {

@@ -56,9 +56,8 @@ class NestedBelongsTo implements ArgResolver
     public static function disconnectOrDelete(BelongsTo $relation, ArgumentSet $args): void
     {
         // We proceed with disconnecting/deleting only if the given $values is truthy.
-        // There is no other information to be passed when issuing those operations,
-        // but GraphQL forces us to pass some value. It would be unintuitive for
-        // the end user if the given value had no effect on the execution.
+        // There is no other information to be passed when issuing those operations, but GraphQL forces us to pass some value.
+        // It would be unintuitive for the end user if the given value had no effect on the execution.
         if (
             $args->has('disconnect')
             && $args->arguments['disconnect']->value

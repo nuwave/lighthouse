@@ -72,16 +72,14 @@ GRAPHQL;
         $relation = $model->{$relationName}();
         assert($relation instanceof Relation);
 
-        // Those types of relations may only have one related model attached to
-        // it, so we don't need to use an ID to know which model to delete.
+        // Those types of relations may only have one related model attached to it, so we don't need to use an ID to know which model to delete.
         $relationIsHasOneLike = $relation instanceof HasOne || $relation instanceof MorphOne;
         // This includes MorphTo, which is a subclass of BelongsTo
         $relationIsBelongsToLike = $relation instanceof BelongsTo;
 
         if ($relationIsHasOneLike || $relationIsBelongsToLike) {
             assert($relation instanceof HasOne || $relation instanceof MorphOne || $relation instanceof BelongsTo); // @phpstan-ignore instanceof.alwaysTrue, booleanOr.alwaysTrue
-            // Only delete if the given value is truthy, since
-            // the client might use a variable and always pass the argument.
+            // Only delete if the given value is truthy, since the client might use a variable and always pass the argument.
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
