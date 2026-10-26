@@ -1057,6 +1057,8 @@ Replaces incoming empty strings `""` with `null`.
 
 When used upon fields, empty strings for non-nullable inputs will pass unchanged.
 Only explicitly placing this on non-nullable inputs will force the conversion.
+
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
@@ -1089,14 +1091,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, add this directive to your global field middleware in `lighthouse.php`:
-
-```php
-    'field_middleware' => [
-        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
-        ...
-    ],
-```
+The default `field_middleware` setting in `lighthouse.php` applies this directive to every field.
 
 ## @count
 
@@ -3800,6 +3795,8 @@ Remove whitespace from the beginning and end of a given input.
 This can be used on:
 - a single argument or input field to sanitize that subtree
 - a field to trim all strings
+
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
@@ -3820,14 +3817,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, add this directive to your global field middleware in `lighthouse.php`:
-
-```php
-    'field_middleware' => [
-        \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
-        ...
-    ],
-```
+The default `field_middleware` setting in `lighthouse.php` applies this directive to every field.
 
 ## @union
 
