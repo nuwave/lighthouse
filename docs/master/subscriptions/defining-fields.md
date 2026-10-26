@@ -48,8 +48,7 @@ final class PostUpdated extends GraphQLSubscription
     {
         $user = $subscriber->context->user;
 
-        // Don't broadcast the subscription to the same
-        // person who updated the post.
+        // Don't broadcast the subscription to the same person who updated the post.
         return $root->updated_by !== $user->id;
     }
 
@@ -75,8 +74,7 @@ final class PostUpdated extends GraphQLSubscription
      */
     public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
     {
-        // Optionally manipulate the `$root` item before it gets broadcasted to
-        // subscribed client(s).
+        // Optionally manipulate the `$root` item before it gets broadcasted to subscribed client(s).
         $root->load(['author', 'author.achievements']);
 
         return $root;

@@ -29,8 +29,7 @@ final class PostUpdatedSubscription extends GraphQLSubscription
         // Clients arguments when subscribing
         $args = $subscriber->args;
 
-        // Ensure that the Post ($root) id matches
-        // the requested `post_id`
+        // Ensure that the Post ($root) id matches the requested `post_id`
         return $root->id == $args['post_id'];
     }
 }

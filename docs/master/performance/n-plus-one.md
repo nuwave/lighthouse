@@ -132,8 +132,7 @@ final class UserPostsBatchLoader
     {
         $this->users[$user->id] = $user;
 
-        // The wrapped callable will run after load() has been called
-        // with all users in the current query.
+        // The wrapped callable will run after load() has been called with all users in the current query.
         return new Deferred(function () use ($user): array {
             // Ensure we only perform the actual loading exactly once.
             if (! $this->hasResolved) {
