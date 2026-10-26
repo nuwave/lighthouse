@@ -40,8 +40,21 @@ final class MyCustomDirectiveTest extends TestCase
 
 When testing custom functionality through a dummy schema, you still need to have a way to resolve fields.
 Lighthouse provides a simple way to mock resolvers in a dummy schema.
+Mark the fields to mock with the `@mock` directive:
 
-Add the `MocksResolvers` trait to your test class:
+```graphql
+"""
+Resolve the field with a mock resolver registered in the test, see `MocksResolvers`.
+"""
+directive @mock(
+  """
+  Specify a unique key for the mock resolver.
+  """
+  key: String = "default"
+) on FIELD_DEFINITION
+```
+
+Then add the `MocksResolvers` trait to your test class:
 
 ```php
 namespace Tests;
