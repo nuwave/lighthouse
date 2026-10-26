@@ -302,7 +302,8 @@ directive @belongsToMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -1816,7 +1817,8 @@ directive @hasMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -1906,7 +1908,8 @@ directive @hasManyThrough(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -2401,7 +2404,8 @@ directive @morphMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -2539,7 +2543,8 @@ directive @morphToMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
