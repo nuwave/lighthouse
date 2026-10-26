@@ -15,6 +15,7 @@ class DropArgsDirective extends BaseDirective implements FieldMiddleware
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Apply the @drop directives on the incoming arguments.
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @dropArgs on FIELD_DEFINITION
 GRAPHQL;

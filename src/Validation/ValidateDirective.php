@@ -18,6 +18,7 @@ class ValidateDirective extends BaseDirective implements FieldMiddleware
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Run validation on a field.
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @validate on FIELD_DEFINITION
 GRAPHQL;
