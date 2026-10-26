@@ -220,7 +220,8 @@ Resolves a field through the Eloquent `BelongsTo` relationship.
 """
 directive @belongsTo(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -271,7 +272,8 @@ Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
 directive @belongsToMany(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -1784,7 +1786,8 @@ Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloq
 """
 directive @hasMany(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -1873,7 +1876,8 @@ Corresponds to [the Eloquent relationship HasManyThrough](https://laravel.com/do
 """
 directive @hasManyThrough(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -1940,7 +1944,8 @@ Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloqu
 """
 directive @hasOne(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -1973,7 +1978,8 @@ Corresponds to [the Eloquent relationship HasOneThrough](https://laravel.com/doc
 """
 directive @hasOneThrough(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2365,7 +2371,8 @@ Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloq
 """
 directive @morphMany(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2442,7 +2449,8 @@ Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/eloqu
 """
 directive @morphOne(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2473,7 +2481,8 @@ Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/eloque
 """
 directive @morphTo(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2500,7 +2509,8 @@ Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.
 """
 directive @morphToMany(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -4452,7 +4462,8 @@ Eager-load an Eloquent relation.
 """
 directive @with(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 

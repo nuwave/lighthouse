@@ -14,7 +14,8 @@ Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloq
 """
 directive @hasMany(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 

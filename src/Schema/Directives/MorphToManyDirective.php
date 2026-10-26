@@ -14,7 +14,8 @@ Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.
 """
 directive @morphToMany(
   """
-  Specify the relationship method name in the model class, if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
