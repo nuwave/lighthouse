@@ -12,6 +12,9 @@ use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
 
+use function Safe\ini_get;
+use function Safe\ini_set;
+
 final class SchemaCacheTest extends TestCase
 {
     use TestsSerialization;
@@ -158,6 +161,24 @@ final class SchemaCacheTest extends TestCase
         );
 
         $this->assertArrayHasKey('Bar', $this->freshDocumentAST()->types);
+    }
+
+    public function testReloadsCacheFileWhenItChangesWithOPcache(): void
+    {
+        if (! extension_loaded('Zend OPcache') || ! filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOL)) {
+            $this->markTestSkipped('Requires OPcache, e.g. run with -d opcache.enable_cli=1.');
+        }
+
+        // Make OPcache serve the compiled file without checking for changes on disk
+        $revalidateFreq = ini_set('opcache.revalidate_freq', '3600');
+        $fileUpdateProtection = ini_set('opcache.file_update_protection', '0');
+
+        try {
+            $this->testReloadsCacheFileWhenItChanges();
+        } finally {
+            ini_set('opcache.revalidate_freq', $revalidateFreq);
+            ini_set('opcache.file_update_protection', $fileUpdateProtection);
+        }
     }
 
     public function testRebuildsWhenCacheFileIsDeleted(): void

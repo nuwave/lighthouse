@@ -110,6 +110,12 @@ class ASTCache
             return $loaded['astArray'];
         }
 
+        // OPcache may still hold a previous version of the file within opcache.revalidate_freq,
+        // which would then be kept in memory under the fingerprint of the new file
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, force: $loaded !== null);
+        }
+
         $astArray = Utils::requireArrayOrForget($this->filesystem, $path);
         if ($astArray === null) {
             unset(static::$loaded[$path]);
