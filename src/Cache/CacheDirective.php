@@ -36,7 +36,8 @@ directive @cache(
 
   """
   Limit access to cached data to the currently authenticated user.
-  When the field is accessible by guest users, this will not have any effect, they will access a shared cache.
+  This has no effect when guest users can access the field.
+  Guest users access a shared cache.
   """
   private: Boolean = false
 ) on FIELD_DEFINITION
