@@ -34,7 +34,7 @@ This optimizes performance by sending less data, but clients must anticipate thi
 Subscriptions do not expire by themselves.
 Unless you delete a subscription, it will continue to broadcast events after the client has disconnected.
 
-The easiest way to expire subscriptions automatically is to use the env `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL` to set an expiration time in seconds (e.g. `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` to expire in one hour).
+Automate expiry by setting `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL` to an expiration time in seconds (e.g. `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` to expire in one hour).
 
 ## Encrypted Subscriptions
 
