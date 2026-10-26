@@ -55,7 +55,7 @@ In order to use federated tracing, you need to enable [tracing](../performance/t
 ],
 ```
 
-Note that federated tracing requires `google/protobuf` to be installed (for better performance you can also install the `protobuf` php extension).
+Federated tracing requires `google/protobuf` to be installed (for better performance you can also install the `protobuf` php extension).
 
 ### Unsupported features
 

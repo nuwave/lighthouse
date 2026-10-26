@@ -44,12 +44,12 @@ enum GlobalIdDecode {
     ARRAY
 
     """
-    Return just `$type`.
+    Return only `$type`.
     """
     TYPE
 
     """
-    Return just `$id`.
+    Return only `$id`.
     """
     ID
 }

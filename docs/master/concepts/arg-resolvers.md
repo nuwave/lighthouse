@@ -14,7 +14,7 @@ However, a single field resolver still has to take care of all the input argumen
 Handling complex input data in a single function is hard because of their dynamic nature.
 The input given by a client might be nested arbitrarily deep and come in many different variations.
 
-The following example shows an example mutation that is actually composed out of multiple distinct operations.
+The following example shows an example mutation that is composed out of multiple distinct operations.
 
 ```graphql
 type Mutation {
@@ -59,7 +59,7 @@ function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
     // Create the new task with the remaining args
     $task = \App\Models\Task::create($args);
 
-    // If the client actually passed notes, create and attach them
+    // If the client passed notes, create and attach them
     if ($notes) {
         foreach($notes as $note) {
             $task->notes()->create($note);
@@ -70,7 +70,7 @@ function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
 }
 ```
 
-In this contrived example, the function is still quite small.
+In this contrived example, the function is still small.
 However, separation of concerns is already violated: A single function is responsible for creating both tasks and notes.
 
 We might want to extend our schema to support more operations in the future, such as updating a task and creating, updating or deleting notes or other, more deeply nested relations.
@@ -78,7 +78,7 @@ Such changes would force us to duplicate code and increase the complexity of our
 
 ## Solution
 
-Ideally, we would want to write small and focused functions that deal with just a part of the given input arguments.
+Ideally, we would want to write small and focused functions that deal with only a part of the given input arguments.
 The execution engine should traverse the given input and take care of calling the appropriate functions with their respective arguments.
 
 ```php

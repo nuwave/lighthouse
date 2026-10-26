@@ -28,7 +28,7 @@ trait MakesGraphQLRequestsLumen // @phpstan-ignore trait.unused (hard to set up 
      * Stores the result of the introspection query.
      *
      * On the first call to introspect() this property is set to
-     * cache the result, as introspection is quite expensive.
+     * cache the result, as introspection is expensive.
      */
     protected TestResponse $introspectionResult;
 

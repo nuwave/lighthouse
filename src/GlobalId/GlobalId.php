@@ -20,9 +20,9 @@ interface GlobalId
      */
     public function decode(string $globalID): array;
 
-    /** Decode the Global ID and get just the ID. */
+    /** Decode the Global ID and get only the ID. */
     public function decodeID(string $globalID): string;
 
-    /** Decode the Global ID and get just the type. */
+    /** Decode the Global ID and get only the type. */
     public function decodeType(string $globalID): string;
 }

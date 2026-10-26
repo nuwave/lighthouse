@@ -117,7 +117,7 @@ class RedisStorageManager implements StoresSubscriptions
 
         // In contrast to the CacheStorageManager, we use redis sets.
         // Instead of reading the entire list, adding the subscriber, and storing the list;
-        // we simply add the name of the subscriber to the set of subscribers of this topic using the sadd command...
+        // we add the name of the subscriber to the set of subscribers of this topic using the sadd command...
         $topicKey = $this->topicKey($topic);
         $this->connection->command('sadd', [
             $topicKey,

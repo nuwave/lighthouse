@@ -9,7 +9,7 @@ $container = Container::getInstance();
 $config = $container->make(ConfigRepository::class);
 if ($routeConfig = $config->get('lighthouse.route')) {
     /**
-     * Not using assert() as only one of those classes will actually be installed.
+     * Not using assert() as only one of those classes will be installed.
      *
      * @var Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router $router
      */

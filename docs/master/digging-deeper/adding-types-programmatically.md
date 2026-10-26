@@ -29,7 +29,7 @@ While Lighthouse is an SDL-first GraphQL server, you can also use native PHP typ
 
 Check out the [webonyx/graphql-php documentation](https://webonyx.github.io/graphql-php/type-definitions) on how to define types.
 
-Note that you will not have access to a large portion of Lighthouse functionality that is provided through server-side directives and the definition is much more verbose.
+You will not have access to a large portion of Lighthouse functionality that is provided through server-side directives and the definition is much more verbose.
 
 Because of this, we do not recommend you use native PHP types for complex object types.
 

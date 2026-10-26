@@ -69,7 +69,7 @@ class ArgumentSet
     /**
      * Add a value at the dot-separated path.
      *
-     * Works just like @see \Illuminate\Support\Arr::add(), but a path segment
+     * Works like @see \Illuminate\Support\Arr::add(), but a path segment
      * of `*` injects the value into every element of the list found at that
      * position instead of a single key.
      */
@@ -104,7 +104,7 @@ class ArgumentSet
 
         // The branch leading up to a `*` might not have been given by the client
         // at all, e.g. an optional nested input that was omitted. In that case,
-        // there is nothing to inject into, so we just do nothing.
+        // there is nothing to inject into, so we do nothing.
         if ($throughWildcard && ! isset($this->arguments[$key])) {
             return;
         }

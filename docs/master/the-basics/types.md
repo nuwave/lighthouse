@@ -84,7 +84,7 @@ type Query {
 }
 ```
 
-In this example, the underlying values are actually integers.
+In this example, the underlying values are integers.
 When the models are retrieved from the database, the mapping is applied and the integers are converted to the defined string keys.
 
 ```php
@@ -311,7 +311,7 @@ Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema
 
 ## Union
 
-A Union is an abstract type that simply enumerates other Object Types.
+A Union is an abstract type that enumerates other Object Types.
 They are similar to interfaces in that they can return different types.
 But do not prescribe any common fields.
 
@@ -329,7 +329,7 @@ type Employee {
 }
 ```
 
-Just like Interfaces, you need a way to determine the concrete Object Type for a Union, based on the resolved value.
+Like Interfaces, you need a way to determine the concrete Object Type for a Union, based on the resolved value.
 If the default type resolver does not work for you, define your own with `php artisan lighthouse:union <Union name>`.
 It is automatically put in the default namespace where Lighthouse can discover it by itself.
 

@@ -159,13 +159,13 @@ enum PersonColumn {
 ```
 
 Lighthouse will still automatically generate the necessary input types.
-Instead of creating enums for the allowed columns, it will simply use the existing `PersonColumn` enum.
+Instead of creating enums for the allowed columns, it uses the existing `PersonColumn` enum.
 
 It is recommended to either use the `columns` or the `columnsEnum` argument.
 When you don't define any allowed columns, clients can specify arbitrary column names as a `String`.
 This approach should by taken with care, as it carries potential performance and security risks and offers little type safety.
 
-A simple query for a person who is exactly 42 years old would look like this:
+A query for a person who is exactly 42 years old would look like this:
 
 ```graphql
 {
@@ -175,7 +175,7 @@ A simple query for a person who is exactly 42 years old would look like this:
 }
 ```
 
-Note that the operator defaults to `EQ` (`=`) if not given, so you could also omit it from the previous example and get the same result.
+The operator defaults to `EQ` (`=`) if not given, so you could also omit it from the previous example and get the same result.
 
 The following query gets actors over age 37 who either have red hair or are at least 150cm:
 
@@ -278,7 +278,7 @@ directive @whereHasConditions(
 ) on ARGUMENT_DEFINITION
 ```
 
-This directive works very similar to [@whereConditions](#whereconditions), except that the conditions are applied to a relation sub query:
+This directive works like [@whereConditions](#whereconditions), except that the conditions are applied to a relation sub query:
 
 ```graphql
 type Query {
@@ -321,7 +321,7 @@ enum QueryPeopleHasRoleColumn {
 }
 ```
 
-A simple query for a person who has an access level of at least 5, through one of their roles, looks like this:
+A query for a person who has an access level of at least 5, through one of their roles, looks like this:
 
 ```graphql
 {
@@ -331,7 +331,8 @@ A simple query for a person who has an access level of at least 5, through one o
 }
 ```
 
-You can also query for relationship existence without any condition; simply use an empty object as argument value.
+You can also query for relationship existence without any condition.
+Use an empty object as argument value.
 This query would retrieve all persons that have a role:
 
 ```graphql
@@ -342,7 +343,7 @@ This query would retrieve all persons that have a role:
 }
 ```
 
-Just like with the [@whereCondition](../api-reference/directives.md#whereconditions) directive, using `null` as argument value does not have any effect on the query.
+Like with the [@whereCondition](../api-reference/directives.md#whereconditions) directive, using `null` as argument value does not have any effect on the query.
 This query would retrieve all persons, no matter if they have a role or not:
 
 ```graphql

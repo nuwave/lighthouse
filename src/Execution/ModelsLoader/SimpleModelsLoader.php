@@ -22,7 +22,7 @@ class SimpleModelsLoader implements ModelsLoader
         // Dot notation may be used to eager load nested relations
         $parts = explode('.', $this->relation);
 
-        // We just return the first level of relations for now.
+        // We only return the first level of relations for now.
         // They hold the nested relations in case they are needed.
         $firstRelation = $parts[0];
 

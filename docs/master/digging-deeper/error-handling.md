@@ -39,7 +39,7 @@ However, you can choose to report client-safe errors by replacing `Nuwave\Lighth
 
 ## Additional Error Information
 
-The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php) may be implemented to add more information than just an error message to the rendered error output.
+The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php) may be implemented to add more information than an error message to the rendered error output.
 
 This custom exception contains information about the reason the exception was thrown:
 

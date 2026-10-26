@@ -81,8 +81,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | A large part of schema generation consists of parsing and AST manipulation.
-    | This operation is very expensive, so it is highly recommended enabling
-    | caching of the final schema to optimize performance of large schemas.
+    | This operation is expensive, so enable caching of the final schema
+    | to optimize performance of large schemas.
     |
     */
 

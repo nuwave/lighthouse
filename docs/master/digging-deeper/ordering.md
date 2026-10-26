@@ -84,7 +84,7 @@ enum PostColumn {
 ```
 
 Lighthouse will still automatically generate the necessary input types and the `SortOrder` enum.
-Instead of generating enums for the allowed columns, it will simply use the existing `PostColumn` enum.
+Instead of generating enums for the allowed columns, it uses the existing `PostColumn` enum.
 
 ### Ordering By Relations
 

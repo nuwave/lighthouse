@@ -246,5 +246,5 @@ final class GeocodeDirective extends BaseDirective implements SaveAwareArgResolv
 When `runBeforeSave()` returns `true`, the resolver is invoked before `$model->save()`, allowing it to set attributes on the model.
 When it returns `false`, the resolver runs after the model is saved — the same timing as any `ArgResolver` that does not implement this interface.
 
-Note that `__invoke()` receives `null` as `$args` if the client sends `null` for a nullable input field.
+`__invoke()` receives `null` as `$args` if the client sends `null` for a nullable input field.
 Guard accordingly.

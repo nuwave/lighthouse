@@ -6,7 +6,7 @@ While [validation](validation) is a great first line of defense, there are cases
 ## Single arguments
 
 A great way to deal with single values is to use an [`ArgTransformerDirective`](../custom-directives/field-argument-directives#argtransformerdirective).
-Lighthouse offers a few built-in options, but it is also really easy to build your own.
+Lighthouse offers a few built-in options, and you can build your own.
 
 Here is how you can remove whitespace of a given input string by using the built-in [@trim](../api-reference/directives.md#trim) directive:
 

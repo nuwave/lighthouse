@@ -108,7 +108,7 @@ class NestedManyToMany implements ArgResolver
             return $relationArray;
         }
 
-        // The default case is simply a flat array of IDs which we don't have to transform
+        // The default case is a flat array of IDs which we don't have to transform
         return $values;
     }
 }

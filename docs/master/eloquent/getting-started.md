@@ -1,6 +1,6 @@
 # Eloquent: Getting Started
 
-Lighthouse makes it easy for you to perform queries and mutations on your Eloquent models.
+Lighthouse lets you perform queries and mutations on your Eloquent models.
 
 ## Defining Models
 
@@ -292,8 +292,7 @@ To upsert multiple models at once, use the [@upsertMany](../api-reference/direct
 
 ## Delete
 
-Deleting models is a breeze using the [@delete](../api-reference/directives.md#delete) directive.
-Dangerously easy.
+Delete models with the [@delete](../api-reference/directives.md#delete) directive.
 
 ```graphql
 type Mutation {
@@ -301,7 +300,7 @@ type Mutation {
 }
 ```
 
-Simply call it with the ID of the user you want to delete.
+Call it with the ID of the user you want to delete.
 
 ```graphql
 mutation {

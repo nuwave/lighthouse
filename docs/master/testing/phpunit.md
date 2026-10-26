@@ -1,13 +1,13 @@
 # Testing with PHPUnit
 
-Lighthouse makes it easy to add automated tests through [PHPUnit](https://phpunit.de).
+Lighthouse supports automated tests through [PHPUnit](https://phpunit.de).
 
 ## Setup
 
 Lighthouse offers some useful test helpers.
 Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
 
-The `MakesGraphQLRequests` trait make it easy to call your API:
+The `MakesGraphQLRequests` trait lets you call your API:
 
 ```diff
 +use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
@@ -106,7 +106,7 @@ public function testPostsSubscription(): void
 
 Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work quite well with the JSON data returned by GraphQL.
+The returned `TestResponse` conveniently offers assertions that work well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
@@ -192,7 +192,7 @@ $response->assertGraphQLSubscriptionNotAuthorized($this);
 
 Once you do your subscription query and get a `TestResponse $response`, you can run the following assertions on it.
 
-To assert the subscription actually received some broadcasts:
+To assert the subscription received some broadcasts:
 
 ```
 // any other way to broadcast would also work
@@ -235,7 +235,7 @@ Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#
 php artisan lighthouse:ide-helper
 ```
 
-The provided assertions are prefixed with `assertGraphQL` for easy discovery.
+The provided assertions are prefixed with `assertGraphQL`, so you can find them through autocompletion.
 They offer useful shortcuts to common testing tasks.
 For example, you might want to ensure that validation works properly:
 

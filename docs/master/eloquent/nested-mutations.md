@@ -69,7 +69,7 @@ input CreatePostInput {
 
 The first argument `title` is a value of the `Post` itself and corresponds to a column in the database.
 
-The second argument `author` is named just like the relationship method that is defined on the `Post` model.
+The second argument `author` is named like the relationship method that is defined on the `Post` model.
 A nested `BelongsTo` relationship exposes the following operations:
 
 - `connect` it to an existing model
@@ -80,7 +80,7 @@ A nested `BelongsTo` relationship exposes the following operations:
 - `delete` the related model and the association to it
 
 Both `disconnect` and `delete` don't make much sense when creating a new model.
-You can control what operations are possible by defining just what you need in the `input`.
+You can control what operations are possible by defining only what you need in the `input`.
 We choose to expose the following operations on the related `User` model:
 
 ```graphql
@@ -181,7 +181,7 @@ input UpdateUserBelongsTo {
 }
 ```
 
-You must pass a truthy value to `disconnect` and `delete` for them to actually run.
+You must pass a truthy value to `disconnect` and `delete` for them to run.
 This structure was chosen as it is consistent with updating `BelongsToMany` relationships and allows the query string to be mostly static, taking a variable value to control its behavior.
 
 ```graphql
@@ -217,7 +217,7 @@ If `false` or `null` is passed, it will not change.
 ```
 
 When issuing an `upsert`, you may expose the same nested operations as an `update`.
-In case a new model is created, they will simply be ignored.
+In case a new model is created, they are ignored.
 
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean) {
@@ -688,7 +688,7 @@ type UserMoviePivot {
 Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass an array where the keys are IDs of related models and the values are pivot data.
 
 Lighthouse exposes this capability through the nested operations on many-to-many relations.
-Instead of passing just a list of IDs, you can define an `input` type that also contains pivot data.
+Instead of passing only a list of IDs, you can define an `input` type that also contains pivot data.
 It must contain a field called `id` to contain the ID of the related model, all other fields will be inserted into the pivot table.
 
 ```graphql

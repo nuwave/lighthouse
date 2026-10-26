@@ -14,7 +14,7 @@ class FieldPath
         $significantPathSegments = array_filter(
             $path,
             // Ignore numeric path entries, as those signify a list of fields.
-            // Combining the queries for lists is the very purpose of the
+            // Combining the queries for lists is the purpose of the
             // batch loader, so they must not be included.
             static fn (int|string $segment): bool => ! is_numeric($segment),
         );

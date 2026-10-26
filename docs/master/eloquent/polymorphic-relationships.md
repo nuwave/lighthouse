@@ -1,10 +1,10 @@
 # Polymorphic Relationships
 
-Just like in Laravel, you can define [Polymorphic Relationships](https://laravel.com/docs/eloquent-relationships#polymorphic-relationships) in your schema.
+Like in Laravel, you can define [Polymorphic Relationships](https://laravel.com/docs/eloquent-relationships#polymorphic-relationships) in your schema.
 
 ## One to One
 
-Suppose you have defined a model structure just like the Laravel example docs.
+Suppose you have defined a model structure like the Laravel example docs.
 You have two models, `Post` and `User` which may both have an `Image` assigned.
 
 Let's start off with the plain type definitions, without any relations.
@@ -26,7 +26,7 @@ type Image {
 }
 ```
 
-First, let's go ahead and add the relations to `Image` since they are straightforward.
+First, add the relations to `Image`.
 The field name should match your relationship method name and be annotated with the [@morphOne](../api-reference/directives.md#morphone) directive.
 
 ```graphql
@@ -64,7 +64,7 @@ type Image {
 ```
 
 The default type resolver will be able to determine which concrete object type is returned when dealing with Eloquent models.
-Your definition should just work.
+Your definition works without further changes.
 
 Given you have a field `images` that returns a list of `[Image!]!`, you could query it like this:
 

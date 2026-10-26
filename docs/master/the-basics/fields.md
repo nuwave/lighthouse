@@ -66,7 +66,7 @@ This query will return the following response:
 ## Fields with arguments
 
 As we learned, _every_ field has a resolver function associated with it.
-Just like functions, fields can take arguments to control their behavior.
+Like functions, fields can take arguments to control their behavior.
 
 Let's construct a query that greets the user.
 We add a required argument `name` that is used to construct the greeting.
@@ -198,7 +198,7 @@ function resolveUserAttribute(User $user, array $args, GraphQLContext $context, 
 ```
 
 Fortunately, the underlying GraphQL implementation already provides [a sensible default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver).
-Plays quite nicely with the data you would typically return from a root resolver, e.g.
+It works well with the data you would typically return from a root resolver, e.g.
 `Eloquent` models or associative arrays.
 
 This means that in most cases, you will only have to provide resolvers for the root fields and make sure they return data in the proper shape.

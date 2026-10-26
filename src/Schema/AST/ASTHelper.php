@@ -310,7 +310,7 @@ class ASTHelper
      *
      * We have to make sure it is unique in the schema.
      * This name is a bit verbose.
-     * It is very unlikely to collide with a random user-defined type.
+     * It is unlikely to collide with a random user-defined type.
      *
      * @example ParentNameFieldNameArgName
      */

@@ -240,7 +240,7 @@ final class MyDirective extends BaseDirective implements FieldResolver
 
 ### Simplify wrapping resolvers in `FieldMiddleware` directives
 
-Wrapping resolvers is very common in `FieldMiddleware` directives and is now simplified.
+Wrapping resolvers is common in `FieldMiddleware` directives and is now simplified.
 
 ```diff
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -432,13 +432,13 @@ type Query {
 }
 ```
 
-Note that [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
+[@guard](docs/master/api-reference/directives.md#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config, see the [default config](src/lighthouse.php) for an example.
 
 If you used `@middleware` for authorization, replace it with [@can](docs/master/api-reference/directives.md#can).
 
 Other functionality can be replaced by a custom [`FieldMiddleware`](docs/master/custom-directives/field-directives.md#fieldmiddleware) directive.
-Just like Laravel Middleware, it can wrap around individual field resolvers.
+Like Laravel Middleware, it can wrap around individual field resolvers.
 
 ### Directives must have an SDL definition
 
@@ -452,7 +452,7 @@ If you previously implemented `DefinedDirective`, remove it from your directives
 +class TrimDirective extends BaseDirective implements ArgTransformerDirective
 ```
 
-Instead of just providing the name of the directive, all directives must now return an SDL definition that formally describes them.
+Instead of only providing the name of the directive, all directives must now return an SDL definition that formally describes them.
 
 ```diff
 -    public function name()
@@ -503,7 +503,8 @@ Client queries will have to be changed like this:
 }
 ```
 
-If you absolutely cannot break your clients, you can re-implement `@orderBy` in your project. It is a relatively simple `ArgManipulator` directive.
+If you absolutely cannot break your clients, you can re-implement `@orderBy` in your project.
+It is a small `ArgManipulator` directive.
 
 ### `@modelClass` and `@model` changed
 
@@ -545,9 +546,9 @@ type Mutation {
 }
 ```
 
-### `@method` passes down just ordered arguments
+### `@method` passes down only ordered arguments
 
-Instead of passing down the usual resolver arguments, the `@method` directive will now pass just the arguments given to a field.
+Instead of passing down the usual resolver arguments, the `@method` directive will now pass only the arguments given to a field.
 This behavior could previously be enabled through the `passOrdered` option, which is now removed.
 
 ```graphql
@@ -662,7 +663,7 @@ $typeRegistry = app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);
 
 Since GraphQL constrains allowed inputs by design, mass assignment protection is not needed.
 By default, Lighthouse will use `forceFill()` when populating a model with arguments in mutation directives.
-This allows you to use mass assignment protection for other cases where it is actually useful.
+This allows you to use mass assignment protection for other cases where it is useful.
 
 If you need to revert to the old behavior of using `fill()`, you can change your `lighthouse.php`:
 

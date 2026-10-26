@@ -24,7 +24,7 @@ class NodeRegistry
      * The stashed current type.
      *
      * PHP resolves fields synchronously and one after another.
-     * So we can safely stash just this one value.
+     * So we can safely stash only this one value.
      * Should the need arise, this can probably be a map from the unique field path to the type.
      */
     protected string $currentType;

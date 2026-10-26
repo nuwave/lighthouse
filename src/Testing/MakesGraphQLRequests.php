@@ -26,7 +26,7 @@ trait MakesGraphQLRequests
      * Stores the result of the introspection query.
      *
      * On the first call to introspect() this property is set to
-     * cache the result, as introspection is quite expensive.
+     * cache the result, as introspection is expensive.
      *
      * @var \Illuminate\Testing\TestResponse<\Symfony\Component\HttpFoundation\Response>
      */

@@ -370,7 +370,7 @@ type User {
 You may want to allow accessing data that describes the relation between the models and is stored in the intermediate table.
 See [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
 
-Just like in Laravel, you can access the `pivot` attribute on the models (or its alias).
+Like in Laravel, you can access the `pivot` attribute on the models (or its alias).
 Even though this attribute is always present when querying the model through the relation, it may not be present when reaching the node through another path in the schema.
 It is recommended to define the field as nullable (no `!`).
 
@@ -1546,7 +1546,7 @@ type Mutation {
 }
 ```
 
-Works very similar to the [@delete](#delete) directive.
+Works like the [@delete](#delete) directive.
 
 ## @enum
 
@@ -1693,12 +1693,12 @@ enum GlobalIdDecode {
   ARRAY
 
   """
-  Return just `$type`.
+  Return only `$type`.
   """
   TYPE
 
   """
-  Return just `$id`.
+  Return only `$id`.
   """
   ID
 }
@@ -1742,7 +1742,7 @@ directive @guard(
 ) repeatable on FIELD_DEFINITION | OBJECT
 ```
 
-Note that [@guard](#guard) does not log in users.
+[@guard](#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config.
 
 ```php
@@ -3118,7 +3118,7 @@ But means that the response does not hold information about the total number of 
 
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
-> Please note that the `SIMPLE` paginator does not have the attributes
+> The `SIMPLE` paginator does not have the attributes
 > `lastPage` and `total`.
 >
 > If you need those fields, you should use the default `PAGINATOR`.
@@ -3236,7 +3236,7 @@ type Query {
 
 ### Custom builder
 
-If simply querying Eloquent does not fit your use-case, you can specify a custom `builder`.
+If a plain Eloquent query does not fit your use case, you can specify a custom `builder`.
 
 ```graphql
 type Query {
@@ -3247,7 +3247,7 @@ type Query {
 Your method receives the typical resolver arguments.
 It must return an instance of `Illuminate\Database\Query\Builder`.
 
-> If you actually want to query a model and possibly its relations through nested fields,
+> If you want to query a model and possibly its relations through nested fields,
 > make sure to return an Eloquent builder, e.g. `Post::query()`.
 
 ```php
@@ -3370,7 +3370,7 @@ type Mutation {
 }
 ```
 
-Works very similar to the [@delete](#delete) directive.
+Works like the [@delete](#delete) directive.
 
 ## @rules
 
@@ -3521,7 +3521,7 @@ scalar DateTime
 Adds a scope to the query builder.
 
 The scope method will receive the client-given value of the argument as the second parameter.
-This also works with custom query builders, it simply calls its methods with the argument value.
+This also works with custom query builders, it calls its methods with the argument value.
 """
 directive @scope(
   """
@@ -3704,7 +3704,7 @@ Internally, the arguments are transformed into a flat structure before they are 
 ]
 ```
 
-Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/field-argument-directives) have been applied, e.g. validation, transformation.
+Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/field-argument-directives) have been applied, e.g. validation, transformation.
 
 ## @subscription
 
@@ -4044,7 +4044,7 @@ directive @upsert(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Lighthouse will try to fetch the model by its primary key, just like [@update](#update).
+Lighthouse will try to fetch the model by its primary key, like [@update](#update).
 If the model doesn't exist, it will be newly created with a given `id`.
 In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
@@ -4504,7 +4504,7 @@ type User {
 }
 ```
 
-If you just want to return the relation as-is, see [handling Eloquent relationships](../eloquent/relationships.md).
+To return the relation as-is, see [handling Eloquent relationships](../eloquent/relationships.md).
 
 ## @withCount
 
@@ -4537,7 +4537,7 @@ type User {
 }
 ```
 
-If you just want to return the count itself as-is, use [@count](#count).
+To return the count as-is, use [@count](#count).
 
 ## @withoutGlobalScopes
 

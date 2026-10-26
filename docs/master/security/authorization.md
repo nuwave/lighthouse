@@ -12,7 +12,7 @@ For example, a user may only be able to see notes they created.
 You can use the nested nature of GraphQL queries to naturally limit access to such fields.
 
 Begin with a field that represents the currently authenticated user, commonly called `me` or `viewer`.
-You can resolve that field quite easily by using the [@auth](../api-reference/directives.md#auth) directive.
+Resolve that field with the [@auth](../api-reference/directives.md#auth) directive.
 
 ```graphql
 type Query {
@@ -38,7 +38,7 @@ type Note {
 }
 ```
 
-Now, authenticated users can query for items that belong to them and are naturally limited to seeing just those.
+Now, authenticated users can query for items that belong to them and are naturally limited to seeing only those.
 
 ```graphql
 {
@@ -116,7 +116,7 @@ final class PostPolicy
 For some models, you may want to restrict access for already resolved instance of a model.
 Use the [@canResolved](../api-reference/directives.md#canresolved) directive to do so.
 
-> This will actually run the field before checking permissions, do not use in mutations.
+> This runs the field before checking permissions, do not use in mutations.
 
 ```graphql
 type Query {

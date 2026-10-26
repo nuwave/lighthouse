@@ -27,7 +27,7 @@ class Validator
         $originalSchema = $this->schemaBuilder->schema();
         $schemaConfig = $originalSchema->getConfig();
 
-        // We add schema directive definitions only here, since it is very slow
+        // We add schema directive definitions only here, since it is slow
         $directiveFactory = new DirectiveFactory(
             new FallbackTypeNodeConverter($this->typeRegistry),
         );

@@ -109,7 +109,7 @@ class ASTBuilder
     {
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
             foreach ($typeExtensionsList as $typeExtension) {
-                // Before we actually extend the types, we apply the manipulator directives
+                // Before we extend the types, we apply the manipulator directives
                 // that are defined on type extensions themselves
                 foreach (
                     $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class) as $typeExtensionManipulator

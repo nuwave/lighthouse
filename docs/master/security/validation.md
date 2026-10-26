@@ -149,7 +149,8 @@ input UpdateUserInput @validator {
 ```
 
 We need to back that with a validator class.
-Lighthouse uses a simple naming convention for validator classes, use the name of the input type and append `Validator`:
+Lighthouse uses a naming convention for validator classes.
+Use the name of the input type and append `Validator`:
 
 ```shell
 php artisan lighthouse:validator UpdateUserInputValidator
@@ -181,7 +182,7 @@ final class UpdateUserInputValidator extends Validator
 }
 ```
 
-Note that this gives you access to all kinds of programmatic validation rules that Laravel provides.
+This gives you access to all kinds of programmatic validation rules that Laravel provides.
 This can give you additional flexibility when you need it.
 
 ### Custom Validator Messages

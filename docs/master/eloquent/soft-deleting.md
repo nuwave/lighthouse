@@ -49,7 +49,7 @@ type Mutation {
 }
 ```
 
-Simply call the field with the ID of the flight you want to restore.
+Call the field with the ID of the flight you want to restore.
 
 ```graphql
 mutation {
@@ -72,7 +72,7 @@ type Mutation {
 }
 ```
 
-Simply call it with the ID of the `Flight` you want to permanently remove.
+Call it with the ID of the `Flight` you want to permanently remove.
 
 ```graphql
 mutation {

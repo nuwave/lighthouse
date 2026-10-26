@@ -1,7 +1,7 @@
 # Lighthouse Contribution Guide
 
 Thank you for contributing to Lighthouse.
-Here are some tips and guidelines to make this easy for you.
+Here are some tips and guidelines to help you.
 
 ## Open a Pull Request
 

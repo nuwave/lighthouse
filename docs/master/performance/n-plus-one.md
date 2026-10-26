@@ -80,7 +80,7 @@ When looking at the query path from `posts`, they may look like:
 In order to combine them, you need to have a single stateful batch loader instance for `users.posts`.
 Use `Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry` to resolve such instances.
 The following code is the resolver for `User.posts`.
-See [resolver precedence](../the-basics/fields.md#resolver-precedence) on how it could actually be assigned to a field.
+See [resolver precedence](../the-basics/fields.md#resolver-precedence) on how it could be assigned to a field.
 
 ```php
 use GraphQL\Deferred;
@@ -145,7 +145,7 @@ final class UserPostsBatchLoader
     }
 
     /**
-     * Actually call out to the posts service and resolve them all at once.
+     * Call out to the posts service and resolve them all at once.
      */
     protected function resolve(): void
     {

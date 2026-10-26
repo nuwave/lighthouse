@@ -34,9 +34,9 @@ type Query {
 
 ## Usage
 
-Lighthouse provides a plethora of built-in schema directives that are ready to be consumed and can simply be used from within the schema.
+Lighthouse provides a plethora of built-in schema directives that you can use in your schema.
 
-The following example is quite dense, but it should give you an idea of what directives are capable of.
+The following example is dense, but it should give you an idea of what directives are capable of.
 
 ```graphql
 type Query {

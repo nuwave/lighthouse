@@ -15,7 +15,7 @@ class Utils
     /**
      * Attempt to find a given class in the given namespaces.
      *
-     * If the class itself exists, it is simply returned as is.
+     * If the class itself exists, it is returned as is.
      * Else, the given namespaces are tried in order.
      *
      * @param  array<string>  $namespacesToTry

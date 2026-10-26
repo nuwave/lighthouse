@@ -1,6 +1,6 @@
 # Eloquent Relationships
 
-Just like in Laravel, you can define [Eloquent Relationships](https://laravel.com/docs/eloquent-relationships) in your schema.
+Like in Laravel, you can define [Eloquent Relationships](https://laravel.com/docs/eloquent-relationships) in your schema.
 
 Suppose you have defined the following model:
 
@@ -25,7 +25,7 @@ final class Post extends Model
 }
 ```
 
-Add fields to your type that are named just like the relationships:
+Add fields to your type that are named like the relationships:
 
 ```graphql
 type Post {
@@ -34,12 +34,12 @@ type Post {
 }
 ```
 
-Because Laravel relationships can be accessed just like regular properties on your model, the default field resolver will work just fine.
+Because Laravel relationships can be accessed like regular properties on your model, the default field resolver works for them.
 
 ## Avoiding the N+1 performance problem
 
 When accessing Eloquent relationships as properties, the relationship data is "lazy loaded".
-This means the relationship data is not actually loaded until you first access the property.
+This means the relationship data is not loaded until you first access the property.
 
 This leads to a common performance pitfall that comes with the nested nature of GraphQL queries: the so-called N+1 query problem.
 [Learn more](../performance/n-plus-one.md).

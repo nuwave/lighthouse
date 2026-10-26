@@ -66,7 +66,7 @@ DESCRIPTION;
         $keyFieldsSelections = $entityResolverProvider->keyFieldsSelections($definition);
         $entityResolverProvider->firstSatisfiedKeyFields($keyFieldsSelections, $value);
 
-        // Ensure we actually have a resolver for the type available
+        // Ensure we have a resolver for the type available
         $entityResolverProvider->resolver($typename);
 
         // @phpstan-ignore-next-line type inference is too weak

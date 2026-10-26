@@ -8,7 +8,7 @@ The most important thing to get you started using Lighthouse will be a schema th
 
 If you already have a server with another library up and running, you can use introspection to retrieve this schema and save it to a file.
 
-A simple tool that is also generally useful is [graphql-cli](https://github.com/graphql-cli/graphql-cli).
+A generally useful tool is [graphql-cli](https://github.com/graphql-cli/graphql-cli).
 
     npm install -g graphql-cli
     graphql init

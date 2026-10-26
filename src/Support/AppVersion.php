@@ -25,7 +25,7 @@ class AppVersion
     protected static function version(): string
     {
         /**
-         * Not using assert() as only one of those classes will actually be installed.
+         * Not using assert() as only one of those classes will be installed.
          *
          * @var \Illuminate\Foundation\Application|\Laravel\Lumen\Application $container
          */
