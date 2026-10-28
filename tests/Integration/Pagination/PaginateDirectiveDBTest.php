@@ -5,6 +5,8 @@ namespace Tests\Integration\Pagination;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Pagination\Cursor;
 use Tests\DBTestCase;
@@ -281,6 +283,12 @@ GRAPHQL;
     {
         return Post::search('great title')
             ->take(self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER);
+    }
+
+    public static function builderForQueryBuilder(): QueryBuilder
+    {
+        return DB::table('users')
+            ->orderByDesc('id');
     }
 
     public function testCreateQueryPaginatorsWithDifferentPages(): void
@@ -1050,5 +1058,338 @@ GRAPHQL;
                 ],
             ],
         ])->assertJsonCount(2, 'data.users.data');
+    }
+
+    public function testPaginateAllowUnlimited(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                paginatorInfo {
+                    count
+                    currentPage
+                    hasMorePages
+                    lastPage
+                    perPage
+                    total
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 3,
+                        'currentPage' => 1,
+                        'hasMorePages' => false,
+                        'lastPage' => 1,
+                        'perPage' => 3,
+                        'total' => 3,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.data');
+    }
+
+    public function testPaginateAllowUnlimitedWithFirstNullOverridesDefaultCount(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true, defaultCount: 2)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJsonCount(2, 'data.users.data');
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(first: null) {
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJsonCount(3, 'data.users.data');
+    }
+
+    public function testPaginateAllowUnlimitedIgnoresPage(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(first: null, page: 2) {
+                paginatorInfo {
+                    count
+                    currentPage
+                    lastPage
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 3,
+                        'currentPage' => 1,
+                        'lastPage' => 1,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.data');
+    }
+
+    public function testPaginateAllowUnlimitedWithoutResults(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                paginatorInfo {
+                    count
+                    hasMorePages
+                    lastPage
+                    total
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 0,
+                        'hasMorePages' => false,
+                        'lastPage' => 1,
+                        'total' => 0,
+                    ],
+                    'data' => [],
+                ],
+            ],
+        ]);
+    }
+
+    public function testSimplePaginateAllowUnlimited(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: SIMPLE, allowUnlimited: true)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                paginatorInfo {
+                    count
+                    hasMorePages
+                    perPage
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 3,
+                        'hasMorePages' => false,
+                        'perPage' => 3,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.data');
+    }
+
+    public function testConnectionAllowUnlimited(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: CONNECTION, allowUnlimited: true)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                pageInfo {
+                    count
+                    currentPage
+                    hasNextPage
+                    lastPage
+                    total
+                }
+                edges {
+                    node {
+                        id
+                    }
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'pageInfo' => [
+                        'count' => 3,
+                        'currentPage' => 1,
+                        'hasNextPage' => false,
+                        'lastPage' => 1,
+                        'total' => 3,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.edges');
+    }
+
+    public function testConnectionAllowUnlimitedIgnoresAfter(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: CONNECTION, allowUnlimited: true)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($after: String) {
+            users(first: null, after: $after) {
+                pageInfo {
+                    count
+                    currentPage
+                    lastPage
+                }
+                edges {
+                    node {
+                        id
+                    }
+                }
+            }
+        }
+        GRAPHQL, [
+            'after' => Cursor::encode(1),
+        ])->assertJson([
+            'data' => [
+                'users' => [
+                    'pageInfo' => [
+                        'count' => 3,
+                        'currentPage' => 1,
+                        'lastPage' => 1,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.edges');
+    }
+
+    public function testPaginateAllowUnlimitedWithQueryBuilder(): void
+    {
+        $users = factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(allowUnlimited: true, builder: "{$this->qualifyTestResolver('builderForQueryBuilder')}")
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                paginatorInfo {
+                    total
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'total' => 3,
+                    ],
+                    'data' => $users
+                        ->sortByDesc('id')
+                        ->map(static fn (User $user): array => ['id' => (string) $user->id])
+                        ->values()
+                        ->all(),
+                ],
+            ],
+        ]);
     }
 }

@@ -2,7 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -357,11 +361,13 @@ final class HasManyDirectiveTest extends DBTestCase
             ]);
     }
 
-    public function testQueryPaginatedHasManyWithNonUniqueForeignKey(): void
+    /** @dataProvider rolesPaginationArgs */
+    #[DataProvider('rolesPaginationArgs')]
+    public function testQueryPaginatedHasManyWithNonUniqueForeignKey(string $paginationArgs): void
     {
-        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
-            roles: [RoleUser!]! @hasMany(relation: "roles", type: PAGINATOR, defaultCount: 10)
+            roles: [RoleUser!]! @hasMany(relation: "roles", type: PAGINATOR, {$paginationArgs})
         }
 
         type RoleUser {
@@ -457,6 +463,13 @@ final class HasManyDirectiveTest extends DBTestCase
                     ],
                 ],
             ]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function rolesPaginationArgs(): iterable
+    {
+        yield 'limited' => ['defaultCount: 10'];
+        yield 'unlimited' => ['allowUnlimited: true'];
     }
 
     public function testCallsScopeWithResolverArgs(): void
@@ -573,6 +586,416 @@ final class HasManyDirectiveTest extends DBTestCase
             ])
             ->assertJsonCount(2, 'data.user.tasks.data')
             ->assertJsonCount(3, 'data.user.posts.data');
+    }
+
+    /** @dataProvider batchloadRelations */
+    #[DataProvider('batchloadRelations')]
+    public function testQueryHasManyPaginatorAllowUnlimited(bool $batchloadRelations): void
+    {
+        config(['lighthouse.batchload_relations' => $batchloadRelations]);
+
+        $userWithTasks = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userWithTasks);
+
+        $tasks = factory(Task::class, 3)->make();
+        $userWithTasks->tasks()->saveMany($tasks);
+
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR, allowUnlimited: true)
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasks {
+                        paginatorInfo {
+                            count
+                            hasMorePages
+                            lastPage
+                            total
+                        }
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'tasks' => [
+                                'paginatorInfo' => [
+                                    'count' => 3,
+                                    'hasMorePages' => false,
+                                    'lastPage' => 1,
+                                    'total' => 3,
+                                ],
+                            ],
+                        ],
+                        [
+                            'tasks' => [
+                                'paginatorInfo' => [
+                                    'count' => 0,
+                                    'hasMorePages' => false,
+                                    'lastPage' => 1,
+                                    'total' => 0,
+                                ],
+                                'data' => [],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonCount(3, 'data.users.0.tasks.data');
+    }
+
+    /** @dataProvider orderedTasksDirectives */
+    #[DataProvider('orderedTasksDirectives')]
+    public function testQueryHasManyPaginatorAllowUnlimitedKeepsOrderOfMultipleParents(string $tasksDirectives): void
+    {
+        $users = factory(User::class, 2)->create();
+
+        $expectedUsers = [];
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+
+            $tasks = factory(Task::class, 3)->make();
+            $user->tasks()->saveMany($tasks);
+
+            $expectedUsers[] = [
+                'tasks' => [
+                    'data' => $tasks
+                        ->sortByDesc('id')
+                        ->map(static fn (Task $task): array => ['id' => $task->id])
+                        ->values()
+                        ->all(),
+                ],
+            ];
+        }
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            tasks: [Task!]! {$tasksDirectives}
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasks {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertExactJson([
+                'data' => [
+                    'users' => $expectedUsers,
+                ],
+            ]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function orderedTasksDirectives(): iterable
+    {
+        yield 'single query for all parents' => [
+            '@hasMany(type: PAGINATOR, allowUnlimited: true) @orderBy(column: "id", direction: DESC)',
+        ];
+
+        $constrainToParent = self::qualifyTestResolver('constrainToParent');
+        yield 'query per parent' => [
+            "@hasMany(type: PAGINATOR, allowUnlimited: true) @orderBy(column: \"id\", direction: DESC) @builder(method: \"{$constrainToParent}\")",
+        ];
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>
+     */
+    public static function constrainToParent(EloquentBuilder $builder, mixed $value, User $user): EloquentBuilder
+    {
+        return $builder->where('user_id', $user->id);
+    }
+
+    /** @dataProvider tasksFieldBuilderDirectives */
+    #[DataProvider('tasksFieldBuilderDirectives')]
+    public function testQueryHasManyPaginatorAllowUnlimitedLoadsAllParentsInOneQuery(string $fieldBuilderDirectives): void
+    {
+        $users = factory(User::class, 3)->create();
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+
+            $tasks = factory(Task::class, 2)->make();
+            $user->tasks()->saveMany($tasks);
+        }
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            tasks: [Task!]! @hasMany {$fieldBuilderDirectives}
+            tasksPaginated: [Task!]! @hasMany(relation: "tasks", type: PAGINATOR, allowUnlimited: true) {$fieldBuilderDirectives}
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $queries = [];
+        DB::listen(static function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasks {
+                        id
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertJsonCount(2, 'data.users.2.tasks');
+
+        $nonPaginatedQueries = $queries;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasksPaginated {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertJsonCount(2, 'data.users.0.tasksPaginated.data')
+            ->assertJsonCount(2, 'data.users.1.tasksPaginated.data')
+            ->assertJsonCount(2, 'data.users.2.tasksPaginated.data');
+
+        // One query for the users, one for the tasks of all users, just like without pagination
+        $paginatedQueries = array_slice($queries, count($nonPaginatedQueries));
+        $this->assertCount(2, $paginatedQueries);
+        $this->assertSame($nonPaginatedQueries, $paginatedQueries);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function tasksFieldBuilderDirectives(): iterable
+    {
+        yield 'without field builder directives' => [''];
+        yield 'with field builder directives' => ['@orderBy(column: "id")'];
+
+        $createdAfterY2K = self::qualifyTestResolver('createdAfterY2K');
+        yield 'with dates that only differ in microseconds' => ["@builder(method: \"{$createdAfterY2K}\")"];
+    }
+
+    /**
+     * Like now(), the date differs in microseconds on every call, which are not part of the executed query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>
+     */
+    public static function createdAfterY2K(EloquentBuilder $builder): EloquentBuilder
+    {
+        return $builder->where('created_at', '>', Carbon::createStrict(2000)->setMicrosecond(random_int(1, 999999)));
+    }
+
+    /** @dataProvider tasksFieldBuilderDirectives */
+    #[DataProvider('tasksFieldBuilderDirectives')]
+    public function testQueryHasManyPaginatorAllowUnlimitedAppliesLimitToEachParent(string $fieldBuilderDirectives): void
+    {
+        $users = factory(User::class, 3)->create();
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+
+            $tasks = factory(Task::class, 3)->make();
+            $user->tasks()->saveMany($tasks);
+        }
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            tasks(foo: Int): [Task!]! @hasMany(type: PAGINATOR, allowUnlimited: true, scopes: ["foo"]) {$fieldBuilderDirectives}
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasks(foo: 2) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertJsonCount(2, 'data.users.0.tasks.data')
+            ->assertJsonCount(2, 'data.users.1.tasks.data')
+            ->assertJsonCount(2, 'data.users.2.tasks.data');
+    }
+
+    public function testQueryHasManyPaginatorAllowUnlimitedAppliesOffsetToEachParent(): void
+    {
+        $users = factory(User::class, 2)->create();
+
+        $expectedUsers = [];
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+
+            $tasks = factory(Task::class, 3)->make();
+            $user->tasks()->saveMany($tasks);
+
+            $secondTask = $tasks->get(1);
+            $this->assertInstanceOf(Task::class, $secondTask);
+
+            $expectedUsers[] = [
+                'tasks' => [
+                    'data' => [
+                        ['id' => $secondTask->id],
+                    ],
+                ],
+            ];
+        }
+
+        $secondTaskOnly = $this->qualifyTestResolver('secondTaskOnly');
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR, allowUnlimited: true) @builder(method: "{$secondTaskOnly}")
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasks {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertExactJson([
+                'data' => [
+                    'users' => $expectedUsers,
+                ],
+            ]);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>
+     */
+    public static function secondTaskOnly(EloquentBuilder $builder): EloquentBuilder
+    {
+        return $builder->orderBy('id')->limit(1)->offset(1);
+    }
+
+    public function testQueryHasManyPaginatorAllowUnlimitedFromConfig(): void
+    {
+        config(['lighthouse.pagination.allow_unlimited' => true]);
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            user: User @first
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                user {
+                    tasks(first: null) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertJsonCount(3, 'data.user.tasks.data');
+    }
+
+    public function testThrowsWhenAllowingUnlimitedWithMaxCount(): void
+    {
+        $this->expectExceptionObject(new DefinitionException('Can not allow unlimited results on User.tasks when the maximum count is 3, set either `allowUnlimited: false` or `maxCount: null`.'));
+
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR, allowUnlimited: true, maxCount: 3)
+        }
+
+        type Task {
+            id: Int!
+        }
+        GRAPHQL);
     }
 
     public function testDoesNotRequireModelClassForPaginatedHasMany(): void
