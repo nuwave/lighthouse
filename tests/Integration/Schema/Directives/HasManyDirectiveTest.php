@@ -834,6 +834,116 @@ final class HasManyDirectiveTest extends DBTestCase
         return $builder->where('created_at', '>', Carbon::createStrict(2000)->setMicrosecond(random_int(1, 999999)));
     }
 
+    /** @dataProvider tasksFieldBuilderDirectives */
+    #[DataProvider('tasksFieldBuilderDirectives')]
+    public function testQueryHasManyPaginatorAllowUnlimitedAppliesLimitToEachParent(string $fieldBuilderDirectives): void
+    {
+        $users = factory(User::class, 3)->create();
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+
+            $tasks = factory(Task::class, 3)->make();
+            $user->tasks()->saveMany($tasks);
+        }
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            tasks(foo: Int): [Task!]! @hasMany(type: PAGINATOR, allowUnlimited: true, scopes: ["foo"]) {$fieldBuilderDirectives}
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasks(foo: 2) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertJsonCount(2, 'data.users.0.tasks.data')
+            ->assertJsonCount(2, 'data.users.1.tasks.data')
+            ->assertJsonCount(2, 'data.users.2.tasks.data');
+    }
+
+    public function testQueryHasManyPaginatorAllowUnlimitedAppliesOffsetToEachParent(): void
+    {
+        $users = factory(User::class, 2)->create();
+
+        $expectedUsers = [];
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+
+            $tasks = factory(Task::class, 3)->make();
+            $user->tasks()->saveMany($tasks);
+
+            $secondTask = $tasks->get(1);
+            $this->assertInstanceOf(Task::class, $secondTask);
+
+            $expectedUsers[] = [
+                'tasks' => [
+                    'data' => [
+                        ['id' => $secondTask->id],
+                    ],
+                ],
+            ];
+        }
+
+        $secondTaskOnly = $this->qualifyTestResolver('secondTaskOnly');
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR, allowUnlimited: true) @builder(method: "{$secondTaskOnly}")
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasks {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            GRAPHQL)
+            ->assertExactJson([
+                'data' => [
+                    'users' => $expectedUsers,
+                ],
+            ]);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\Task>
+     */
+    public static function secondTaskOnly(EloquentBuilder $builder): EloquentBuilder
+    {
+        return $builder->orderBy('id')->limit(1)->offset(1);
+    }
+
     public function testQueryHasManyPaginatorAllowUnlimitedFromConfig(): void
     {
         config(['lighthouse.pagination.allow_unlimited' => true]);

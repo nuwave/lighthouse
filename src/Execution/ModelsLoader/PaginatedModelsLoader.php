@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -76,12 +77,18 @@ class PaginatedModelsLoader implements ModelsLoader
 
                 $relation->initRelation($models, $this->relation);
 
-                if ($first === null && $parentGroups->count() === 1) {
-                    return $relation;
+                if ($first !== null) {
+                    return $relation->forPage($this->paginationArgs->page, $first);
                 }
 
-                // Unlimited queries combined with UNION ALL below still need a limit, otherwise MySQL ignores their ORDER BY
-                return $relation->forPage($this->paginationArgs->page, $first ?? PHP_INT_MAX);
+                // Unlimited queries combined with UNION ALL below still need a limit, otherwise MySQL ignores their ORDER BY.
+                // Keep limits and offsets of the decorated query, they only apply to the single parent of this group.
+                $query = $relation->getBaseQuery();
+                if ($parentGroups->count() > 1 && $query->limit === null) {
+                    $query->limit(PHP_INT_MAX);
+                }
+
+                return $relation;
             });
 
         // Merge all the relation queries into a single query with UNION ALL.
@@ -111,6 +118,7 @@ class PaginatedModelsLoader implements ModelsLoader
      *
      * Builder directives may constrain the query differently for each parent.
      * Usually they do not, which allows loading the related models of all parents in a single query.
+     * Limits and offsets must apply to the related models of each parent separately, so such parents are never grouped.
      *
      * @see \Tests\Integration\Schema\Directives\BuilderDirectiveTest::testCallsCustomBuilderMethodOnFieldWithSpecificModel
      *
@@ -121,17 +129,25 @@ class PaginatedModelsLoader implements ModelsLoader
     protected function groupParentsByConstraints(EloquentCollection $parents): array
     {
         if (! $this->decorationDependsOnParent) {
-            return [array_values($parents->all())];
+            $anyParent = $parents->first();
+            assert($anyParent instanceof Model);
+
+            if (! $this->hasLimitOrOffset($this->decoratedQuery($parents, $anyParent))) {
+                return [array_values($parents->all())];
+            }
         }
 
-        /** @var array<string, list<\Illuminate\Database\Eloquent\Model>> $groups */
+        /** @var array<list<\Illuminate\Database\Eloquent\Model>> $groups */
         $groups = [];
 
         foreach ($parents as $model) {
-            $relation = $this->relationInstance($parents);
-            ($this->decorateBuilder)($relation, $model);
+            $query = $this->decoratedQuery($parents, $model);
 
-            $query = $relation->getQuery()->toBase();
+            if ($this->hasLimitOrOffset($query)) {
+                $groups[] = [$model];
+
+                continue;
+            }
 
             // Compare bindings as they are executed, e.g. dates that only differ in microseconds may be formatted equally
             $bindings = $query->getConnection()->prepareBindings($query->getBindings());
@@ -140,6 +156,25 @@ class PaginatedModelsLoader implements ModelsLoader
         }
 
         return array_values($groups);
+    }
+
+    /**
+     * Apply the builder decorations for the given parent to a fresh relation query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $parents
+     */
+    protected function decoratedQuery(EloquentCollection $parents, Model $parent): QueryBuilder
+    {
+        $relation = $this->relationInstance($parents);
+        ($this->decorateBuilder)($relation, $parent);
+
+        return $relation->getQuery()->toBase();
+    }
+
+    protected function hasLimitOrOffset(QueryBuilder $query): bool
+    {
+        return $query->limit !== null
+            || $query->offset !== null;
     }
 
     /**
