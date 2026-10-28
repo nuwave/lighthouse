@@ -10,6 +10,7 @@ class RootType
 
     public const SUBSCRIPTION = 'Subscription';
 
+    /** @deprecated use DocumentAST::isRootType(), this only knows the default names */
     public static function isRootType(string $typeName): bool
     {
         return in_array(

@@ -80,15 +80,15 @@ class FieldValue
     {
         $parentName = $this->getParentName();
 
-        return match ($parentName) {
-            RootType::QUERY,
-            RootType::MUTATION,
-            RootType::SUBSCRIPTION => RootType::namespaces($parentName),
-            default => array_map(
-                static fn (string $typesNamespace): string => "{$typesNamespace}\\{$parentName}",
-                (array) config('lighthouse.namespaces.types'),
-            ),
-        };
+        $defaultRootTypeName = $this->parent->getDocumentAST()->defaultRootTypeName($parentName);
+        if ($defaultRootTypeName !== null) {
+            return RootType::namespaces($defaultRootTypeName);
+        }
+
+        return array_map(
+            static fn (string $typesNamespace): string => "{$typesNamespace}\\{$parentName}",
+            (array) config('lighthouse.namespaces.types'),
+        );
     }
 
     /**

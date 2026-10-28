@@ -9,6 +9,7 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Cache\CacheKeyDirective;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 
 class TypeValue
@@ -18,7 +19,13 @@ class TypeValue
 
     public function __construct(
         protected TypeDefinitionNode $typeDefinition,
+        protected DocumentAST $documentAST,
     ) {}
+
+    public function getDocumentAST(): DocumentAST
+    {
+        return $this->documentAST;
+    }
 
     /** Get the name of the node. */
     public function getTypeDefinitionName(): string
@@ -38,7 +45,7 @@ class TypeValue
             $typeName = $this->getTypeDefinitionName();
 
             // The Query type is exempt from requiring a cache key
-            if ($typeName === RootType::QUERY) {
+            if ($typeName === $this->getDocumentAST()->rootTypes[RootType::QUERY]) {
                 return null;
             }
 

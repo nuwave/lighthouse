@@ -68,6 +68,39 @@ final class SubscriptionTest extends TestCase
         );
     }
 
+    public function testSendsSubscriptionChannelForCustomRootTypeName(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: Query
+            subscription: RootSubscription
+        }
+
+        type Post {
+            title: String!
+        }
+
+        type RootSubscription {
+            onPostCreated: Post
+        }
+
+        type Query {
+            foo: String
+        }
+        GRAPHQL;
+
+        $response = $this->subscribe();
+
+        $cache = $this->app->make(CacheStorageManager::class);
+
+        $subscriber = $cache->subscribersByTopic('ON_POST_CREATED')->first();
+
+        $this->assertInstanceOf(Subscriber::class, $subscriber);
+        $response->assertExactJson(
+            $this->buildResponse('onPostCreated', $subscriber->channel),
+        );
+    }
+
     public function testSendsSubscriptionChannelInBatchedResponse(): void
     {
         $response = $this->postGraphQL([

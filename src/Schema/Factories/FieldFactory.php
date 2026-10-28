@@ -114,7 +114,8 @@ class FieldFactory
     /** @return FieldResolverFn */
     protected function defaultResolver(FieldValue $fieldValue): callable
     {
-        if ($fieldValue->getParentName() === RootType::SUBSCRIPTION) {
+        $subscriptionTypeName = $fieldValue->getParent()->getDocumentAST()->rootTypes[RootType::SUBSCRIPTION] ?? null;
+        if ($fieldValue->getParentName() === $subscriptionTypeName) {
             /** @var ProvidesSubscriptionResolver $providesSubscriptionResolver */
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);
 

@@ -375,4 +375,23 @@ final class CanDirectiveTest extends TestCase
         }
         GRAPHQL);
     }
+
+    public function testThrowsIfResolvedIsUsedOnCustomMutationRoot(): void
+    {
+        $this->expectExceptionObject(CanDirective::resolvedIsUnsafeInMutations('foo'));
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: Query
+            mutation: RootMutation
+        }
+
+        type Query {
+            foo: ID
+        }
+
+        type RootMutation {
+            foo: ID @can(resolved: true)
+        }
+        GRAPHQL);
+    }
 }

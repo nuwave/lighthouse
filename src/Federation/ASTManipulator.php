@@ -72,9 +72,16 @@ class ASTManipulator
     {
         // In federation, it is fine for a schema to not have a user-defined root query type,
         // since we add two federation related fields to it here.
-        $documentAST->types[RootType::QUERY] ??= Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
+        $queryTypeName = $documentAST->rootTypes[RootType::QUERY];
+        if (! isset($documentAST->types[$queryTypeName])) {
+            if ($queryTypeName !== RootType::QUERY) {
+                throw \Nuwave\Lighthouse\Schema\TypeRegistry::failedToLoadType($queryTypeName);
+            }
 
-        $queryType = $documentAST->types[RootType::QUERY];
+            $documentAST->types[$queryTypeName] = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$queryTypeName}");
+        }
+
+        $queryType = $documentAST->types[$queryTypeName];
         assert($queryType instanceof ObjectTypeDefinitionNode);
 
         $entitiesClass = addslashes(Entities::class);
