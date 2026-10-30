@@ -199,15 +199,15 @@ GRAPHQL;
             usort($definitions, static fn ($left, $right): int => $left->name <=> $right->name);
         }
 
+        $valueNodesByName = [];
+        foreach ($type->astNode->values ?? [] as $valueNode) {
+            $valueNodesByName[$valueNode->name->value] = $valueNode;
+        }
+
         foreach ($definitions as $value) {
-            if ($value->astNode === null) {
-                foreach ($type->astNode->values ?? [] as $valueNode) {
-                    if ($valueNode->name->value === $value->name) {
-                        $value = clone $value;
-                        $value->astNode = $valueNode;
-                        break;
-                    }
-                }
+            if ($value->astNode === null && isset($valueNodesByName[$value->name])) {
+                $value = clone $value;
+                $value->astNode = $valueNodesByName[$value->name];
             }
 
             $values[] = static::printDescription($options, $value, '  ', $firstInBlock)
