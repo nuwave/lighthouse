@@ -1,6 +1,8 @@
 * text=auto
 
+/.ai export-ignore
 /.github export-ignore
+/bin export-ignore
 /benchmarks export-ignore
 /docs export-ignore
 /tests export-ignore
@@ -9,6 +11,8 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.php-cs-fixer.php export-ignore
+/.worktreeinclude export-ignore
+/buf.gen.yaml export-ignore
 /CHANGELOG.md export-ignore
 /CONTRIBUTING.md export-ignore
 /docker-compose.yml export-ignore
@@ -18,7 +22,9 @@
 /node.dockerfile export-ignore
 /php.dockerfile export-ignore
 /phpbench.json export-ignore
+/phpstan-bootstrap.php export-ignore
 /phpstan.neon export-ignore
 /phpunit.xml.dist export-ignore
 /rector.php export-ignore
+/SECURITY.md export-ignore
 /UPGRADE.md export-ignore

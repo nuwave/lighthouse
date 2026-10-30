@@ -1,4 +1,4 @@
-FROM php:8.3-cli
+FROM php:8.5-cli
 
 WORKDIR /workdir
 
@@ -12,7 +12,6 @@ RUN apt-get update && \
         libicu-dev \
     && docker-php-ext-install \
         zip \
-        mysqli \
         pdo_mysql \
         intl \
         bcmath \
@@ -23,7 +22,7 @@ RUN apt-get update && \
     && docker-php-ext-enable \
         xdebug \
         redis \
-    && echo 'memory_limit=-1' > /usr/local/etc/php/conf.d/lighthouse.ini
+    && printf 'memory_limit=-1\nxdebug.mode=off\n' > /usr/local/etc/php/conf.d/lighthouse.ini
 
 ARG USER
 ARG USER_ID

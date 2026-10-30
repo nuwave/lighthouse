@@ -28,6 +28,8 @@ directive @inject(
   The target name of the argument into which the value is injected.
   You can use dot notation to set the value at arbitrary depth
   within the incoming argument.
+  Use an asterisk `*` as a path segment to inject the value into every
+  element of a list found at that position.
   """
   name: String!
 ) repeatable on FIELD_DEFINITION

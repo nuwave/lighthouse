@@ -4,10 +4,9 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->name('*.php')
     ->notPath('src/Tracing/FederatedTracing/Proto')
-    ->notPath('vendor')
-    ->notPath('phpstan-tmp-dir')
     ->ignoreDotFiles(false)
-    ->ignoreVCS(true);
+    ->ignoreVCS(true)
+    ->ignoreVCSIgnored(true);
 
 return MLL\PhpCsFixerConfig\risky($finder, [
     'general_phpdoc_annotation_remove' => [

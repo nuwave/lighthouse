@@ -70,21 +70,33 @@ final class SchemaCacheTest extends TestCase
         ]);
     }
 
-    public function testInvalidSchemaCacheContents(): void
+    public function testRebuildsInvalidFile(): void
     {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int @mock
+        }
+        GRAPHQL;
+
         $config = $this->app->make(ConfigRepository::class);
 
         $filesystem = $this->app->make(Filesystem::class);
         $path = $config->get('lighthouse.schema_cache.path');
         $filesystem->put($path, '');
 
-        $this->expectException(\AssertionError::class);
-        $this->expectExceptionMessage("The schema cache file at {$path} is expected to return an array.");
+        $this->mockResolver(42);
+
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        GRAPHQL);
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'foo' => 42,
+            ],
+        ]);
+
+        $this->assertIsArray(require $path);
     }
 
     private function cacheSchema(): void
