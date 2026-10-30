@@ -15,6 +15,8 @@ class OverrideDirective extends BaseDirective
 Indicates that an object field is now resolved by this subgraph instead of another subgraph
 where it's also defined. This enables you to migrate a field from one subgraph to another.
 
+The optional label argument enables progressive overrides, for example label: "percent(10)".
+
 You can apply @override to entity fields and fields of the root operation types (such as Query and Mutation).
 
 ```graphql
@@ -32,7 +34,7 @@ If multiple subgraphs attempt to @override the same field, a composition error o
 
 https://www.apollographql.com/docs/federation/federated-types/federated-directives#override
 """
-directive @override(from: String!) on FIELD_DEFINITION
+directive @override(from: String!, label: String) on FIELD_DEFINITION
 GRAPHQL;
     }
 }

@@ -83,7 +83,7 @@ parameters:
   - '#Function (hrtime) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
 
   # Unavailable in thecodingmachine/safe:2
-  - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
+  - '#Function (sort|substr|ksort|usort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
 
   # Ignore errors caused by the absence of Lumen in the dev dependencies
   - path: src/Support/AppVersion.php
