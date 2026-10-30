@@ -34,6 +34,11 @@ type U @key(fields: "id") {
 https://www.apollographql.com/docs/graphos/schema-design/federated-schemas/reference/directives#fromcontext
 """
 directive @fromContext(field: federation__ContextFieldValue) on ARGUMENT_DEFINITION
+
+"""
+A context field selection consumed by `@fromContext`.
+"""
+scalar federation__ContextFieldValue
 GRAPHQL;
     }
 }
