@@ -21,6 +21,7 @@ use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvider;
+use Nuwave\Lighthouse\Select\SelectServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
@@ -86,6 +87,7 @@ abstract class TestCase extends TestbenchTestCase
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
+            SelectServiceProvider::class,
             SoftDeletesServiceProvider::class,
             TestingServiceProvider::class,
             ValidationServiceProvider::class,

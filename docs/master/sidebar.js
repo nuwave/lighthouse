@@ -99,6 +99,7 @@ module.exports = [
       "performance/schema-caching",
       "performance/query-caching",
       ["performance/n-plus-one", "The N+1 Query Problem"],
+      "performance/optimized-selects",
       "performance/caching",
       "performance/deferred",
       "performance/tracing",
