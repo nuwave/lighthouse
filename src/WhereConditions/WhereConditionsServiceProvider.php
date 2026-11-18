@@ -51,6 +51,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                 static::createHasConditionsInputType(
                     static::DEFAULT_WHERE_CONDITIONS,
                     'Dynamic HAS conditions for WHERE condition queries.',
+                    'String',
                 ),
             );
             $documentAST->setTypeDefinition(
@@ -144,7 +145,7 @@ GRAPHQL
         );
     }
 
-    public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
+    public static function createHasConditionsInputType(string $name, string $description, string $relationType): InputObjectTypeDefinitionNode
     {
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
@@ -163,7 +164,7 @@ GRAPHQL
             "{$description}"
             input {$hasRelationInputName} {
                 "The relation that is checked."
-                relation: String!
+                relation: {$relationType}!
 
                 "The comparison operator to test against the amount."
                 operator: {$operatorName} = {$operatorDefault}

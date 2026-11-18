@@ -17,10 +17,12 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
+use Nuwave\Lighthouse\Support\Traits\GeneratesRelationsEnum;
 
 abstract class WhereConditionsBaseDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator
 {
     use GeneratesColumnsEnum;
+    use GeneratesRelationsEnum;
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
@@ -42,11 +44,20 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
+        $this->validateMutuallyExclusiveArguments(['relations', 'relationsEnum']);
 
-        if ($this->hasAllowedColumns()) {
+        $hasAllowedColumns = $this->hasAllowedColumns();
+        $hasAllowedRelations = $this->hasAllowedRelations();
+
+        if ($hasAllowedColumns || $hasAllowedRelations) {
             $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
             $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);
-            $allowedColumnsEnumName = $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType);
+            $allowedColumnsEnumName = $hasAllowedColumns
+                ? $this->generateColumnsEnum($documentAST, $argDefinition, $parentField, $parentType)
+                : 'String';
+            $allowedRelationsEnumName = $hasAllowedRelations
+                ? $this->generateRelationsEnum($documentAST, $argDefinition, $parentField, $parentType)
+                : 'String';
 
             $documentAST
                 ->setTypeDefinition(
@@ -67,6 +78,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     WhereConditionsServiceProvider::createHasConditionsInputType(
                         $restrictedWhereConditionsName,
                         "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument of the query `{$parentField->name->value}`.",
+                        $allowedRelationsEnumName,
                     ),
                 );
         } else {

@@ -30,6 +30,20 @@ directive @whereConditions(
     columnsEnum: String
 
     """
+    Restrict the allowed relation names to a well-defined list.
+    This improves introspection capabilities and security.
+    Mutually exclusive with `relationsEnum`.
+    """
+    relations: [String!]
+
+    """
+    Use an existing enumeration type to restrict the allowed relations to a predefined list.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `relations`.
+    """
+    relationsEnum: String
+
+    """
     Reference a method that applies the client given conditions to the query builder.
 
     Expected signature: `(

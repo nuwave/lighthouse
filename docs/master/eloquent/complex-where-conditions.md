@@ -50,6 +50,20 @@ directive @whereConditions(
   columnsEnum: String
 
   """
+  Restrict the allowed relation names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with `relationsEnum`.
+  """
+  relations: [String!]
+
+  """
+  Use an existing enumeration type to restrict the allowed relations to a predefined list.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `relations`.
+  """
+  relationsEnum: String
+
+  """
   Reference a method that applies the client given conditions to the query builder.
 
   Expected signature: `(
@@ -72,7 +86,11 @@ You can apply this directive on any field that performs an Eloquent query:
 ```graphql
 type Query {
   people(
-    where: _ @whereConditions(columns: ["age", "type", "haircolour", "height"])
+    where: _
+      @whereConditions(
+        columns: ["age", "type", "haircolour", "height"]
+        relations: ["friends", "friends.friends"]
+      )
   ): [Person!]! @all
 }
 
@@ -82,10 +100,11 @@ type Person {
   height: Int!
   type: String!
   hair_colour: String!
+  friends: [Person!]! @hasMany
 }
 ```
 
-Lighthouse automatically generates definitions for an `Enum` type and an `Input` type that are restricted to the defined columns.
+Lighthouse automatically generates definitions for `Enum` types and an `Input` type that are restricted to the defined columns and relations.
 You do not have to specify them by hand.
 The blank type named `_` will be changed to the actual type.
 Here are the types that will be included in the compiled schema:
@@ -123,7 +142,7 @@ enum QueryPeopleWhereColumn {
 "Dynamic HAS conditions for WHERE condition queries."
 input QueryPeopleWhereWhereConditionsRelation {
   "The relation that is checked."
-  relation: String!
+  relation: QueryPeopleWhereRelation!
 
   "The comparison operator to test against the amount."
   operator: SQLOperator = GTE
@@ -133,6 +152,12 @@ input QueryPeopleWhereWhereConditionsRelation {
 
   "Additional condition logic."
   condition: QueryPeopleWhereWhereConditions
+}
+
+"Allowed relation names for Query.people.where."
+enum QueryPeopleWhereRelation {
+  FRIENDS @enum(value: "friends")
+  FRIENDS__FRIENDS @enum(value: "friends.friends")
 }
 ```
 
@@ -160,9 +185,10 @@ enum PersonColumn {
 
 Lighthouse will still automatically generate the necessary input types.
 Instead of creating enums for the allowed columns, it will simply use the existing `PersonColumn` enum.
+The same works for `relationsEnum` instead of `relations`.
 
-It is recommended to either use the `columns` or the `columnsEnum` argument.
-When you don't define any allowed columns, clients can specify arbitrary column names as a `String`.
+It is recommended to use the `columns` or the `columnsEnum` argument, as well as the `relations` or the `relationsEnum` argument.
+When you don't define any allowed columns or relations, clients can specify arbitrary names as a `String`.
 This approach should by taken with care, as it carries potential performance and security risks and offers little type safety.
 
 A simple query for a person who is exactly 42 years old would look like this:
@@ -224,6 +250,45 @@ This query would retrieve all persons without any condition:
 ```graphql
 {
   people(where: null) {
+    name
+  }
+}
+```
+
+Use the `HAS` clause to filter by relation existence.
+This query retrieves all persons that have at least 1 friend:
+
+```graphql
+{
+  people(where: { HAS: { relation: FRIENDS, amount: 1, operator: GTE } }) {
+    name
+  }
+}
+```
+
+The previous example includes the default values for `amount` and `operator`, you can also omit them:
+
+```graphql
+{
+  people(where: { HAS: { relation: FRIENDS } }) {
+    name
+  }
+}
+```
+
+Add a `condition` to filter the related models.
+This query retrieves all persons that have at least one friend older than 42:
+
+```graphql
+{
+  people(
+    where: {
+      HAS: {
+        relation: FRIENDS
+        condition: { column: "age", operator: GT, value: 42 }
+      }
+    }
+  ) {
     name
   }
 }
