@@ -2,6 +2,10 @@
 
 namespace Benchmarks;
 
+use Tally\Attribute\DataProvider;
+use Tally\Attribute\Warmup;
+
+#[Warmup(1)]
 final class HugeResponseBench extends QueryBench
 {
     protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -30,6 +34,7 @@ final class HugeResponseBench extends QueryBench
      */
     public function resolve(): array
     {
+        /** @var array<string, mixed>|null $parent */
         static $parent;
         if (! isset($parent)) {
             $parent = [
@@ -48,18 +53,8 @@ final class HugeResponseBench extends QueryBench
         return $parent;
     }
 
-    /**
-     * @Warmup(1)
-     *
-     * @Revs(10)
-     *
-     * @Iterations(10)
-     *
-     * @ParamProviders({"providePerformanceTuning"})
-     *
-     * @BeforeMethods("setPerformanceTuning")
-     */
-    public function benchmark1(): void
+    #[DataProvider('providePerformanceTuning')]
+    public function benchmark1(bool ...$performanceTuning): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -70,18 +65,8 @@ final class HugeResponseBench extends QueryBench
         ');
     }
 
-    /**
-     * @Warmup(1)
-     *
-     * @Revs(10)
-     *
-     * @Iterations(10)
-     *
-     * @ParamProviders({"providePerformanceTuning"})
-     *
-     * @BeforeMethods("setPerformanceTuning")
-     */
-    public function benchmark100(): void
+    #[DataProvider('providePerformanceTuning')]
+    public function benchmark100(bool ...$performanceTuning): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -94,18 +79,8 @@ final class HugeResponseBench extends QueryBench
         ');
     }
 
-    /**
-     * @Warmup(1)
-     *
-     * @Revs(10)
-     *
-     * @Iterations(10)
-     *
-     * @ParamProviders({"providePerformanceTuning"})
-     *
-     * @BeforeMethods("setPerformanceTuning")
-     */
-    public function benchmark10k(): void
+    #[DataProvider('providePerformanceTuning')]
+    public function benchmark10k(bool ...$performanceTuning): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         {

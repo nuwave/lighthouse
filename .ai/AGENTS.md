@@ -17,7 +17,7 @@ make it             # Run all checks before committing (fix, stan, test)
 make fix            # Auto-format code (rector, php-cs-fixer, prettier)
 make stan           # Static analysis with PHPStan
 make test           # Run PHPUnit tests
-make bench          # Run PHPBench benchmarks
+make bench          # Count benchmark instructions with Tally
 ```
 
 ### Running a Single Test

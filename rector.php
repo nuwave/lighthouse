@@ -26,7 +26,6 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
         Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector::class => [
             __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
-            __DIR__ . '/benchmarks/BenchmarkTestCase.php', // exposes protected methods
         ],
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class => [
             __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // previous exception makes GraphQL\Error\Error not client-safe
@@ -39,7 +38,6 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
     ]);
     $rectorConfig->paths([
-        __DIR__ . '/benchmarks',
         __DIR__ . '/src',
         __DIR__ . '/tests',
         __DIR__ . '/.php-cs-fixer.php',

@@ -1,0 +1,38 @@
+{
+    "name": "nuwave/lighthouse-benchmarks",
+    "description": "Benchmarks for nuwave/lighthouse",
+    "license": "MIT",
+    "type": "project",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "..",
+            "options": {
+                "versions": {
+                    "nuwave/lighthouse": "dev-master"
+                },
+                "reference": "none"
+            }
+        }
+    ],
+    "require": {
+        "laravel/framework": "^13",
+        "laravel/scout": "^10",
+        "mockery/mockery": "^1",
+        "nuwave/lighthouse": "*@dev",
+        "orchestra/testbench": "^11",
+        "phpstan/phpstan": "^2",
+        "phpstan/tally": "^1",
+        "phpunit/phpunit": "^12",
+        "rector/rector": "^2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Benchmarks\\": "src/",
+            "Tests\\": "../tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

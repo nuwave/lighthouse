@@ -2,6 +2,10 @@
 
 namespace Benchmarks;
 
+use Tally\Attribute\DataProvider;
+use Tally\Attribute\Warmup;
+
+#[Warmup(1)]
 final class HugeRequestBench extends QueryBench
 {
     protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -41,52 +45,22 @@ final class HugeRequestBench extends QueryBench
         return $query;
     }
 
-    /**
-     * @Warmup(1)
-     *
-     * @Revs(10)
-     *
-     * @Iterations(10)
-     *
-     * @ParamProviders({"providePerformanceTuning"})
-     *
-     * @BeforeMethods("setPerformanceTuning")
-     */
-    public function benchmark1(): void
+    #[DataProvider('providePerformanceTuning')]
+    public function benchmark1(bool ...$performanceTuning): void
     {
         $this->query ??= $this->generateQuery(1);
         $this->graphQL($this->query);
     }
 
-    /**
-     * @Warmup(1)
-     *
-     * @Revs(10)
-     *
-     * @Iterations(10)
-     *
-     * @ParamProviders({"providePerformanceTuning"})
-     *
-     * @BeforeMethods("setPerformanceTuning")
-     */
-    public function benchmark10(): void
+    #[DataProvider('providePerformanceTuning')]
+    public function benchmark10(bool ...$performanceTuning): void
     {
         $this->query ??= $this->generateQuery(10);
         $this->graphQL($this->query);
     }
 
-    /**
-     * @Warmup(1)
-     *
-     * @Revs(10)
-     *
-     * @Iterations(10)
-     *
-     * @ParamProviders({"providePerformanceTuning"})
-     *
-     * @BeforeMethods("setPerformanceTuning")
-     */
-    public function benchmark100(): void
+    #[DataProvider('providePerformanceTuning')]
+    public function benchmark100(bool ...$performanceTuning): void
     {
         $this->query ??= $this->generateQuery(100);
         $this->graphQL($this->query);

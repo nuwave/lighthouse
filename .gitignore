@@ -15,10 +15,12 @@ docs/superpowers
 phpstan-tmp-dir
 rector-tmp-dir
 proto-tmp
+benchmarks/tally-results
 
 # composer
 composer.phar
 composer.lock
+!benchmarks/composer.lock
 vendor
 
 # lnai-generated

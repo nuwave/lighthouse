@@ -21,7 +21,6 @@
 /netlify.toml export-ignore
 /node.dockerfile export-ignore
 /php.dockerfile export-ignore
-/phpbench.json export-ignore
 /phpstan-bootstrap.php export-ignore
 /phpstan.neon export-ignore
 /phpunit.xml.dist export-ignore

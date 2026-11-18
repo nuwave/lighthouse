@@ -5,10 +5,9 @@ namespace Benchmarks;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Tally\Attribute\Before;
 
-/**
- * @BeforeMethods({"setUp"})
- */
 abstract class QueryBench
 {
     protected BenchmarkTestCase $testCase;
@@ -27,6 +26,7 @@ abstract class QueryBench
 
         $config = $this->config();
         $routeName = $config->get('lighthouse.route.name');
+        assert(is_string($routeName), 'Lighthouse configures its route name as a string.');
         $this->graphQLEndpoint = route($routeName);
     }
 
@@ -35,6 +35,8 @@ abstract class QueryBench
      *
      * @param  array<string, mixed>  $variables
      * @param  array<string, mixed>  $extraParams
+     *
+     * @return TestResponse<Response>
      */
     protected function graphQL(string $query, array $variables = [], array $extraParams = []): TestResponse
     {
@@ -61,34 +63,23 @@ abstract class QueryBench
         return $this->graphQLEndpoint;
     }
 
-    /**
-     * Set up function with the performance tuning.
-     *
-     * @param  array{0: bool, 1: bool, 2: bool}  $params Performance tuning parameters
-     */
-    public function setPerformanceTuning(array $params): void
+    #[Before]
+    public function setPerformanceTuning(bool $removeFieldMiddleware, bool $queryCache, bool $validationCache): void
     {
         $this->setUp();
 
         $configRepository = $this->config();
 
-        if ($params[0]) {
+        if ($removeFieldMiddleware) {
             $configRepository->set('lighthouse.field_middleware', []);
         }
 
-        $configRepository->set('lighthouse.query_cache.enable', $params[1]);
-        $configRepository->set('lighthouse.validation_cache.enable', $params[2]);
+        $configRepository->set('lighthouse.query_cache.enable', $queryCache);
+        $configRepository->set('lighthouse.validation_cache.enable', $validationCache);
     }
 
-    /**
-     * Indexes:
-     *  0: Remove all middlewares
-     *  1: Enable query cache
-     *  2: Enable validation cache
-     *
-     * @return array<string, array{0: bool, 1: bool, 2: bool}>
-     */
-    public function providePerformanceTuning(): array
+    /** @return array<string, array{bool, bool, bool}> */
+    public static function providePerformanceTuning(): array
     {
         return [
             'nothing' => [false, false, false],

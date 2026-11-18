@@ -4,10 +4,10 @@ namespace Benchmarks;
 
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Tally\Attribute\Before;
+use Tally\Attribute\Warmup;
 
-/**
- * @BeforeMethods({"prepareSchema"})
- */
+#[Warmup(1)]
 final class ASTUnserializationBench
 {
     public const SCHEMA = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -31,6 +31,7 @@ final class ASTUnserializationBench
 
     private string $documentAST;
 
+    #[Before]
     public function prepareSchema(): void
     {
         $this->documentNode = serialize(
@@ -45,25 +46,13 @@ final class ASTUnserializationBench
         );
     }
 
-    /**
-     * @Revs(100)
-     *
-     * @Iterations(10)
-     */
     public function benchUnserializeDocumentNode(): void
     {
-        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         unserialize($this->documentNode);
     }
 
-    /**
-     * @Revs(100)
-     *
-     * @Iterations(10)
-     */
     public function benchUnserializeDocumentAST(): void
     {
-        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         unserialize($this->documentAST);
     }
 }

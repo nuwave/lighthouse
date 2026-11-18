@@ -1,0 +1,36 @@
+name: Benchmarks
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/benchmarks.yml
+      - benchmarks/**
+      - composer.json
+      - Makefile
+      - src/**
+      - tests/**
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  benchmarks:
+    name: Count benchmark instructions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - run: make stan-benchmarks
+
+      - run: make bench
+
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tally-results
+          path: benchmarks/tally-results

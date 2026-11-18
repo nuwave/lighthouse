@@ -1,0 +1,6 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - rector.php
+        - tally.php
