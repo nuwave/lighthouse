@@ -154,8 +154,7 @@ class Defer implements CreatesResponse
                 // We've hit the max execution time or max nested levels of deferred fields.
                 $this->shouldDeferFurther = false;
 
-                // We process remaining deferred fields, but are no longer allowing additional
-                // fields to be deferred.
+                // We process remaining deferred fields, but are no longer allowing additional fields to be deferred.
                 if ($this->hasRemainingDeferred()) {
                     $this->executeDeferred();
                 }

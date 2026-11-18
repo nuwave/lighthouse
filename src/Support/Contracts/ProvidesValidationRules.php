@@ -7,8 +7,7 @@ interface ProvidesValidationRules
     /**
      * Rules to use for query validation.
      *
-     * Returning `null` enables all available rules,
-     * returning `[]` skips query validation entirely.
+     * Returning `null` enables all available rules, returning `[]` skips query validation entirely.
      *
      * @return array<string, \GraphQL\Validator\Rules\ValidationRule>|null
      */

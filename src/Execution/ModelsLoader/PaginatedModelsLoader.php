@@ -80,8 +80,7 @@ class PaginatedModelsLoader implements ModelsLoader
         $relatedModels = $mergedRelationQuery->get();
 
         return $relatedModels->unique(
-            // Compare all attributes because there might not be a unique primary key
-            // or there could be differing pivot attributes.
+            // Compare all attributes because there might not be a unique primary key or there could be differing pivot attributes.
             static fn (Model $relatedModel): string => serialize($relatedModel->getRawOriginal()),
         );
     }

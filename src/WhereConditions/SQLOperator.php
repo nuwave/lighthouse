@@ -72,10 +72,10 @@ enum SQLOperator {
     "Whether a value is not in the JSON."
     JSON_DOESNT_CONTAIN @enum(value: "JsonDoesntContain")
 
-    "Whether the length of the JSON array is equals to the value."
+    "Whether the length of the JSON array equals the value."
     JSON_LENGTH_EQ @enum(value: "JsonLengthEq")
 
-    "Whether the length of the JSON array is not equals to the value."
+    "Whether the length of the JSON array does not equal the value."
     JSON_LENGTH_NEQ @enum(value: "JsonLengthNeq")
 
     "Whether the length of the JSON array is less than the value."
@@ -84,10 +84,10 @@ enum SQLOperator {
     "Whether the length of the JSON array is greater than the value."
     JSON_LENGTH_GT @enum(value: "JsonLengthGt")
 
-    "Whether the length of the JSON array is less than or equals to the value."
+    "Whether the length of the JSON array is less than or equal to the value."
     JSON_LENGTH_LTE @enum(value: "JsonLengthLte")
 
-    "Whether the length of the JSON array is greater than or equals to the value."
+    "Whether the length of the JSON array is greater than or equal to the value."
     JSON_LENGTH_GTE @enum(value: "JsonLengthGte")
 }
 GRAPHQL;
@@ -118,8 +118,7 @@ GRAPHQL;
         $arity = $this->operatorArity($operator);
 
         if ($arity === 3) {
-            // Usually, the operator is passed as the second argument to the condition
-            // method, e.g. ->where('some_col', '=', $value)
+            // Usually, the operator is passed as the second argument to the condition method, e.g. ->where('some_col', '=', $value)
             $args[] = match ($operator) {
                 'JsonLengthEq' => '=',
                 'JsonLengthNeq' => '!=',
@@ -134,8 +133,7 @@ GRAPHQL;
                 $method .= 'JsonLength';
             }
         } else {
-            // We use the fact that the operators are named after Laravel's condition
-            // methods, so we can simply append the name, e.g. whereNull, whereNotBetween
+            // We use the fact that the operators are named after Laravel's condition methods, so we can append the name, e.g. whereNull, whereNotBetween
             $method .= $operator;
         }
 

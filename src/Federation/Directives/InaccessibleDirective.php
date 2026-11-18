@@ -12,8 +12,7 @@ class InaccessibleDirective extends BaseDirective
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-Indicates that a definition in the subgraph schema should be omitted from the router's API schema,
-even if that definition is also present in other subgraphs.
+Indicates that a definition in the subgraph schema should be omitted from the router's API schema, even if that definition is also present in other subgraphs.
 This means that the field is not exposed to clients at all.
 
 ```graphql
@@ -24,10 +23,8 @@ type Position @shareable {
 }
 ```
 
-An @inaccessible field or type is not omitted from the supergraph schema, so the router
-still knows it exists (but clients can't include it in operations).
-This is what enables the router to use an @inaccessible field as part of an entity's @key
-when combining entity fields from multiple subgraphs.
+An @inaccessible field or type is not omitted from the supergraph schema, so the router still knows it exists (but clients can't include it in operations).
+This is what enables the router to use an @inaccessible field as part of an entity's @key when combining entity fields from multiple subgraphs.
 
 If a type is marked @inaccessible, all fields that return that type must also be marked @inaccessible.
 Otherwise, a composition error occurs.

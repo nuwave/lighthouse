@@ -59,8 +59,7 @@ final class RulesForArrayDirectiveTest extends TestCase
 
     public function testBuiltInRuleNotShadowedByGlobalClassWithMatchingName(): void
     {
-        // Like a facade alias such as `URL` or intervention/image's `Image`,
-        // which matches the built-in rule case-insensitively once loaded.
+        // Like a facade alias such as `URL` or intervention/image's `Image`, which matches the built-in rule case-insensitively once loaded.
         if (! class_exists('Filled')) {
             class_alias((new class {})::class, 'Filled');
         }

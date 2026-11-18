@@ -84,9 +84,11 @@ $rectorConfig->ruleWithConfiguration(RootResolverSignatureRector::class, [
 
 ### Known Limitation
 
-The rule assumes every class with an `__invoke` method found under the resolver directories (e.g. `App\GraphQL\Queries`, `App\GraphQL\Mutations`) is a root resolver.
+The rule assumes that every class with an `__invoke` method in the resolver directories is a root resolver.
+Examples of those directories are `App\GraphQL\Queries` and `App\GraphQL\Mutations`.
 
-Classes that are **not** root resolvers — such as nested field resolvers that receive a parent model as their first argument — will be incorrectly rewritten.
+The rule incorrectly rewrites classes that are **not** root resolvers.
+Examples are nested field resolvers that receive a parent model as their first argument.
 
 **Mitigations:**
 

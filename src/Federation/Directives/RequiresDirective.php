@@ -13,9 +13,9 @@ class RequiresDirective extends BaseDirective
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-The @requires directive is used to annotate the required input fieldset from a base type for a resolver. It is used to
-develop a query plan where the required fields may not be needed by the client, but the service may need additional
-information from other services. For example:
+The @requires directive is used to annotate the required input fieldset from a base type for a resolver.
+It is used to develop a query plan where the required fields may not be needed by the client, but the service may need additional information from other services.
+For example:
 
     extend type User @key(fields: "id") {
       id: ID! @external
@@ -25,8 +25,7 @@ information from other services. For example:
 """
 directive @requires(
     """
-    It is used to develop a query plan where the required fields may not be needed by the client, but the service may
-    need additional information from other services.
+    It is used to develop a query plan where the required fields may not be needed by the client, but the service may need additional information from other services.
     """
     fields: _FieldSet!
 ) on FIELD_DEFINITION

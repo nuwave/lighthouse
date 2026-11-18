@@ -15,8 +15,7 @@ Validate an argument using [Laravel validation](https://laravel.com/docs/validat
 directive @rules(
   """
   Specify the validation rules to apply to the field.
-  This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules),
-  or the fully qualified class name of a custom validation rule.
+  Reference either one of [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules) or the fully qualified class name of a custom validation rule.
 
   Validation rules that mutate the given input value are _not_ supported:
   - `exclude_if`

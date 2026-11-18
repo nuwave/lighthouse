@@ -12,7 +12,8 @@ Includes the annotated element from the schema conditionally.
 """
 directive @show(
   """
-  Specify which environments may use this field, e.g. ["testing"].
+  Specify which environments include this element, e.g. `["testing"]`.
+  Compared against the value returned from `app()->environment()`.
   """
   env: [String!]!
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT

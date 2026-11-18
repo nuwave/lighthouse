@@ -12,8 +12,8 @@ class ProvidesDirective extends BaseDirective
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-The `@provides` directive is used to annotate the expected returned fieldset from a field
-on a base type that is  guaranteed to be selectable by the gateway. Given the following example:
+The `@provides` directive is used to annotate the expected returned fieldset from a field on a base type that is  guaranteed to be selectable by the gateway.
+Given the following example:
 
 ```graphql
 type Review @key(fields: "id") {
@@ -26,10 +26,8 @@ extend type Product @key(fields: "upc") {
 }
 ```
 
-When fetching `Review.product` from the Reviews service, it is possible to request the `name`
-with the expectation that the Reviews service can provide it when going from review to product.
-`Product.name` is an external field on an external type which is why the local type extension
-of `Product` and annotation of `name` is required.
+When fetching `Review.product` from the Reviews service, it is possible to request the `name` with the expectation that the Reviews service can provide it when going from review to product.
+`Product.name` is an external field on an external type which is why the local type extension of `Product` and annotation of `name` is required.
 
 https://www.apollographql.com/docs/federation/federation-spec/#provides
 """

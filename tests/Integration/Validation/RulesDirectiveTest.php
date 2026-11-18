@@ -230,8 +230,7 @@ final class RulesDirectiveTest extends TestCase
 
     public function testBuiltInRuleNotShadowedByGlobalClassWithMatchingName(): void
     {
-        // Like a facade alias such as `URL` or intervention/image's `Image`,
-        // which matches the built-in rule case-insensitively once loaded.
+        // Like a facade alias such as `URL` or intervention/image's `Image`, which matches the built-in rule case-insensitively once loaded.
         // The container then resolves its `url` binding, the UrlGenerator.
         if (! class_exists('Url')) {
             class_alias((new class {})::class, 'Url');

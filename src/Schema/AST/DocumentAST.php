@@ -61,8 +61,7 @@ class DocumentAST implements Arrayable
     /**
      * The type extensions within the parsed document.
      *
-     * Will NOT be kept after unserialization, as the type
-     * extensions are merged with the types before.
+     * Will NOT be kept after unserialization, as the type extensions are merged with the types before.
      *
      * @var array<string, array<int, \GraphQL\Language\AST\TypeExtensionNode&\GraphQL\Language\AST\Node>>
      */
@@ -104,8 +103,7 @@ class DocumentAST implements Arrayable
                 ['noLocation' => true],
             );
         } catch (SyntaxError $syntaxError) {
-            // Throw our own error class instead, since otherwise a schema definition
-            // error would get rendered to the Client.
+            // Throw our own error class instead, since otherwise a schema definition error would get rendered to the Client.
             throw new SchemaSyntaxErrorException($syntaxError);
         }
 
@@ -137,9 +135,8 @@ class DocumentAST implements Arrayable
                         throw new DefinitionException("Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}.");
                     }
 
-                    // It might be valid to have multiple types that correspond to a single model
-                    // in order to hide some fields in some scenarios, so we cannot decide on a
-                    // single object type for a given class name unambiguously right here.
+                    // Multiple types may correspond to a single model, e.g. to hide some fields in some scenarios.
+                    // So we cannot pick a single object type for a given class name here.
                     $instance->classNameToObjectTypeNames[$modelClass][] = $name;
                 }
             } elseif ($definition instanceof TypeExtensionNode) {
@@ -188,8 +185,7 @@ class DocumentAST implements Arrayable
     /**
      * Convert to a serializable array.
      *
-     * We exclude the type extensions stored in $typeExtensions,
-     * as they are merged with the actual types at this point.
+     * We exclude the type extensions stored in $typeExtensions, as they are merged with the actual types at this point.
      *
      * @return SerializableDocumentAST
      */

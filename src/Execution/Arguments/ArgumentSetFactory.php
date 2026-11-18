@@ -107,8 +107,7 @@ class ArgumentSetFactory
             return null;
         }
 
-        // We have to do this conversion as we are resolving a client query
-        // because the incoming arguments put a bound on recursion depth
+        // We have to do this conversion as we are resolving a client query because the incoming arguments put a bound on recursion depth
         if ($type instanceof ListType) {
             $typeInList = $type->type;
 

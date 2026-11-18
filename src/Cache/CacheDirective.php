@@ -36,8 +36,8 @@ directive @cache(
 
   """
   Limit access to cached data to the currently authenticated user.
-  When the field is accessible by guest users, this will not have
-  any effect, they will access a shared cache.
+  This has no effect when guest users can access the field.
+  Guest users access a shared cache.
   """
   private: Boolean = false
 ) on FIELD_DEFINITION
@@ -76,7 +76,7 @@ GRAPHQL;
                 path: $path,
             );
 
-            // We found a matching value in the cache, so we can return early without actually running the query.
+            // We found a matching value in the cache, so we can return early without running the query.
             $value = $cache->get($cacheKey);
             if ($value !== null) {
                 // Deferring the result will allow nested deferred resolves to be bundled together, see https://github.com/nuwave/lighthouse/pull/2270#discussion_r1072414584.
@@ -86,8 +86,7 @@ GRAPHQL;
             // In Laravel cache, null is considered a non-existent value, see https://laravel.com/docs/9.x/cache#checking-for-item-existence:
             // > The `has` method [...] will also return false if the item exists but its value is null.
             //
-            // If caching `null` value becomes something worthwhile, one possible way to achieve it is to
-            // encapsulate the `$result` at writing time :
+            // If caching `null` value becomes something worthwhile, one possible way to achieve it is to encapsulate the `$result` at writing time :
             //
             //    $storeInCache = static function ($result) use ($cacheKey, $maxAge, $cache): void {
             //        $value = ['rawValue' => $result];
@@ -102,9 +101,9 @@ GRAPHQL;
             //        return $value['rawValue'];
             //    }
             //
-            // Such a change would introduce some potential BC, if for instance cached value was already containing
-            // an object with a `rawValue` key prior the implementation change. A possible workaround is to choose a
-            // less collision-probable key instead of `rawValue` (e.g. "lighthouse:rawValue").
+            // Such a change could break backwards compatibility.
+            // For instance, a value cached before the change might already contain an object with a `rawValue` key.
+            // A possible workaround is to choose a less collision-probable key instead of `rawValue` (e.g. "lighthouse:rawValue").
 
             $resolved = $resolver($root, $args, $context, $resolveInfo);
 

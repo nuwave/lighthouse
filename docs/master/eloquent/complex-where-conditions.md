@@ -3,7 +3,8 @@
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
 Adding query conditions ad-hoc can be cumbersome and limiting when you require manifold ways to filter query results.
-Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients and allow them to apply complex, dynamic WHERE conditions to queries.
+Lighthouse's `WhereConditions` extension gives clients advanced query capabilities.
+They can apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
@@ -16,7 +17,8 @@ return [
 ]
 ```
 
-For other versions, register the service provider `Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
+For other versions, register the service provider `Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider`.
+See [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
@@ -159,13 +161,13 @@ enum PersonColumn {
 ```
 
 Lighthouse will still automatically generate the necessary input types.
-Instead of creating enums for the allowed columns, it will simply use the existing `PersonColumn` enum.
+Instead of creating enums for the allowed columns, it uses the existing `PersonColumn` enum.
 
 It is recommended to either use the `columns` or the `columnsEnum` argument.
 When you don't define any allowed columns, clients can specify arbitrary column names as a `String`.
 This approach should by taken with care, as it carries potential performance and security risks and offers little type safety.
 
-A simple query for a person who is exactly 42 years old would look like this:
+A query for a person who is exactly 42 years old would look like this:
 
 ```graphql
 {
@@ -175,7 +177,7 @@ A simple query for a person who is exactly 42 years old would look like this:
 }
 ```
 
-Note that the operator defaults to `EQ` (`=`) if not given, so you could also omit it from the previous example and get the same result.
+The operator defaults to `EQ` (`=`) if not given, so you could also omit it from the previous example and get the same result.
 
 The following query gets actors over age 37 who either have red hair or are at least 150cm:
 
@@ -237,16 +239,15 @@ Qualify such columns with the table name, e.g. `@whereConditions(columns: ["role
 
 ```graphql
 """
-Allows clients to filter a query based on the existence of a related model, using
-a dynamically controlled `WHERE` condition that applies to the relationship.
+Allow clients to filter a query by the existence of a related model.
+A dynamically controlled `WHERE` condition applies to the relationship.
 """
 directive @whereHasConditions(
   """
   The Eloquent relationship that the conditions will be applied to.
 
-  This argument can be omitted if the argument name follows the naming
-  convention `has{$RELATION}`. For example, if the Eloquent relationship
-  is named `posts`, the argument name must be `hasPosts`.
+  This argument can be omitted if the argument name follows the naming convention `has{$RELATION}`.
+  For example, if the Eloquent relationship is named `posts`, the argument name must be `hasPosts`.
   """
   relation: String
 
@@ -279,7 +280,7 @@ directive @whereHasConditions(
 ) on ARGUMENT_DEFINITION
 ```
 
-This directive works very similar to [@whereConditions](#whereconditions), except that the conditions are applied to a relation sub query:
+This directive works like [@whereConditions](#whereconditions), except that the conditions are applied to a relation sub query:
 
 ```graphql
 type Query {
@@ -322,7 +323,7 @@ enum QueryPeopleHasRoleColumn {
 }
 ```
 
-A simple query for a person who has an access level of at least 5, through one of their roles, looks like this:
+A query for a person who has an access level of at least 5, through one of their roles, looks like this:
 
 ```graphql
 {
@@ -332,7 +333,8 @@ A simple query for a person who has an access level of at least 5, through one o
 }
 ```
 
-You can also query for relationship existence without any condition; simply use an empty object as argument value.
+You can also query for relationship existence without any condition.
+Use an empty object as argument value.
 This query would retrieve all persons that have a role:
 
 ```graphql
@@ -343,7 +345,7 @@ This query would retrieve all persons that have a role:
 }
 ```
 
-Just like with the [@whereCondition](../api-reference/directives.md#whereconditions) directive, using `null` as argument value does not have any effect on the query.
+Like with the [@whereCondition](../api-reference/directives.md#whereconditions) directive, using `null` as argument value does not have any effect on the query.
 This query would retrieve all persons, no matter if they have a role or not:
 
 ```graphql

@@ -39,7 +39,8 @@ Excludes the annotated element from the schema conditionally.
 """
 directive @hide(
   """
-  Specify which environments must not use this field, e.g. ["production"].
+  Specify which environments exclude this element, e.g. `["production"]`.
+  Compared against the value returned from `app()->environment()`.
   """
   env: [String!]!
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT

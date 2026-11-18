@@ -36,7 +36,8 @@ Starting from the root level, the fields within the query are executed.
 Each field may be wrapped with field middleware, which can add authentication, authorization, fine-grained validation, and more.
 Finally, the field resolver is called to produce a value for the field.
 
-If the field contains a subselection, the same process happens for the nested fields, until we either abort with an error or traversed the entire query tree.
+If the field contains a subselection, the same process happens for the nested fields.
+This continues until we either abort with an error or traverse the entire query tree.
 
 [Learn more about GraphQL execution](https://graphql.org/learn/execution).
 

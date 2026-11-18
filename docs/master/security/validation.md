@@ -4,7 +4,7 @@ Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/val
 
 ## Single Arguments
 
-The simplest way to leverage the built-in validation rules is to use the [@rules](../api-reference/directives.md#rules) directive.
+Apply the built-in validation rules with the [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {
@@ -149,7 +149,8 @@ input UpdateUserInput @validator {
 ```
 
 We need to back that with a validator class.
-Lighthouse uses a simple naming convention for validator classes, use the name of the input type and append `Validator`:
+Lighthouse uses a naming convention for validator classes.
+Use the name of the input type and append `Validator`:
 
 ```shell
 php artisan lighthouse:validator UpdateUserInputValidator
@@ -181,7 +182,7 @@ final class UpdateUserInputValidator extends Validator
 }
 ```
 
-Note that this gives you access to all kinds of programmatic validation rules that Laravel provides.
+This gives you access to all kinds of programmatic validation rules that Laravel provides.
 This can give you additional flexibility when you need it.
 
 ### Custom Validator Messages
@@ -310,7 +311,8 @@ type Mutation {
 By default, Lighthouse enables all default query validation rules from `webonyx/graphql-php`.
 This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type.
 
-If you want to add custom rules or change which ones are used, you can bind a custom implementation of the interface `Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules` through a service provider.
+To add custom rules or change which ones are used, implement the interface `Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules`.
+Bind your implementation through a service provider.
 
 ```php
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;

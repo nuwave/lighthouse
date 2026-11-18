@@ -12,6 +12,7 @@ class SanitizeDirective extends ArgTraversalDirective
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Apply sanitization to the arguments of a field.
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @sanitize on FIELD_DEFINITION
 GRAPHQL;

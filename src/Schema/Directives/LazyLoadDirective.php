@@ -19,8 +19,7 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware, FieldM
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
-on the relations of a list of models.
+Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading) on the relations of a list of models.
 """
 directive @lazyLoad(
   """

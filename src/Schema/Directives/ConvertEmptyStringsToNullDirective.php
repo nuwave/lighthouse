@@ -20,6 +20,8 @@ Replaces incoming empty strings `""` with `null`.
 
 When used upon fields, empty strings for non-nullable inputs will pass unchanged.
 Only explicitly placing this on non-nullable inputs will force the conversion.
+
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 GRAPHQL;

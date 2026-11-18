@@ -129,8 +129,7 @@ class GraphQL
         ?string $operationName = null,
         ?string $queryHash = null,
     ): ExecutionResult {
-        // Building the executable schema might take a while to do,
-        // so we do it before we fire the StartExecution event.
+        // Building the executable schema might take a while to do, so we do it before we fire the StartExecution event.
         // This allows tracking the time for batched queries independently.
         $schema = $this->schemaBuilder->schema();
 

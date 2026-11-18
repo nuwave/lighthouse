@@ -21,10 +21,9 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         $rules = $this->directiveArgValue('apply');
 
         // Custom rules may be referenced through their fully qualified class name.
-        // The Laravel validator expects a class instance to be passed, so we
-        // resolve any given rule where a corresponding class exists.
-        // Requiring a namespace separator keeps built-in rules such as `url` or `image`
-        // from matching global classes or facade aliases, as class names are case-insensitive.
+        // The Laravel validator expects a class instance to be passed, so we resolve any given rule where a corresponding class exists.
+        // Requiring a namespace separator keeps built-in rules such as `url` or `image` from matching global classes or facade aliases.
+        // This matters because class names are case-insensitive.
         foreach ($rules as $key => $rule) {
             if (str_contains($rule, '\\') && class_exists($rule)) {
                 $rules[$key] = Container::getInstance()->make($rule);

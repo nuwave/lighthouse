@@ -17,7 +17,7 @@ class ScopeDirective extends BaseDirective implements ArgBuilderDirective
 Adds a scope to the query builder.
 
 The scope method will receive the client-given value of the argument as the second parameter.
-This also works with custom query builders, it simply calls its methods with the argument value.
+This also works with custom query builders, it calls its methods with the argument value.
 """
 directive @scope(
   """

@@ -17,9 +17,9 @@ class ExternalDirective extends BaseDirective implements FieldResolver
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
 """
-Individual federated services should be runnable without having the entire graph present. Fields marked with @external
-are declarations of fields that are defined in another service. All fields referred to in @key, @requires, and @provides
-directives need to have corresponding @external fields in the same service.
+Individual federated services should be runnable without having the entire graph present.
+Fields marked with @external are declarations of fields that are defined in another service.
+All fields referred to in @key, @requires, and @provides directives need to have corresponding @external fields in the same service.
 
 https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
 """
@@ -31,7 +31,7 @@ GRAPHQL;
     {
         $defaultFieldResolver = Executor::getDefaultFieldResolver();
 
-        // The parent might just hold a foreign key to the external object, in which case we just return that.
+        // The parent might only hold a foreign key to the external object, in which case we return that.
         return static fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed => is_scalar($root)
             ? $root
             : $defaultFieldResolver($root, $args, $context, $resolveInfo);

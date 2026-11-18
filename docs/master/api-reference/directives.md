@@ -156,11 +156,10 @@ type Query {
 Defer the execution of mutations to [queued jobs](https://laravel.com/docs/queues).
 
 This directive must only be used on fields of the root mutation type.
-When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched
-and the value `true` is returned - thus the fields return type must be `Boolean!`.
+When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched and the value `true` is returned.
+Thus, the field's return type must be `Boolean!`.
 
-Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job,
-it will actually execute the underlying field resolver.
+Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job, it executes the underlying field resolver.
 Errors that occur during execution are reported through the Laravel exception handler.
 The handlers in the `config/lighthouse.php` option `error_handlers` are not called.
 """
@@ -221,8 +220,8 @@ Resolves a field through the Eloquent `BelongsTo` relationship.
 """
 directive @belongsTo(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -273,8 +272,8 @@ Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
 directive @belongsToMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -303,8 +302,8 @@ directive @belongsToMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -371,8 +370,9 @@ type User {
 You may want to allow accessing data that describes the relation between the models and is stored in the intermediate table.
 See [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
 
-Just like in Laravel, you can access the `pivot` attribute on the models (or its alias).
-Even though this attribute is always present when querying the model through the relation, it may not be present when reaching the node through another path in the schema.
+Like in Laravel, you can access the `pivot` attribute on the models (or its alias).
+This attribute is always present when querying the model through the relation.
+It may be missing when reaching the node through another path in the schema.
 It is recommended to define the field as nullable (no `!`).
 
 The following example assumes the intermediate table between `User` and `Role` defines a column `meta`.
@@ -418,7 +418,8 @@ type RoleUserPivot {
 }
 ```
 
-When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) that either contains the attributes of the intermediate table or contains a `pivot` field with the corresponding type.
+When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types).
+It contains either the attributes of the intermediate table or a `pivot` field with the corresponding type.
 
 The custom edge type must contain at least the following two fields:
 
@@ -613,6 +614,8 @@ final class AddUsersToCompany
 ```graphql
 """
 Broadcast the results of a mutation to subscribed clients.
+
+Place this after other field middleware directives that may transform the result, so it broadcasts the final value.
 """
 directive @broadcast(
   """
@@ -678,8 +681,7 @@ scalar BuilderValue
 You must point to a `method` that receives the builder instance.
 That method can apply additional constraints to the query.
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 When used on an argument, the method is only called when the argument is specified (may be `null`).
@@ -719,6 +721,8 @@ final class MyClass
 ```graphql
 """
 Cache the result of a resolver.
+
+Place this after other field middleware to ensure it caches the correct transformed value.
 """
 directive @cache(
   """
@@ -729,8 +733,8 @@ directive @cache(
 
   """
   Limit access to cached data to the currently authenticated user.
-  When the field is accessible by guest users, this will not have
-  any effect, they will access a shared cache.
+  This has no effect when guest users can access the field.
+  Guest users access a shared cache.
   """
   private: Boolean = false
 ) on FIELD_DEFINITION
@@ -818,8 +822,7 @@ injectArgs: Boolean! = false
 """
 Statically defined arguments that are passed to `Gate::check`.
 
-You may pass arbitrary GraphQL literals,
-e.g.: [1, 2, 3] or { foo: "bar" }
+You may pass any GraphQL literal, e.g. `[1, 2, 3]` or `{ foo: "bar" }`.
 """
 args: CanArgs
 
@@ -831,17 +834,23 @@ action: CanAction! = EXCEPTION_PASS
 """
 Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
 """
-returnValue: CanArgs
-"""
+returnValue: CanReturnValue
 ```
 
 Types are specified as:
 
 ```graphql
 """
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
 """
 scalar CanArgs
+
+"""
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
+"""
+scalar CanReturnValue
 
 enum CanAction {
   """
@@ -855,7 +864,7 @@ enum CanAction {
   EXCEPTION_NOT_AUTHORIZED
 
   """
-  Return the value specified in `returnValue` argument to conceal the real error.
+  Return the value specified in the `returnValue` directive argument to conceal the real error.
   """
   RETURN_VALUE
 }
@@ -869,11 +878,11 @@ You can find usage examples of these directives in [the authorization docs](../s
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-Query for specific model instances to check the policy against, using primary key(s) from specified argument.
+Query for specific model instances to check the policy against, using the primary key(s) from the specified argument.
 """
 directive @canFind(
   """
-  Specify the name of the field argument that contains its primary key(s).
+  Specify the name of the field argument that contains the primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
   """
@@ -919,8 +928,8 @@ directive @canModel(
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-Query for specific model instances to check the policy against, using arguments
-with directives that add constraints to the query builder, such as `@eq`.
+Query for specific model instances to check the policy against.
+Use arguments with directives that add constraints to the query builder, such as `@eq`.
 """
 directive @canQuery(
   """
@@ -1049,6 +1058,8 @@ Replaces incoming empty strings `""` with `null`.
 
 When used upon fields, empty strings for non-nullable inputs will pass unchanged.
 Only explicitly placing this on non-nullable inputs will force the conversion.
+
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
@@ -1081,14 +1092,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, add this directive to your global field middleware in `lighthouse.php`:
-
-```php
-    'field_middleware' => [
-        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
-        ...
-    ],
-```
+The default `field_middleware` setting in `lighthouse.php` applies this directive to every field.
 
 ## @count
 
@@ -1159,8 +1163,7 @@ directive @create(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -1212,8 +1215,7 @@ directive @createMany(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -1246,8 +1248,7 @@ directive @delete(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 
@@ -1296,7 +1297,8 @@ type Mutation {
 }
 ```
 
-If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or `MorphTo` relationship, you can pass a Boolean instead of an ID, as there is only one possible model that can be deleted.
+For a `HasOne`, `MorphOne`, `BelongsTo` or `MorphTo` relationship to a single other model, you can pass a Boolean instead of an ID.
+There is only one possible model to delete.
 
 ```graphql
 type Mutation {
@@ -1373,7 +1375,7 @@ directive @feature(
   Specify what the state of the feature should be for the field to be included.
   """
   when: FeatureState! = ACTIVE
-) on FIELD_DEFINITION | OBJECT
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 
 """
 Options for the `when` argument of `@feature`.
@@ -1391,7 +1393,8 @@ enum FeatureState {
 }
 ```
 
-Requires the installation of [Laravel Pennant](https://laravel.com/docs/pennant) and manual registration of the service provider `Nuwave\Lighthouse\Pennant\PennantServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
+Requires the installation of [Laravel Pennant](https://laravel.com/docs/pennant).
+Register the service provider `Nuwave\Lighthouse\Pennant\PennantServiceProvider` manually, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ## @field
 
@@ -1421,7 +1424,8 @@ type Mutation {
 }
 ```
 
-You can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md), The following will look for a class in `App\GraphQL\Queries` by default.
+You can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md).
+The following will look for a class in `App\GraphQL\Queries` by default.
 
 ```graphql
 type Query {
@@ -1541,15 +1545,14 @@ type Mutation {
 }
 ```
 
-Works very similar to the [@delete](#delete) directive.
+Works like the [@delete](#delete) directive.
 
 ## @enum
 
 ```graphql
 """
 Assign an internal value to an enum key.
-When dealing with the Enum type in your code,
-you will receive the defined value instead of the string key.
+Your code receives the internal value instead of the string key.
 """
 directive @enum(
   """
@@ -1668,8 +1671,8 @@ final class PlacedOrder
 """
 Converts between IDs/types and global IDs.
 
-When used upon a field, it encodes;
-when used upon an argument, it decodes.
+On a field, it encodes the value.
+On an argument, it decodes the value.
 """
 directive @globalId(
   """
@@ -1689,18 +1692,19 @@ enum GlobalIdDecode {
   ARRAY
 
   """
-  Return just `$type`.
+  Return only `$type`.
   """
   TYPE
 
   """
-  Return just `$id`.
+  Return only `$id`.
   """
   ID
 }
 ```
 
-Instead of the original ID, the `id` field will now return a base64-encoded String that globally identifies the User and can be used for querying the `node` endpoint.
+Instead of the original ID, the `id` field now returns a base64-encoded String that globally identifies the User.
+Clients can use it to query the `node` endpoint.
 
 ```graphql
 type User {
@@ -1725,8 +1729,7 @@ You may rebind the `Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to a
 """
 Run authentication through one or more guards from `config/auth.php`.
 
-This is run per field and may allow unauthenticated
-users to still receive partial results.
+This runs per field, so unauthenticated users may still receive partial results.
 
 Used upon an object, it applies to all fields within.
 """
@@ -1739,7 +1742,7 @@ directive @guard(
 ) repeatable on FIELD_DEFINITION | OBJECT
 ```
 
-Note that [@guard](#guard) does not log in users.
+[@guard](#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config.
 
 ```php
@@ -1797,8 +1800,8 @@ Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloq
 """
 directive @hasMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -1827,8 +1830,8 @@ directive @hasMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -1888,8 +1891,8 @@ Corresponds to [the Eloquent relationship HasManyThrough](https://laravel.com/do
 """
 directive @hasManyThrough(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -1918,8 +1921,8 @@ directive @hasManyThrough(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -1957,8 +1960,8 @@ Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloqu
 """
 directive @hasOne(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -1991,8 +1994,8 @@ Corresponds to [the Eloquent relationship HasOneThrough](https://laravel.com/doc
 """
 directive @hasOneThrough(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2032,8 +2035,7 @@ directive @in(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2051,17 +2053,14 @@ Inject a value from the context object into the arguments.
 directive @inject(
   """
   A path to the property of the context that will be injected.
-  If the value is nested within the context, you may use dot notation
-  to get it, e.g. "user.id".
+  Use dot notation to get a nested value from the context, e.g. `user.id`.
   """
   context: String!
 
   """
   The target name of the argument into which the value is injected.
-  You can use dot notation to set the value at arbitrary depth
-  within the incoming argument.
-  Use an asterisk `*` as a path segment to inject the value into every
-  element of a list found at that position.
+  Use dot notation to set the value at any depth within the incoming arguments.
+  Use an asterisk `*` as a path segment to inject the value into every element of a list found at that position.
   """
   name: String!
 ) repeatable on FIELD_DEFINITION
@@ -2088,8 +2087,8 @@ type Mutation {
 }
 ```
 
-If you need to inject a value into every element of a list, such as a nested `create` mutation
-for a `HasMany` relation, use an asterisk `*` as a wildcard path segment.
+To inject a value into every element of a list, use an asterisk `*` as a wildcard path segment.
+An example is a nested `create` mutation for a `HasMany` relation.
 
 ```graphql
 type Mutation {
@@ -2181,7 +2180,7 @@ directive @hide(
   Compared against the value returned from `app()->environment()`.
   """
   env: [String!]!
-) repeatable on FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 ```
 
 See [feature toggles](../digging-deeper/feature-toggles.md).
@@ -2190,8 +2189,7 @@ See [feature toggles](../digging-deeper/feature-toggles.md).
 
 ```graphql
 """
-Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
-on the relations of a list of models.
+Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading) on the relations of a list of models.
 """
 directive @lazyLoad(
   """
@@ -2225,8 +2223,7 @@ directive @like(
   key: String
 
   """
-  Fixate the positions of wildcards (`%`, `_`) in the LIKE comparison around the
-  placeholder `{}`, e.g. `%{}`, `__{}` or `%{}%`.
+  Fix the positions of wildcards (`%`, `_`) around the placeholder `{}` in the LIKE comparison, e.g. `%{}`, `__{}` or `%{}%`.
   If specified, wildcard characters in the client-given input are escaped.
   If not specified, the client can pass wildcards unescaped.
   """
@@ -2240,26 +2237,24 @@ directive @like(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ## @limit
 
 ```graphql
 """
-Allow clients to specify the maximum number of results to return when used on an argument,
-or statically limit them when used on a field.
+On an argument, allow clients to specify the maximum number of results to return.
+On a field, limit the number of results statically.
 
-By default, this directive does not influence the number of results the resolver queries internally,
-but limits how much of it is returned to clients. Use the `builder` argument to change this.
+By default, this directive does not change how many results the resolver queries internally.
+It only limits how many of them are returned to clients.
+Use the `builder` argument to change this.
 """
 directive @limit(
   """
-  You may set this to `true` if the field uses a query builder,
-  then this directive will apply a LIMIT clause to it.
-  Typically, this option should only be used for root fields,
-  as it may cause wrong results with batched relation queries.
+  Set this to `true` to apply a LIMIT clause to the query builder of the field.
+  Only use this on root fields, as it may cause wrong results with batched relation queries.
   """
   builder: Boolean! = false
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
@@ -2310,8 +2305,7 @@ type Query {
 """
 Resolve a field by calling a method on the parent object.
 
-Use this if the data is not accessible through simple property access or if you
-want to pass argument to the method.
+Use this if the data is not accessible through simple property access, or to pass arguments to the method.
 """
 directive @method(
   """
@@ -2393,8 +2387,8 @@ Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/eloq
 """
 directive @morphMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2423,8 +2417,8 @@ directive @morphMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -2472,8 +2466,8 @@ Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/eloqu
 """
 directive @morphOne(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2504,8 +2498,8 @@ Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/eloque
 """
 directive @morphTo(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2532,8 +2526,8 @@ Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.
 """
 directive @morphToMany(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -2562,8 +2556,8 @@ directive @morphToMany(
   maxCount: Int
 
   """
-  Specify a custom type that implements the Edge interface
-  to extend edge object.
+  Name a custom object type to use for the edges instead of the generated one.
+  It needs the fields `node` and `cursor` and may add more fields.
   Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
@@ -2670,8 +2664,7 @@ directive @neq(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2684,8 +2677,7 @@ type User {
 
 ```graphql
 """
-A no-op nested arg resolver that delegates all calls
-to the ArgResolver directives attached to the children.
+A no-op nested arg resolver that delegates all calls to the ArgResolver directives of its children.
 """
 directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
@@ -2722,8 +2714,7 @@ type User {
 """
 Register a type for Relay's global object identification.
 
-When used without any arguments, Lighthouse will attempt
-to resolve the type through a model with the same name.
+Without arguments, Lighthouse tries to resolve the type through the model with the same name.
 """
 directive @node(
   """
@@ -2807,8 +2798,7 @@ directive @notIn(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2899,8 +2889,7 @@ input OrderByRelation {
 }
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 See [ordering](../digging-deeper/ordering.md).
@@ -3000,8 +2989,7 @@ type Query {
 }
 ```
 
-> When you want to paginate a relationship, use the to-many relationship
-> directives such as [@hasMany](directives.md#hasmany) instead.
+> When you want to paginate a relationship, use the to-many relationship directives such as [@hasMany](directives.md#hasmany) instead.
 
 The schema definition is automatically transformed to this:
 
@@ -3124,8 +3112,7 @@ But means that the response does not hold information about the total number of 
 
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
-> Please note that the `SIMPLE` paginator does not have the attributes
-> `lastPage` and `total`.
+> The `SIMPLE` paginator does not have the attributes `lastPage` and `total`.
 >
 > If you need those fields, you should use the default `PAGINATOR`.
 
@@ -3242,7 +3229,7 @@ type Query {
 
 ### Custom builder
 
-If simply querying Eloquent does not fit your use-case, you can specify a custom `builder`.
+If a plain Eloquent query does not fit your use case, you can specify a custom `builder`.
 
 ```graphql
 type Query {
@@ -3253,8 +3240,7 @@ type Query {
 Your method receives the typical resolver arguments.
 It must return an instance of `Illuminate\Database\Query\Builder`.
 
-> If you actually want to query a model and possibly its relations through nested fields,
-> make sure to return an Eloquent builder, e.g. `Post::query()`.
+> If you want to query a model and possibly its relations through nested fields, make sure to return an Eloquent builder, e.g. `Post::query()`.
 
 ```php
 namespace App\Models;
@@ -3376,7 +3362,7 @@ type Mutation {
 }
 ```
 
-Works very similar to the [@delete](#delete) directive.
+Works like the [@delete](#delete) directive.
 
 ## @rules
 
@@ -3387,10 +3373,9 @@ Validate an argument using [Laravel validation](https://laravel.com/docs/validat
 directive @rules(
   """
   Specify the validation rules to apply to the field.
-  This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules),
-  or the fully qualified class name of a custom validation rule.
+  Reference either one of [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules) or the fully qualified class name of a custom validation rule.
 
-  Validation rules that mutate the given input values are _not_ supported:
+  Validation rules that mutate the given input value are _not_ supported:
   - `exclude_if`
   - `exclude_unless`
   Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
@@ -3443,8 +3428,7 @@ Run validation on an array itself, using [Laravel built-in validation](https://l
 directive @rulesForArray(
   """
   Specify the validation rules to apply to the field.
-  This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
-  or the fully qualified class name of a custom validation rule.
+  Reference either one of [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules) or the fully qualified class name of a custom validation rule.
 
   Validation rules that mutate the given input values are _not_ supported:
   - `exclude_if`
@@ -3529,7 +3513,7 @@ scalar DateTime
 Adds a scope to the query builder.
 
 The scope method will receive the client-given value of the argument as the second parameter.
-This also works with custom query builders, it simply calls its methods with the argument value.
+This also works with custom query builders, it calls its methods with the argument value.
 """
 directive @scope(
   """
@@ -3540,8 +3524,7 @@ directive @scope(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -3584,7 +3567,8 @@ directive @search(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Requires the installation of [Laravel Scout](https://laravel.com/docs/scout) and manual registration of the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
+Requires the installation of [Laravel Scout](https://laravel.com/docs/scout).
+Register the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider` manually, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 The model `search()` method is called with the argument value.
 It uses the Scout driver you configured.
@@ -3603,7 +3587,8 @@ The [@search](#search) directive only works in combination with filter directive
 Scout is only activated if an argument annotated with [@search](#search) is present with a string value.
 Passing `null` behaves the same as leaving the argument out and falls back to a database query.
 
-When using [@convertEmptyStringsToNull](#convertemptystringstonull), nullable `String` arguments with an empty string value may be converted to `null` and therefore not activate Scout.
+With [@convertEmptyStringsToNull](#convertemptystringstonull), nullable `String` arguments with an empty string value may become `null`.
+Those do not activate Scout.
 If you need empty-string search behavior, prefer an explicit schema contract such as a dedicated search field or a non-null search argument.
 
 Normally the search will be performed using the index specified by the model's `searchableAs` method.
@@ -3623,11 +3608,11 @@ Includes the annotated element from the schema conditionally.
 """
 directive @show(
   """
-  Specify which environments include this element, e.g. ["testing"].
+  Specify which environments include this element, e.g. `["testing"]`.
   Compared against the value returned from `app()->environment()`.
   """
   env: [String!]!
-) repeatable on FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 ```
 
 See [feature toggles](../digging-deeper/feature-toggles.md).
@@ -3637,8 +3622,7 @@ See [feature toggles](../digging-deeper/feature-toggles.md).
 ```graphql
 """
 Allows to filter if trashed elements should be fetched.
-This manipulates the schema by adding the argument
-`trashed: Trashed @trashed` to the field.
+This adds the argument `trashed: Trashed @trashed` to the field.
 """
 directive @softDeletes on FIELD_DEFINITION
 ```
@@ -3665,8 +3649,7 @@ Find out how the added filter works: [@trashed](#trashed)
 
 ```graphql
 """
-Merge the fields of a nested input object into the arguments of its parent
-when processing the field arguments given by a client.
+Merge the fields of a nested input object into the arguments of its parent when processing the field arguments given by a client.
 """
 directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
@@ -3714,7 +3697,7 @@ Internally, the arguments are transformed into a flat structure before they are 
 ]
 ```
 
-Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/field-argument-directives) have been applied, e.g. validation, transformation.
+Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/field-argument-directives) have been applied, e.g. validation, transformation.
 
 ## @subscription
 
@@ -3745,7 +3728,8 @@ type Subscription {
 
 ```graphql
 """
-Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
+Limit the rate of access to the field.
+Works like the Laravel middleware `ThrottleRequests`.
 """
 directive @throttle(
   """
@@ -3786,8 +3770,7 @@ Allows to filter if trashed elements should be fetched.
 directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 The most convenient way to use this directive is through [@softDeletes](#softdeletes).
@@ -3809,6 +3792,8 @@ Remove whitespace from the beginning and end of a given input.
 This can be used on:
 - a single argument or input field to sanitize that subtree
 - a field to trim all strings
+
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
@@ -3829,14 +3814,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, add this directive to your global field middleware in `lighthouse.php`:
-
-```php
-    'field_middleware' => [
-        \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
-        ...
-    ],
-```
+The default `field_middleware` setting in `lighthouse.php` applies this directive to every field.
 
 ## @union
 
@@ -3915,8 +3893,7 @@ directive @update(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -3966,8 +3943,7 @@ directive @updateMany(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -3990,8 +3966,8 @@ input UpdatePostInput {
 
 ```graphql
 """
-Uploads given file to storage, removes the argument and sets
-the returned path to the attribute key provided.
+Upload the given file to storage and remove the argument.
+The returned path is set to the given attribute key.
 
 This does not change the schema from a client perspective.
 """
@@ -4049,14 +4025,13 @@ directive @upsert(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Lighthouse will try to fetch the model by its primary key, just like [@update](#update).
+Lighthouse will try to fetch the model by its primary key, like [@update](#update).
 If the model doesn't exist, it will be newly created with a given `id`.
 In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
@@ -4099,8 +4074,7 @@ directive @upsertMany(
 
   """
   Specify the name of the relation on the parent model.
-  This is only needed when using this directive as a nested arg
-  resolver and if the name of the relation is not the arg name.
+  Only necessary when this directive is used as a nested arg resolver and the relation is named differently from the argument.
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -4133,7 +4107,8 @@ input UpsertUserInput {
 }
 ```
 
-For `@upsertMany`, all configured identifying columns must be present with non-null values for every input item, otherwise the upsert fails with a GraphQL error.
+For `@upsertMany`, every input item must have non-null values for all configured identifying columns.
+Otherwise, the upsert fails with a GraphQL error.
 
 ## @validator
 
@@ -4145,9 +4120,8 @@ directive @validator(
   """
   The name of the class to use.
 
-  If defined on an input, this defaults to a class called `{$inputName}Validator` in the
-  default validator namespace. For fields, it uses the namespace of the parent type
-  and the field name: `{$parent}\{$field}Validator`.
+  If defined on an input, this defaults to a class called `{$inputName}Validator` in the default validator namespace.
+  For fields, it uses the namespace of the parent type and the field name: `{$parent}\{$field}Validator`.
   """
   class: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
@@ -4197,8 +4171,7 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar WhereValue
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 You can specify simple operators:
@@ -4269,8 +4242,7 @@ directive @whereAuth(
 ) on FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 The following query returns all posts that belong to the currently authenticated user.
@@ -4288,8 +4260,7 @@ type Query {
 """
 Verify that a column's value is between two values.
 
-The type of the input value this is defined upon should be
-an `input` object with two fields.
+The type of the argument or input field should be an `input` object with two fields.
 """
 directive @whereBetween(
   """
@@ -4300,8 +4271,7 @@ directive @whereBetween(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 This example defines an `input` to filter that a value is between two dates.
@@ -4343,8 +4313,7 @@ directive @whereJsonContains(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4400,8 +4369,7 @@ type Mutation {
 """
 Verify that a column's value lies outside two values.
 
-The type of the input value this is defined upon should be
-an `input` object with two fields.
+The type of the argument or input field should be an `input` object with two fields.
 """
 directive @whereNotBetween(
   """
@@ -4412,8 +4380,7 @@ directive @whereNotBetween(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4450,8 +4417,7 @@ directive @whereNotNull(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4481,8 +4447,7 @@ directive @whereNull(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4499,8 +4464,8 @@ Eager-load an Eloquent relation.
 """
 directive @with(
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
+  Specify the relationship method name in the model class.
+  Only necessary if it is named differently from the field in the schema.
   """
   relation: String
 
@@ -4520,7 +4485,7 @@ type User {
 }
 ```
 
-If you just want to return the relation as-is, see [handling Eloquent relationships](../eloquent/relationships.md).
+To return the relation as-is, see [handling Eloquent relationships](../eloquent/relationships.md).
 
 ## @withCount
 
@@ -4528,9 +4493,9 @@ If you just want to return the relation as-is, see [handling Eloquent relationsh
 """
 Eager-load the count of an Eloquent relation if the field is queried.
 
-Note that this does not return a value for the field, the count is simply
-prefetched, assuming it is used to compute the field value. Use `@count`
-if the field should simply return the relation count.
+This does not return a value for the field.
+It only prefetches the count, assuming the field value is computed from it.
+Use `@count` to return the relation count as the field value.
 """
 directive @withCount(
   """
@@ -4553,7 +4518,7 @@ type User {
 }
 ```
 
-If you just want to return the count itself as-is, use [@count](#count).
+To return the count as-is, use [@count](#count).
 
 ## @withoutGlobalScopes
 
@@ -4572,8 +4537,7 @@ directive @withoutGlobalScopes(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works when the field resolver passes its builder through
-> `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```php

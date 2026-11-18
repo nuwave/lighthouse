@@ -28,7 +28,8 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Sets rate limit to access the field. Does the same as ThrottleRequests Laravel Middleware.
+Limit the rate of access to the field.
+Works like the Laravel middleware `ThrottleRequests`.
 """
 directive @throttle(
     """
@@ -105,7 +106,7 @@ GRAPHQL;
     {
         $name = $this->directiveArgValue('name');
         if ($name !== null) {
-            // @phpstan-ignore-next-line limiter() can actually return null, some Laravel versions lie
+            // @phpstan-ignore-next-line limiter() can return null, some Laravel versions lie
             $this->limiter->limiter($name)
                 ?? throw new DefinitionException("Named limiter {$name} is not found.");
         }

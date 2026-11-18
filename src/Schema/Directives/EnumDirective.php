@@ -9,8 +9,7 @@ class EnumDirective extends BaseDirective
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Assign an internal value to an enum key.
-When dealing with the Enum type in your code,
-you will receive the defined value instead of the string key.
+Your code receives the internal value instead of the string key.
 """
 directive @enum(
   """

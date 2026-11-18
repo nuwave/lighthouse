@@ -17,15 +17,15 @@ function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolv
    For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
 3. `GraphQLContext $context`: Arbitrary data that is shared between all fields of a single query.
    Lighthouse passes in an instance of `Nuwave\Lighthouse\Schema\Context` by default.
-4. `ResolveInfo $resolveInfo`: Information about the query itself,
-   such as the execution state, the field name, path to the field from the root, and more.
+4. `ResolveInfo $resolveInfo`: Information about the query itself.
+   Includes execution state, field name, path to the field from the root, and more.
 
 The return value of this must fit the return type defined for the corresponding field from the schema.
 
 ## Root resolvers
 
-Root resolvers are classes with an `__invoke` method that sit directly in the configured
-`lighthouse.namespaces.queries` or `lighthouse.namespaces.mutations` namespaces.
+Root resolvers are classes with an `__invoke` method.
+They sit directly in the configured `lighthouse.namespaces.queries` or `lighthouse.namespaces.mutations` namespaces.
 Lighthouse calls them with positional arguments `($root, $args, $context, $resolveInfo)` where `$root` is always `null` for root types.
 
 Omitting `$root` causes Lighthouse's positional `null` to bind to `$args`, producing TypeErrors at runtime.
@@ -61,8 +61,8 @@ You can define your own complexity function with the [@complexity](../api-refere
 function (int $childrenComplexity, array $args): int
 ```
 
-1. `$childrenComplexity`: The complexity of the children of the field. In case you expect to return
-   multiple children, it can be useful to do some maths on this.
+1. `$childrenComplexity`: The complexity of the children of the field.
+   In case you expect to return multiple children, it can be useful to do some maths on this.
 2. `array $args`: The arguments that were passed into the field.
    For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`
 

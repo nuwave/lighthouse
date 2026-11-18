@@ -12,6 +12,7 @@ class TransformArgsDirective extends ArgTraversalDirective
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Transform the arguments of a field.
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @transformArgs on FIELD_DEFINITION
 GRAPHQL;

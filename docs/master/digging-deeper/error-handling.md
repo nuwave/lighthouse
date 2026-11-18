@@ -17,7 +17,8 @@ Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/erro
 
 Lighthouse will catch exceptions thrown during the execution of a query and return them as part of the response.
 
-The error handler `Nuwave\Lighthouse\Execution\ReportingErrorHandler` is included in the default configuration and reports non-client-safe errors through the default Laravel exception handler.
+The default configuration includes the error handler `Nuwave\Lighthouse\Execution\ReportingErrorHandler`.
+It reports non-client-safe errors through the default Laravel exception handler.
 
 Client-safe errors are assumed to be something that:
 
@@ -26,7 +27,7 @@ Client-safe errors are assumed to be something that:
 
 Thus, they are typically not actionable for server developers.
 
-However, you can choose to report client-safe errors by replacing `Nuwave\Lighthouse\Execution\ReportingErrorHandler` with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthouse.php` config:
+To also report client-safe errors, replace `Nuwave\Lighthouse\Execution\ReportingErrorHandler` with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthouse.php` config:
 
 ```diff
 'error_handlers' => [
@@ -39,7 +40,7 @@ However, you can choose to report client-safe errors by replacing `Nuwave\Lighth
 
 ## Additional Error Information
 
-The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php) may be implemented to add more information than just an error message to the rendered error output.
+The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php) may be implemented to add more information than an error message to the rendered error output.
 
 This custom exception contains information about the reason the exception was thrown:
 

@@ -20,6 +20,8 @@ Remove whitespace from the beginning and end of a given input.
 This can be used on:
 - a single argument or input field to sanitize that subtree
 - a field to trim all strings
+
+Lighthouse applies this to every field by default, through the `field_middleware` setting in `lighthouse.php`.
 """
 directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 GRAPHQL;

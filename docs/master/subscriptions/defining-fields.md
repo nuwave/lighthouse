@@ -17,7 +17,8 @@ php artisan lighthouse:subscription PostUpdated
 Lighthouse will look for a class matching the capitalized name of the field within the default subscription namespace.
 For example, the field `postUpdated` should have a corresponding class at `App\GraphQL\Subscriptions\PostUpdated`.
 
-All subscription field classes **must** implement the abstract class `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement the two methods `authorize` and `filter`.
+All subscription field classes **must** extend the abstract class `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+They implement the two methods `authorize` and `filter`.
 
 ```php
 namespace App\GraphQL\Subscriptions;
@@ -48,8 +49,7 @@ final class PostUpdated extends GraphQLSubscription
     {
         $user = $subscriber->context->user;
 
-        // Don't broadcast the subscription to the same
-        // person who updated the post.
+        // Don't broadcast the subscription to the same person who updated the post.
         return $root->updated_by !== $user->id;
     }
 
@@ -75,8 +75,7 @@ final class PostUpdated extends GraphQLSubscription
      */
     public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
     {
-        // Optionally manipulate the `$root` item before it gets broadcasted to
-        // subscribed client(s).
+        // Optionally manipulate the `$root` item before it gets broadcasted to subscribed client(s).
         $root->load(['author', 'author.achievements']);
 
         return $root;
@@ -84,4 +83,5 @@ final class PostUpdated extends GraphQLSubscription
 }
 ```
 
-If the default namespaces are not working with your application structure or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription) directive to point to a different class.
+If the default namespaces do not fit your application structure, or you want to be more explicit, use the [@subscription](../api-reference/directives.md#subscription) directive.
+It points to a different class.

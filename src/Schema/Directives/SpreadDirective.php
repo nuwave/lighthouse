@@ -22,8 +22,7 @@ class SpreadDirective extends BaseDirective implements FieldMiddleware, ArgManip
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Merge the fields of a nested input object into the arguments of its parent
-when processing the field arguments given by a client.
+Merge the fields of a nested input object into the arguments of its parent when processing the field arguments given by a client.
 """
 directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;

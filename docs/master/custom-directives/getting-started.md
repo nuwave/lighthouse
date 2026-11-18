@@ -13,7 +13,7 @@ The class name of a directive must follow the following pattern:
 
     <DirectiveName>Directive
 
-Let's implement a simple `@upperCase` directive as a part of this introduction.
+Let's implement an `@upperCase` directive as a part of this introduction.
 Use the artisan generator command to create it:
 
 ```shell
@@ -56,7 +56,7 @@ Depending on what your directive should do, you can pick one or more of the prov
 They serve as the point of contact to Lighthouse.
 
 In this case, our directive needs to run after the actual resolver.
-Just like [Laravel Middleware](https://laravel.com/docs/middleware), we can wrap around it by using the `FieldMiddleware` directive.
+Like [Laravel Middleware](https://laravel.com/docs/middleware), we can wrap around it by using the `FieldMiddleware` directive.
 
 ```php
 namespace App\GraphQL\Directives;
@@ -97,9 +97,8 @@ Now that we defined and implemented the directive, how can Lighthouse find it?
 When Lighthouse encounters a directive within the schema, it starts looking for a matching class in the following order:
 
 1. User-defined namespaces as configured in `config/lighthouse.php`, defaults to `App\GraphQL\Directives`
-1. The [RegisterDirectiveNamespaces](../api-reference/events.md#registerdirectivenamespaces) event is dispatched
-   to gather namespaces defined by plugins, extensions or other listeners
+1. The [RegisterDirectiveNamespaces](../api-reference/events.md#registerdirectivenamespaces) event is dispatched to gather namespaces defined by plugins, extensions or other listeners
 1. Lighthouse's built-in directive namespace
 
-This means that our directive is already registered, just by matter of defining it in the default namespace.
+This means that our directive is already registered, because it is defined in the default namespace.
 Will take precedence over potential other directives with the same name.

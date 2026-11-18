@@ -1,7 +1,7 @@
 # Lighthouse Contribution Guide
 
 Thank you for contributing to Lighthouse.
-Here are some tips and guidelines to make this easy for you.
+Here are some tips and guidelines to help you.
 
 ## Open a Pull Request
 
@@ -26,9 +26,9 @@ Before you release a new version, make sure to familiarize yourself with:
 
 To create a new release, follow these steps:
 1. Copy the `## Changelog` sections of the pull requests merged since the last release into [`CHANGELOG.md`](CHANGELOG.md), appending each pull request URL.
-Add missing entries if needed.
+   Add missing entries if needed.
 2. Based on those entries and the previous version, define the next version number.
-Add it to [`CHANGELOG.md`](CHANGELOG.md).
+   Add it to [`CHANGELOG.md`](CHANGELOG.md).
 3. [Draft a new release](https://github.com/nuwave/lighthouse/releases/new)
 4. Add the version number as both tag and title
 5. Add the changelog entries as the description

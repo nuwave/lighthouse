@@ -6,8 +6,8 @@ use Illuminate\Container\Container as Application;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 
 /**
- * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager. Purpose is
- * to serve as a base class to easily generate a manager that creates drivers with configuration options.
+ * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager.
+ * Purpose is to serve as a base class to generate a manager that creates drivers with configuration options.
  *
  * @phpstan-type CustomCreator callable(\Illuminate\Container\Container $app, array<string, mixed> $config): object
  */

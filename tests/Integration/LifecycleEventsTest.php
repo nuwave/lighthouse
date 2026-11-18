@@ -27,8 +27,7 @@ final class LifecycleEventsTest extends TestCase
 
         $eventsDispatcher->listen('*', static function (string $name, array $payload) use (&$events): void {
             if (str_starts_with($name, 'Nuwave\\Lighthouse')) {
-                // We only fire class-based events, so the payload
-                // always holds exactly a single class instance.
+                // We only fire class-based events, so the payload always holds exactly a single class instance.
                 $events[] = $payload[0];
             }
         });

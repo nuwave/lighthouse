@@ -61,7 +61,8 @@ A great way to keep up to date with your current version of Lighthouse is to add
     ],
 ```
 
-If the generated definitions conflict with those provided by your IDE, try `--omit-built-in` to avoid redefining built-in directives such as `@deprecated`.
+If the generated definitions conflict with those of your IDE, try `--omit-built-in`.
+It avoids redefining built-in directives such as `@deprecated`.
 
 ## interface
 
@@ -89,7 +90,7 @@ Compile the GraphQL schema and print the result.
 php artisan lighthouse:print-schema
 ```
 
-This can be quite useful, as the root `.graphql` files do not necessarily contain the whole schema.
+This is useful, as the root `.graphql` files do not necessarily contain the whole schema.
 Schema imports, native PHP types and schema manipulation may influence the final schema.
 
 Use the `-W` / `--write` option to output the schema to default file storage (usually `storage/app`).

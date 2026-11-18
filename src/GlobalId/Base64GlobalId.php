@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\GlobalId;
 /**
  * The default encoding of global IDs in Lighthouse.
  *
- * The way that IDs are generated basically works like this:
+ * The way that IDs are generated works like this:
  *
  * 1. Take the name of a type, e.g. "User" and an ID, e.g. 123
  * 2. Glue them together, separated by a colon, e.g. "User:123"

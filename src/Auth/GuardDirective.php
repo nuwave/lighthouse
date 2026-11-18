@@ -32,8 +32,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
 """
 Run authentication through one or more guards from `config/auth.php`.
 
-This is run per field and may allow unauthenticated
-users to still receive partial results.
+This runs per field, so unauthenticated users may still receive partial results.
 
 Used upon an object, it applies to all fields within.
 """

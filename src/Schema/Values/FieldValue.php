@@ -156,8 +156,8 @@ class FieldValue
      */
     public function finishResolver(callable $resolver): callable
     {
-        // We expect the wrapped resolvers to run in order, but nesting them causes the last
-        // applied wrapper to be run first. Thus, we reverse the wrappers before applying them.
+        // We expect the wrapped resolvers to run in order, but nesting them causes the last applied wrapper to be run first.
+        // Thus, we reverse the wrappers before applying them.
         foreach (array_reverse($this->resolverWrappers) as $wrapper) {
             $resolver = $wrapper($resolver);
         }

@@ -70,8 +70,7 @@ class ASTManipulator
 
     protected function addRootFields(DocumentAST &$documentAST): void
     {
-        // In federation, it is fine for a schema to not have a user-defined root query type,
-        // since we add two federation related fields to it here.
+        // In federation, it is fine for a schema to not have a user-defined root query type, since we add two federation related fields to it here.
         $documentAST->types[RootType::QUERY] ??= Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
 
         $queryType = $documentAST->types[RootType::QUERY];

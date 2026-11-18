@@ -13,16 +13,15 @@ class WhereHasConditionsDirective extends WhereConditionsBaseDirective
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Allows clients to filter a query based on the existence of a related model, using
-a dynamically controlled `WHERE` condition that applies to the relationship.
+Allow clients to filter a query by the existence of a related model.
+A dynamically controlled `WHERE` condition applies to the relationship.
 """
 directive @whereHasConditions(
     """
     The Eloquent relationship that the conditions will be applied to.
 
-    This argument can be omitted if the argument name follows the naming
-    convention `has{$RELATION}`. For example, if the Eloquent relationship
-    is named `posts`, the argument name must be `hasPosts`.
+    This argument can be omitted if the argument name follows the naming convention `has{$RELATION}`.
+    For example, if the Eloquent relationship is named `posts`, the argument name must be `hasPosts`.
     """
     relation: String
 
@@ -87,8 +86,7 @@ GRAPHQL;
     {
         $relationName = $this->directiveArgValue('relation');
 
-        // If the relation name is not set explicitly, we assume the argument
-        // name follows a convention and contains the relation name
+        // If the relation name is not set explicitly, we assume the argument name follows a convention and contains the relation name
         if (is_null($relationName)) {
             return lcfirst(
                 Str::after($this->nodeName(), 'has'),

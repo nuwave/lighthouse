@@ -7,8 +7,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Controls the HTTP route that your GraphQL server responds to.
-    | You may set `route` => false, to disable the default route
-    | registration and take full control.
+    | You may set `route` => false, to disable the default route registration and take full control.
     |
     */
 
@@ -34,8 +33,8 @@ return [
             // Always set the `Accept: application/json` header.
             Nuwave\Lighthouse\Http\Middleware\AcceptJson::class,
 
-            // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
-            // middleware, this delegates auth and permission checks to the field level.
+            // Logs in a user if they are authenticated.
+            // In contrast to Laravel's 'auth' middleware, this delegates auth and permission checks to the field level.
             Nuwave\Lighthouse\Http\Middleware\AttemptAuthentication::class,
 
             // Logs every incoming GraphQL query.
@@ -81,8 +80,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | A large part of schema generation consists of parsing and AST manipulation.
-    | This operation is very expensive, so it is highly recommended enabling
-    | caching of the final schema to optimize performance of large schemas.
+    | This operation is expensive, so enable caching of the final schema to optimize performance of large schemas.
     |
     */
 
@@ -182,8 +180,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Should the source location be included in the AST nodes resulting from query parsing?
-    | Setting this to `false` improves performance, but omits the key `locations` from errors,
-    | see https://spec.graphql.org/October2021/#sec-Errors.Error-result-format.
+    | Setting this to `false` improves performance, but omits the key `locations` from errors, see https://spec.graphql.org/October2021/#sec-Errors.Error-result-format.
     |
     */
 
@@ -194,9 +191,8 @@ return [
     | Namespaces
     |--------------------------------------------------------------------------
     |
-    | These are the default namespaces where Lighthouse looks for classes to
-    | extend functionality of the schema. You may pass in either a string
-    | or an array, they are tried in order and the first match is used.
+    | These are the default namespaces where Lighthouse looks for classes to extend functionality of the schema.
+    | You may pass in either a string or an array, they are tried in order and the first match is used.
     |
     */
 
@@ -236,8 +232,7 @@ return [
     | Pagination
     |--------------------------------------------------------------------------
     |
-    | Set defaults for the pagination features within Lighthouse, such as
-    | the @paginate directive, or paginated relation directives.
+    | Set defaults for the pagination features within Lighthouse, such as the @paginate directive, or paginated relation directives.
     |
     */
 
@@ -290,8 +285,8 @@ return [
     | Error Handlers
     |--------------------------------------------------------------------------
     |
-    | Register error handlers that receive the Errors that occur during execution
-    | and handle them. You may use this to log, filter or format the errors.
+    | Register error handlers that receive the Errors that occur during execution and handle them.
+    | You may use this to log, filter or format the errors.
     | The classes must implement \Nuwave\Lighthouse\Execution\ErrorHandler
     |
     */
@@ -342,8 +337,7 @@ return [
     | Persisted Queries
     |--------------------------------------------------------------------------
     |
-    | Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
-    | [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
+    | Lighthouse supports Automatic Persisted Queries (APQ), compatible with the [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
     | You may set this flag to either process or deny these queries.
     |
     */
@@ -355,10 +349,8 @@ return [
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | If set to true, the execution of built-in directives that mutate models
-    | will be wrapped in a transaction to ensure atomicity.
-    | The transaction is committed after the root field resolves,
-    | thus errors in nested fields do not cause a rollback.
+    | If set to true, the execution of built-in directives that mutate models will be wrapped in a transaction to ensure atomicity.
+    | The transaction is committed after the root field resolves, thus errors in nested fields do not cause a rollback.
     |
     */
 
@@ -369,9 +361,8 @@ return [
     | Mass Assignment Protection
     |--------------------------------------------------------------------------
     |
-    | If set to true, mutations will use forceFill() over fill() when populating
-    | a model with arguments in mutation directives. Since GraphQL constrains
-    | allowed inputs by design, mass assignment protection is not needed.
+    | If set to true, mutations will use forceFill() over fill() when populating a model with arguments in mutation directives.
+    | Since GraphQL constrains allowed inputs by design, mass assignment protection is not needed.
     |
     */
 
@@ -382,8 +373,7 @@ return [
     | Batchload Relations
     |--------------------------------------------------------------------------
     |
-    | If set to true, relations marked with directives like @hasMany or @belongsTo
-    | will be optimized by combining the queries through the BatchLoader.
+    | If set to true, relations marked with directives like @hasMany or @belongsTo will be optimized by combining the queries through the BatchLoader.
     |
     */
 
@@ -394,9 +384,8 @@ return [
     | Shortcut Foreign Key Selection
     |--------------------------------------------------------------------------
     |
-    | If set to true, Lighthouse will shortcut queries where the client selects only the
-    | foreign key pointing to a related model. Only works if the related model's primary
-    | key field is called exactly `id` for every type in your schema.
+    | If set to true, Lighthouse will shortcut queries where the client selects only the foreign key pointing to a related model.
+    | Only works if the related model's primary key field is called exactly `id` for every type in your schema.
     |
     */
 
@@ -407,8 +396,7 @@ return [
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
-    | Here you can define GraphQL subscription broadcaster and storage drivers
-    | as well their required configuration options.
+    | Here you can define GraphQL subscription broadcaster and storage drivers as well their required configuration options.
     |
     */
 
@@ -434,8 +422,8 @@ return [
          * Default subscription storage time to live in seconds.
          *
          * Indicates how long a subscription can stay active before automatic removal from storage.
-         * Setting this to `null` means the subscriptions are stored forever. This may cause
-         * stale subscriptions to linger indefinitely in case cleanup fails for any reason.
+         * Setting this to `null` means the subscriptions are stored forever.
+         * This may cause stale subscriptions to linger indefinitely in case cleanup fails for any reason.
          */
         'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
 

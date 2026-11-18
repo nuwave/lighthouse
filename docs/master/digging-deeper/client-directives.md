@@ -18,8 +18,7 @@ Allows for conditional exclusion during execution as described by the `if` argum
 ```graphql
 directive @skip(
   """
-  If the value passed into the if field is true the field this
-  is decorating will not be included in the query response.
+  If the value passed into the if field is true the field this is decorating will not be included in the query response.
   """
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
@@ -94,7 +93,8 @@ The following example illustrates how a field `foo` can be referenced three time
 }
 ```
 
-You can get all arguments for every node that is referencing the field you are currently resolving, passing the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature):
+You can get all arguments for every node that references the field you are resolving.
+Pass the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature):
 
 ```php
 $arguments = $clientDirective->forField($resolveInfo);

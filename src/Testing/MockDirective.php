@@ -17,7 +17,7 @@ class MockDirective extends BaseDirective implements FieldResolver
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Allows you to easily hook up a resolver for an endpoint.
+Resolve the field with a mock resolver registered in the test, see `MocksResolvers`.
 """
 directive @mock(
     """
