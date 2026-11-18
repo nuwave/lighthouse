@@ -3,13 +3,16 @@
 namespace Tests\Integration\Federation;
 
 use GraphQL\Type\Definition\UnionType;
+use Nuwave\Lighthouse\Console\PrintSchemaCommand;
+use Nuwave\Lighthouse\Federation\FederationPrinter;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
+use Nuwave\Lighthouse\Schema\Validator;
 use Tests\TestCase;
 
 final class FederationSchemaTest extends TestCase
 {
     private const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
-        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.12", import: ["@authenticated", "@cacheTag", "@composeDirective", "@context", "@cost", "@extends", "@external", "@fromContext", "@inaccessible", "@interfaceObject", "@key", "@listSize", "@override", "@policy", "@provides", "@requires", "@requiresScopes", "@shareable", "@tag"])
         GRAPHQL;
 
     protected function getPackageProviders($app): array
@@ -91,7 +94,7 @@ final class FederationSchemaTest extends TestCase
     public function testServiceQueryShouldReturnFederationV2SchemaExtension(): void
     {
         $schemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
-        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.12", import: ["@authenticated", "@cacheTag", "@composeDirective", "@context", "@cost", "@extends", "@external", "@fromContext", "@inaccessible", "@interfaceObject", "@key", "@listSize", "@override", "@policy", "@provides", "@requires", "@requiresScopes", "@shareable", "@tag"])
         GRAPHQL;
 
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -111,7 +114,7 @@ final class FederationSchemaTest extends TestCase
     public function testServiceQueryShouldReturnFederationV2ComposedDirectives(): void
     {
         $schemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
-        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective"]) @link(url: "https://myspecs.dev/myCustomDirective/v1.0", import: ["@foo", "@bar"]) @composeDirective(name: "@foo") @composeDirective(name: "@bar")
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.12", import: ["@composeDirective"]) @link(url: "https://myspecs.dev/myCustomDirective/v1.0", import: ["@foo", "@bar"]) @composeDirective(name: "@foo") @composeDirective(name: "@bar")
         GRAPHQL;
 
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -132,7 +135,7 @@ final class FederationSchemaTest extends TestCase
 
     public function testPaginationTypesAreNotMarkedAsSharableWhenUsingFederationV1(): void
     {
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User @key(fields: "id") {
             id: ID!
         }
@@ -154,7 +157,7 @@ final class FederationSchemaTest extends TestCase
 
     public function testPaginationTypesAreMarkedAsSharableWhenUsingFederationV2(): void
     {
-        $schema = /** @lang GraphQL */ <<<GRAPHQL
+        $schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User @key(fields: "id") {
             id: ID!
         }
@@ -173,6 +176,91 @@ final class FederationSchemaTest extends TestCase
         $this->assertStringContainsString('type PaginatorInfo @shareable {', $sdl);
         $this->assertStringContainsString('type PageInfo @shareable {', $sdl);
         $this->assertStringContainsString('type SimplePaginatorInfo @shareable {', $sdl);
+    }
+
+    public function testServiceAndCommandPreserveFederationDirectivesAtAllSchemaLocations(): void
+    {
+        $types = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Product implements Node @key(fields: "id") @authenticated @requiresScopes(scopes: [["read:products", "read:details"], ["admin"]]) @policy(policies: [["public"], ["staff", "active"]]) @context(name: "product") @context(name: "otherProduct") @cost(weight: 10) @cacheTag(format: "product-{$key.id}") @cacheTag(format: "products") {
+          id: ID!
+          name: String @authenticated @requiresScopes(scopes: [["read:products"]]) @policy(policies: [["public"]]) @cost(weight: 5) @override(from: "catalog", label: "percent(10)")
+          related(currency: String = "USD" @fromContext(field: "$product { name }") @cost(weight: 2), first: Int): [Product!]! @listSize(assumedSize: 10, slicingArguments: ["first"], requireOneSlicingArgument: false)
+          currency: Currency
+        }
+
+        type ProductConnection {
+          nodes: [Product!]!
+        }
+
+        interface Node @context(name: "node") {
+          id: ID!
+        }
+
+        union Result @context(name: "result") = Product
+
+        enum Currency @authenticated @requiresScopes(scopes: [["read:currency"]]) @policy(policies: [["currency"]]) @cost(weight: 1) {
+          USD @tag(name: "default")
+        }
+
+        input ProductFilter @tag(name: "filter") {
+          name: String @cost(weight: 3) @tag(name: "filter-name")
+        }
+
+        type Query @authenticated @cost(weight: 1) @cacheTag(format: "catalog") {
+          products(filter: ProductFilter, first: Int @cost(weight: 1)): [Product!]! @listSize(slicingArguments: ["first"]) @cacheTag(format: "products") @cacheTag(format: "catalog-products") @mock
+          results: [Result!]! @listSize(assumedSize: 5) @mock
+          page(first: Int): ProductConnection @listSize(slicingArguments: ["first"], sizedFields: ["nodes"]) @mock
+          date: Date @mock
+        }
+        GRAPHQL;
+
+        $scalar = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar Date @authenticated @requiresScopes(scopes: [["read:date"]]) @policy(policies: [["date"]]) @cost(weight: 1)
+        GRAPHQL;
+        $scalarImplementation = /** @lang GraphQL */ <<<'GRAPHQL'
+        @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+        GRAPHQL;
+
+        $schemaExtension = self::FEDERATION_V2_SCHEMA_EXTENSION . ' @tag(name: "catalog")';
+        $this->schema = $schemaExtension . $types . $scalar . $scalarImplementation;
+
+        $serviceSdl = $this->_serviceSdl();
+        $tester = $this->commandTester(new PrintSchemaCommand());
+        $tester->execute(['--federation' => true]);
+
+        foreach ([$serviceSdl, $tester->getDisplay()] as $sdl) {
+            $this->assertSdlContainsString($schemaExtension, $sdl);
+            foreach (explode("\n\n", $types) as $type) {
+                $this->assertStringContainsString(str_replace(' @mock', '', $type), $sdl);
+            }
+
+            $this->assertStringContainsString($scalar, $sdl);
+            $this->assertStringNotContainsString('@scalar', $sdl);
+            foreach (FederationPrinter::FEDERATION_DIRECTIVES as $directive) {
+                $this->assertStringNotContainsString("directive @{$directive}", $sdl);
+            }
+        }
+
+        $this->app->make(Validator::class)->validate();
+    }
+
+    public function testPreservesDirectivesOnDescribedArguments(): void
+    {
+        $this->schema = self::FEDERATION_V2_SCHEMA_EXTENSION . /** @lang GraphQL */ <<<'GRAPHQL'
+        type Product @key(fields: "id") @context(name: "product") @shareable @shareable {
+          id: ID!
+          name(
+            """The contextual name."""
+            name: String = "default" @fromContext(field: "$product { id }") @cost(weight: 2)
+          ): String
+        }
+        GRAPHQL;
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString('"The contextual name."', $sdl);
+        $this->assertStringContainsString('name: String = "default" @fromContext(field: "$product { id }") @cost(weight: 2)', $sdl);
+        $this->assertStringContainsString('@shareable @shareable', $sdl);
     }
 
     private function _serviceSdl(): string
