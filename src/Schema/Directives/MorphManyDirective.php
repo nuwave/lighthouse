@@ -44,6 +44,13 @@ directive @morphMany(
   maxCount: Int
 
   """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
+
+  """
   Specify a custom type that implements the Edge interface
   to extend edge object.
   Only applies when using Relay style "connection" pagination.

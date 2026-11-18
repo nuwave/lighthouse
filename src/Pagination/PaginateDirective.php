@@ -78,6 +78,13 @@ directive @paginate(
   maxCount: Int
 
   """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
+
+  """
   Reference a function to customize the complexity score calculation.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
@@ -131,6 +138,7 @@ GRAPHQL;
             $parentType,
             $this->defaultCount(),
             $this->paginateMaxCount(),
+            allowUnlimited: $this->allowUnlimited(),
         );
     }
 
@@ -195,6 +203,13 @@ GRAPHQL;
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount', config('lighthouse.pagination.max_count'));
+    }
+
+    protected function allowUnlimited(): bool
+    {
+        return $this->directiveArgValue('allowUnlimited')
+            ?? config('lighthouse.pagination.allow_unlimited')
+            ?? false;
     }
 
     public function complexityResolver(FieldValue $fieldValue): callable

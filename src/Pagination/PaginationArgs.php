@@ -7,6 +7,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator as SimplePaginator;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Cache\CacheDirective;
@@ -17,7 +19,8 @@ class PaginationArgs
 {
     public function __construct(
         public int $page,
-        public int $first,
+        /** Null means all items are requested, see `allowUnlimited` of pagination directives. */
+        public ?int $first,
         public PaginationType $type,
     ) {}
 
@@ -28,7 +31,18 @@ class PaginationArgs
      */
     public static function extractArgs(array $args, ResolveInfo $resolveInfo, PaginationType $proposedPaginationType, ?int $paginateMaxCount): self
     {
-        $first = $args['first'];
+        // Absent if unlimited results are allowed and no default count is set
+        $first = $args['first'] ?? null;
+
+        if ($first === null) {
+            // The schema prevents this, unless it is cached and the configuration changed since
+            if ($paginateMaxCount !== null) {
+                throw new Error(self::requestedUnlimitedItems($paginateMaxCount));
+            }
+
+            // All items fit on the first page, so the requested page or cursor is irrelevant
+            return new static(1, null, self::optimalPaginationType($proposedPaginationType, $resolveInfo));
+        }
 
         $page = $proposedPaginationType->isConnection()
             ? self::calculateCurrentPage(
@@ -63,6 +77,11 @@ class PaginationArgs
     public static function requestedTooManyItems(int $maxCount, int $actualCount): string
     {
         return "Maximum number of {$maxCount} requested items exceeded, got {$actualCount}. Fetch smaller chunks.";
+    }
+
+    public static function requestedUnlimitedItems(int $maxCount): string
+    {
+        return "Maximum number of {$maxCount} requested items exceeded, got unlimited. Fetch smaller chunks.";
     }
 
     /** Calculate the current page to inform the user about the pagination state. */
@@ -110,6 +129,21 @@ class PaginationArgs
      */
     public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): Paginator
     {
+        if ($this->first === null) {
+            // Just like with @all, search engines may limit the results of Laravel\Scout\Builder
+            $items = $builder->get();
+            $total = $items->count();
+
+            // Paginators require a positive amount of items per page
+            $perPage = max(1, $total);
+
+            if ($this->type->isSimple()) {
+                return new SimplePaginator($items, $perPage, $this->page); // @phpstan-ignore return.type (generic type does not matter)
+            }
+
+            return new LengthAwarePaginator($items, $total, $perPage, $this->page); // @phpstan-ignore return.type (generic type does not matter)
+        }
+
         if ($this->first === 0) {
             if ($this->type->isSimple()) {
                 return new ZeroPerPagePaginator($this->page); // @phpstan-ignore return.type (generic type does not matter)

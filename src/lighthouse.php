@@ -253,6 +253,12 @@ return [
          * Setting this to `null` means the count is unrestricted.
          */
         'max_count' => null,
+
+        /*
+         * Allow clients to fetch all items of paginated lists at once by passing `first: null`.
+         * Requires `max_count` to be `null`, unless fields overrule it with `maxCount: null`.
+         */
+        'allow_unlimited' => false,
     ],
 
     /*
