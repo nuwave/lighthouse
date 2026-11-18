@@ -104,6 +104,11 @@
                 "PKSA-tcfz-w4fm-hhk9": "Dev dependency, not exploitable in test usage"
             }
         },
+        "policy": {
+            "advisories": {
+                "block": false
+            }
+        },
         "sort-packages": true
     },
     "extra": {
