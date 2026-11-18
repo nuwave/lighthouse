@@ -5,6 +5,7 @@ namespace Benchmarks;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Tally\Attribute\Before;
+use Tally\Attribute\Expected;
 use Tally\Attribute\Warmup;
 
 #[Warmup(1)]
@@ -46,11 +47,13 @@ final class ASTUnserializationBench
         );
     }
 
+    #[Expected(instructions: '182.7K', cycles: '205.5K', memory: '60.82KiB')]
     public function benchUnserializeDocumentNode(): void
     {
         unserialize($this->documentNode);
     }
 
+    #[Expected(instructions: '66.69K', cycles: '78.37K', memory: '31.62KiB')]
     public function benchUnserializeDocumentAST(): void
     {
         unserialize($this->documentAST);
