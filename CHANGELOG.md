@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
+## v6.74.1
+
+### Fixed
+
+- Support all versions of `webonyx/graphql-php` ^15 again https://github.com/nuwave/lighthouse/pull/2815
+
 ## v6.74.0
 
 ### Added
