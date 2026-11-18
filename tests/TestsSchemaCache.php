@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 
 trait TestsSchemaCache
 {
@@ -23,5 +24,7 @@ trait TestsSchemaCache
     {
         $filesystem = $this->app->make(Filesystem::class);
         $filesystem->delete($this->schemaCachePath());
+
+        ASTCache::forgetLoaded();
     }
 }

@@ -16,6 +16,17 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 class ASTCache
 {
+    /**
+     * Schema cache file contents, kept for the lifetime of the PHP process.
+     *
+     * Long-running workers such as Laravel Octane resolve a fresh ASTBuilder for each request.
+     * Requiring the cache file each time would compile it and allocate the whole array again
+     * when OPcache is not enabled for the worker, see https://github.com/nuwave/lighthouse/issues/2436.
+     *
+     * @var array<string, array{fingerprint: string, astArray: array<mixed>}>
+     */
+    protected static array $loaded = [];
+
     protected bool $enable;
 
     protected string $path;
@@ -49,18 +60,25 @@ class ASTCache
         $contents = /** @lang PHP */ "<?php return {$variable};";
 
         Utils::atomicPut(filesystem: $this->filesystem, path: $this->path(), contents: $contents);
+        unset(static::$loaded[$this->path()]);
     }
 
     public function clear(): void
     {
         $this->filesystem->delete($this->path());
+        unset(static::$loaded[$this->path()]);
+    }
+
+    /** Forget all schema cache file contents kept in memory, the files on disk are not affected. */
+    public static function forgetLoaded(): void
+    {
+        static::$loaded = [];
     }
 
     /** @param  callable(): DocumentAST  $build */
     public function fromCacheOrBuild(callable $build): DocumentAST
     {
-        $path = $this->path();
-        $astArray = Utils::requireArrayOrForget($this->filesystem, $path);
+        $astArray = $this->load($this->path());
         if ($astArray !== null) {
             /** @var SerializableDocumentAST $astArray */
 
@@ -71,5 +89,60 @@ class ASTCache
         $this->set($documentAST);
 
         return $documentAST;
+    }
+
+    /**
+     * Load the cache file contents, reusing them from memory while the file is unchanged.
+     *
+     * @return array<mixed>|null
+     */
+    protected function load(string $path): ?array
+    {
+        $fingerprint = $this->fingerprint($path);
+        if ($fingerprint === null) {
+            unset(static::$loaded[$path]);
+
+            return null;
+        }
+
+        $loaded = static::$loaded[$path] ?? null;
+        if ($loaded !== null && $loaded['fingerprint'] === $fingerprint) {
+            return $loaded['astArray'];
+        }
+
+        // OPcache may still hold a previous version of the file within opcache.revalidate_freq,
+        // which would then be kept in memory under the fingerprint of the new file
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, force: $loaded !== null);
+        }
+
+        $astArray = Utils::requireArrayOrForget($this->filesystem, $path);
+        if ($astArray === null) {
+            unset(static::$loaded[$path]);
+
+            return null;
+        }
+
+        static::$loaded[$path] = [
+            'fingerprint' => $fingerprint,
+            'astArray' => $astArray,
+        ];
+
+        return $astArray;
+    }
+
+    /** Identifies a version of the cache file without reading it, null if it does not exist. */
+    protected function fingerprint(string $path): ?string
+    {
+        clearstatcache(true, $path);
+
+        // Suppress the warning when the file does not exist, null is returned for that case
+        $stat = @stat($path);
+        if ($stat === false) {
+            return null;
+        }
+
+        // Files are replaced atomically by moving a new file into place, which changes the inode
+        return "{$stat['ino']}-{$stat['mtime']}-{$stat['size']}";
     }
 }
