@@ -38,7 +38,6 @@ GRAPHQL;
                 $root,
                 $args,
                 $context,
-                $resolveInfo,
             )
             ->get();
         foreach ($models as $model) {
