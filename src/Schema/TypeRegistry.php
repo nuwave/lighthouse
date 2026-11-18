@@ -246,7 +246,7 @@ class TypeRegistry
     public function scalarOverrides(): array
     {
         $overrides = [];
-        foreach (Type::BUILT_IN_SCALAR_NAMES as $name) {
+        foreach ([Type::INT, Type::FLOAT, Type::STRING, Type::BOOLEAN, Type::ID] as $name) {
             if (
                 isset($this->types[$name])
                 || isset($this->documentAST->types[$name])
