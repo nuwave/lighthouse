@@ -39,6 +39,15 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 class TypeRegistry
 {
+    // TODO use Type::BUILT_IN_SCALAR_NAMES once webonyx/graphql-php ^15.31 is required
+    protected const BUILT_IN_SCALAR_NAMES = [
+        Type::INT,
+        Type::FLOAT,
+        Type::STRING,
+        Type::BOOLEAN,
+        Type::ID,
+    ];
+
     /** Lazily initialized. */
     protected FieldFactory $fieldFactory;
 
@@ -246,7 +255,7 @@ class TypeRegistry
     public function scalarOverrides(): array
     {
         $overrides = [];
-        foreach (Type::BUILT_IN_SCALAR_NAMES as $name) {
+        foreach (self::BUILT_IN_SCALAR_NAMES as $name) {
             if (
                 isset($this->types[$name])
                 || isset($this->documentAST->types[$name])

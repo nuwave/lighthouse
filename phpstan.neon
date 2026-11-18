@@ -52,6 +52,10 @@ parameters:
   # Relation forwards calls to Builder
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
 
+  # webonyx/graphql-php < 15.14.1 types DocumentValidator::validate() as array instead of list
+  - path: src/GraphQL.php
+    message: '#Method Nuwave\\Lighthouse\\GraphQL::validateCacheableRules\(\) should return list<GraphQL\\Error\\Error> but returns (non-empty-)?array<int, GraphQL\\Error\\Error>\.#'
+
   # Laravel changes its generics arity between major versions
   - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
   - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'

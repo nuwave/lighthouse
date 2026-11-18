@@ -86,9 +86,13 @@ class FederationPrinter
             : null;
         $config->setQuery($newQueryType);
 
-        $config->setMutation(Arr::pull($types, RootType::MUTATION));
+        $mutationType = Arr::pull($types, RootType::MUTATION);
+        assert($mutationType === null || $mutationType instanceof ObjectType);
+        $config->setMutation($mutationType);
 
-        $config->setSubscription(Arr::pull($types, RootType::SUBSCRIPTION));
+        $subscriptionType = Arr::pull($types, RootType::SUBSCRIPTION);
+        assert($subscriptionType === null || $subscriptionType instanceof ObjectType);
+        $config->setSubscription($subscriptionType);
 
         $config->setTypes($types);
 
