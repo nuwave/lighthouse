@@ -73,7 +73,7 @@ jobs:
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: composer remove --dev --no-update phpbench/phpbench rector/rector
+        run: composer remove --dev --no-update rector/rector
 
       - name: "Remove Pennant for Laravel 9 because it is not compatible"
         if: matrix.laravel-version == '^9'
@@ -130,7 +130,7 @@ jobs:
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: composer remove --dev --no-update phpstan/phpstan-mockery phpbench/phpbench
+        run: composer remove --dev --no-update phpstan/phpstan-mockery
 
       - name: "Remove Pennant for Laravel 9 because it is not compatible"
         if: matrix.laravel-version == '^9'
@@ -181,8 +181,6 @@ jobs:
           path: ~/.composer/cache
           key: php-8.5-composer-^13
 
-      - run: composer remove --dev phpbench/phpbench --no-update
-
       - run: composer require laravel/framework:^13 --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
@@ -191,25 +189,3 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-  benchmarks:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.5"
-          coverage: none
-          extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
-
-      - name: "Cache composer dependencies"
-        uses: actions/cache@v6
-        with:
-          path: ~/.composer/cache
-          key: php-8.5-composer-^13
-
-      - run: composer require laravel/framework:^13 --no-interaction --prefer-dist --no-progress
-
-      - run: vendor/bin/phpbench run --progress=none --report=aggregate

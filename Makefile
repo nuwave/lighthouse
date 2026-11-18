@@ -14,7 +14,7 @@ build: ## Build the local Docker containers
 	docker compose build --pull --build-arg="USER_ID=$(shell id -u)" --build-arg="GROUP_ID=$(shell id -g)"
 
 .PHONY: fix
-fix: rector php-cs-fixer prettier ## Automatically refactor and format code
+fix: rector rector-benchmarks php-cs-fixer prettier ## Automatically refactor and format code
 
 .PHONY: rector
 rector: ## Refactor code with Rector
@@ -29,16 +29,45 @@ prettier: ## Format code with prettier
 	docker compose run --rm node-docs yarn run prettify
 
 .PHONY: stan
-stan: ## Run static analysis with PHPStan
+stan: stan-benchmarks ## Run static analysis with PHPStan
 	docker compose run --rm --no-deps php vendor/bin/phpstan --verbose
 
 .PHONY: test
 test: ## Run tests with PHPUnit
 	docker compose run --rm php vendor/bin/phpunit
 
+ifdef GITHUB_ACTIONS
+benchmarks-github-actions=--env=GITHUB_ACTIONS --env=GITHUB_WORKSPACE=/app --env=GITHUB_STEP_SUMMARY --volume="$(GITHUB_STEP_SUMMARY):$(GITHUB_STEP_SUMMARY)"
+endif
+run-benchmarks=docker build --quiet --tag=lighthouse-benchmarks benchmarks > /dev/null && docker run --rm --volume="$(CURDIR):/app" --user="$(shell id -u):$(shell id -g)" --env=COMPOSER_HOME=/tmp/composer $(benchmarks-github-actions) lighthouse-benchmarks
+
+benchmarks/vendor: benchmarks/composer.json benchmarks/composer.lock
+	$(run-benchmarks) composer validate --no-check-publish
+	$(run-benchmarks) composer install
+	touch benchmarks/vendor
+
 .PHONY: bench
-bench: ## Run benchmarks with PHPBench
-	docker compose run --rm php vendor/bin/phpbench run --report=aggregate
+bench: benchmarks/vendor ## Count benchmark instructions with Tally
+	$(run-benchmarks) vendor/bin/tally run --output=tally-results
+
+.PHONY: bench-update
+bench-update: ## Update the dependencies the benchmarks are counted with
+	$(run-benchmarks) composer update
+
+.PHONY: bench-accept
+bench-accept: benchmarks/vendor ## Accept the counts of the CI run RUN as expected
+	$(if $(RUN),,$(error Pass the ID of the CI run, e.g. make bench-accept RUN=123))
+	rm -rf benchmarks/tally-results
+	gh run download $(RUN) --repo=nuwave/lighthouse --name=tally-results --dir=benchmarks/tally-results
+	$(run-benchmarks) vendor/bin/tally accept tally-results
+
+.PHONY: stan-benchmarks
+stan-benchmarks: benchmarks/vendor ## Run static analysis on the benchmarks with PHPStan
+	$(run-benchmarks) vendor/bin/phpstan
+
+.PHONY: rector-benchmarks
+rector-benchmarks: benchmarks/vendor ## Refactor the benchmarks with Rector
+	$(run-benchmarks) vendor/bin/rector process
 
 vendor: composer.json ## Install composer dependencies
 	docker compose run --rm --no-deps php composer update

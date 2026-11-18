@@ -362,8 +362,24 @@ You can use the following two case-sensitive regexes to search for violations:
 
 ## Benchmarks
 
-We use [phpbench](https://github.com/phpbench/phpbench) for running benchmarks on performance-critical pieces of code.
+We benchmark performance critical code in the [benchmark suite](benchmarks) with [Tally](https://github.com/phpstan/tally).
+Tally counts the instructions, cycles and memory of each benchmark under a CPU simulation, so the numbers do not depend on the speed of the machine.
+The expected numbers are committed in `#[Expected]` attributes, and CI fails when a benchmark gets slower.
 
-Run the reports that are defined in `phpbench.json` via the command line:
+Tally needs a newer PHP than this library supports, so it runs in Docker with its own Composer project in `benchmarks`.
+
+Count the benchmarks:
 
     make bench
+
+Counts can differ between machines.
+When a benchmark gets faster, or slower on purpose, accept the numbers of the CI run with [gh](https://cli.github.com) and commit them.
+The run ID is in the URL of the CI run:
+
+    make bench-accept RUN=<run-id>
+
+Use `make bench-accept` instead of the accept command in the CI job summary, which assumes Tally runs outside Docker.
+
+The benchmarks count with the dependency versions locked in `benchmarks/composer.lock`, so upstream releases do not move the numbers.
+To count with current versions, run `make bench-update`, push the new lock and accept the numbers of that CI run.
+The PHP image in `benchmarks/Dockerfile` is pinned by digest and updated by hand the same way.

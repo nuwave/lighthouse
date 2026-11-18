@@ -4,6 +4,7 @@ namespace Benchmarks;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 /**
@@ -23,6 +24,8 @@ final class BenchmarkTestCase extends TestCase
      * @param  array<string, mixed>  $extraParams
      * @param  array<string, mixed>  $headers
      * @param  array<string, string>  $routeParams
+     *
+     * @return TestResponse<Response>
      */
     public function graphql(
         string $query,
