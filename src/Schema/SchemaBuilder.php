@@ -40,29 +40,16 @@ class SchemaBuilder
 
         $this->typeRegistry->setDocumentAST($documentAST);
 
-        // Always set Query since it is required
-        $query = $this->typeRegistry->get(RootType::QUERY);
-        assert($query instanceof ObjectType);
-        $config->setQuery($query);
-
-        // Mutation and Subscription are optional, so only add them
-        // if they are present in the schema
-        if (isset($documentAST->types[RootType::MUTATION])) {
-            $mutation = $this->typeRegistry->get(RootType::MUTATION);
-            assert($mutation instanceof ObjectType);
-            $config->setMutation($mutation);
-        }
-
-        if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
-            $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
-            assert($subscription instanceof ObjectType);
-            $config->setSubscription($subscription);
-        }
-
         // Use lazy type loading to prevent unnecessary work
-        $config->setTypeLoader(
-            fn (string $name): ?Type => $this->typeRegistry->search($name),
-        );
+        $config->setQuery(function (): ObjectType {
+            $query = $this->typeRegistry->get(RootType::QUERY);
+            assert($query instanceof ObjectType, 'The schema validates the root query type is an object type.');
+
+            return $query;
+        });
+        $config->setMutation(fn (): ?ObjectType => $this->searchObjectType(RootType::MUTATION));
+        $config->setSubscription(fn (): ?ObjectType => $this->searchObjectType(RootType::SUBSCRIPTION));
+        $config->setTypeLoader(fn (string $name): ?Type => $this->typeRegistry->search($name));
 
         // Enables introspection to list all types in the schema
         $config->setTypes(
@@ -95,5 +82,13 @@ class SchemaBuilder
         $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
+    }
+
+    protected function searchObjectType(string $name): ?ObjectType
+    {
+        $type = $this->typeRegistry->search($name);
+        assert($type === null || $type instanceof ObjectType, 'The schema validates root types are object types.');
+
+        return $type;
     }
 }
