@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -55,6 +56,57 @@ final class WithCountDirectiveTest extends DBTestCase
                 ],
             ]);
         });
+    }
+
+    public function testEagerLoadsRelationCountOntoEveryInstanceOfTheSameModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            role: Role @first
+        }
+
+        type Role {
+            users: [User!]! @belongsToMany
+        }
+
+        type User {
+            tasksCountLoaded: Boolean!
+                @withCount(relation: "tasks")
+                @method
+        }
+        GRAPHQL;
+
+        $role = factory(Role::class)->create();
+        $this->assertInstanceOf(Role::class, $role);
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $role->users()->attach($user, ['meta' => 'first']);
+        $role->users()->attach($user, ['meta' => 'second']);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            role {
+                users {
+                    tasksCountLoaded
+                }
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'role' => [
+                    'users' => [
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testFailsToEagerLoadRelationCountWithoutRelation(): void
