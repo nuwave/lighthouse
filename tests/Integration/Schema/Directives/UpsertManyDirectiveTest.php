@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Arguments\ParentRelationScope;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -534,5 +535,53 @@ GRAPHQL;
         $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
 
         return $typeRegistry->get('Admin');
+    }
+
+    public function testNestedUpsertManyWithoutRelationFailsWhenScopedToParent(): void
+    {
+        config(['lighthouse.nested_mutations_scope_to_parent' => true]);
+
+        $user = factory(User::class)->create();
+        $otherUsersTask = factory(Task::class)->make();
+        $otherUsersTask->name = 'original';
+        $otherUsersTask->user()->associate(factory(User::class)->create());
+        $otherUsersTask->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type User {
+            id: Int
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsertMany(relation: "tasks")
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!, $taskID: Int!) {
+            updateUser(input: {
+                id: $userID
+                tasks: [{ id: $taskID, name: "hacked" }]
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'userID' => $user->id,
+            'taskID' => $otherUsersTask->id,
+        ])->assertGraphQLErrorMessage(ParentRelationScope::unrelatedModel([$otherUsersTask->id]));
+
+        $otherUsersTask->refresh();
+        $this->assertSame('original', $otherUsersTask->name);
     }
 }

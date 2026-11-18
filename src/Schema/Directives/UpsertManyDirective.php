@@ -52,6 +52,7 @@ GRAPHQL;
         return new UpsertModel(
             new SaveModel($parentRelation),
             $this->directiveArgValue('identifyingColumns'),
+            $parentRelation,
         );
     }
 

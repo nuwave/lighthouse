@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToMany implements ArgResolver
@@ -30,7 +31,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation), $relation));
 
             foreach ($args->arguments['update']->value as $childArgs) {
                 $updateModel($relation->make(), $childArgs);
@@ -38,7 +39,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation), parentRelation: $relation));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
                 $upsertModel($relation->make(), $childArgs);
@@ -57,13 +58,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('disconnect')) {
-            $children = $relation
-                ->make()
-                ->whereIn(
-                    $relation->make()->getKeyName(),
-                    $args->arguments['disconnect']->value,
-                )
-                ->get();
+            $children = ParentRelationScope::findMany($relation, $args->arguments['disconnect']->value);
             foreach ($children as $child) {
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
@@ -71,9 +66,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('delete')) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain(),
-            );
+            ParentRelationScope::delete($relation, Arr::wrap($args->arguments['delete']->toPlain()));
         }
     }
 }

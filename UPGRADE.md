@@ -9,6 +9,13 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ## v6 to v7
 
+### Nested mutations only act on related models
+
+The config option `nested_mutations_scope_to_parent` was removed.
+Nested mutations now always scope to the parent.
+The nested operations `delete`, `disconnect`, `update` and `upsert` throw an error when given the ID of a model that is not related to the parent.
+To move a model to another parent, use `connect`.
+
 ### Leverage automatic test trait setup
 
 Methods you need to explicitly call to set up test traits were removed in favor of automatic setup.
