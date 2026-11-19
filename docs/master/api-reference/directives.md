@@ -2385,6 +2385,74 @@ type Post @model(class: "\\App\\BlogPost") {
 }
 ```
 
+## @morphedByMany
+
+```graphql
+"""
+Corresponds to the inverse side of [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.com/docs/eloquent-relationships#many-to-many-polymorphic-relations),
+defined through `morphedByMany()`.
+"""
+directive @morphedByMany(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
+  Allows to resolve the relation as a paginated list.
+  """
+  type: MorphedByManyType
+
+  """
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
+  """
+  defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
+  """
+  maxCount: Int
+
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
+) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@morphedByMany`.
+"""
+enum MorphedByManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Offset-based pagination like Laravel "Simple Pagination".
+  It does not count the total number of records.
+  """
+  SIMPLE
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
+```
+
 ## @morphMany
 
 ```graphql
