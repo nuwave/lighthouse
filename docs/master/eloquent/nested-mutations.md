@@ -763,3 +763,7 @@ It is also possible to use the `sync` and `syncWithoutDetaching` operations.
 ## MorphToMany
 
 Works exactly like [BelongsToMany](#belongstomany).
+
+## MorphedByMany
+
+Works exactly like [BelongsToMany](#belongstomany).
